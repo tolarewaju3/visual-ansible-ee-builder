@@ -109,4 +109,12 @@ All colors MUST be HSL.
   body {
     @apply bg-background text-foreground;
   }
+
+  .bg-code {
+    background-color: hsl(var(--code-background));
+  }
+
+  .text-terminal-green {
+    color: hsl(var(--terminal-green));
+  }
 }

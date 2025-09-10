@@ -10,23 +10,24 @@ import { Label } from "@/components/ui/label";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Separator } from "@/components/ui/separator";
 
-interface BuildConfig {
-  imageName: string;
-  imageTag: string;
-  collections: string[];
-  requirements: string[];
-  packages: string[];
+interface Collection {
+  name: string;
+  version?: string;
 }
 
-const Build = () => {
-  const [buildConfig] = useState<BuildConfig>({
-    imageName: "my-ansible-ee",
-    imageTag: "latest",
-    collections: ["ansible.posix:1.5.4", "community.general:7.2.1"],
-    requirements: ["requests>=2.28.0", "pyyaml>=6.0"],
-    packages: ["git", "curl", "openssh-client"]
-  });
+interface Step3Props {
+  selectedCollections: Collection[];
+  requirements: string[];
+  selectedPackages: string[];
+}
 
+export function Step3Build({
+  selectedCollections,
+  requirements,
+  selectedPackages,
+}: Step3Props) {
+  const [imageName, setImageName] = useState("my-ansible-ee");
+  const [imageTag, setImageTag] = useState("latest");
   const [isBuilding, setIsBuilding] = useState(false);
   const [buildProgress, setBuildProgress] = useState(0);
   const [buildStatus, setBuildStatus] = useState<'idle' | 'building' | 'success' | 'error'>('idle');
@@ -64,21 +65,25 @@ const Build = () => {
   };
 
   const generateDockerfile = () => {
+    const collections = selectedCollections.map(c => 
+      c.version ? `${c.name}:${c.version}` : c.name
+    );
+
     return `FROM quay.io/ansible/ansible-runner:latest
 
 # Install system packages
-RUN apt-get update && apt-get install -y \\
-    ${buildConfig.packages.join(' \\\n    ')} \\
+${selectedPackages.length > 0 ? `RUN apt-get update && apt-get install -y \\
+    ${selectedPackages.join(' \\\n    ')} \\
     && apt-get clean \\
-    && rm -rf /var/lib/apt/lists/*
+    && rm -rf /var/lib/apt/lists/*` : '# No system packages specified'}
 
 # Install Python requirements
-COPY requirements.txt /tmp/requirements.txt
-RUN pip install -r /tmp/requirements.txt
+${requirements.length > 0 ? `COPY requirements.txt /tmp/requirements.txt
+RUN pip install -r /tmp/requirements.txt` : '# No Python requirements specified'}
 
 # Install Ansible collections
-RUN ansible-galaxy collection install \\
-    ${buildConfig.collections.join(' \\\n    ')}
+${collections.length > 0 ? `RUN ansible-galaxy collection install \\
+    ${collections.join(' \\\n    ')}` : '# No collections specified'}
 
 # Set working directory
 WORKDIR /runner
@@ -87,10 +92,14 @@ WORKDIR /runner
 CMD ["ansible-runner"]`;
   };
 
+  const generateRequirementsTxt = () => {
+    return requirements.join('\n') || '# No requirements specified';
+  };
+
   return (
-    <div className="container mx-auto p-6">
-      <div className="mb-6">
-        <h1 className="text-3xl font-bold text-foreground mb-2">Build Configuration</h1>
+    <div className="space-y-6">
+      <div className="text-center mb-8">
+        <h1 className="text-3xl font-bold text-foreground mb-2">Build & Deploy</h1>
         <p className="text-muted-foreground">
           Review your configuration and build the execution environment
         </p>
@@ -110,11 +119,19 @@ CMD ["ansible-runner"]`;
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="imageName">Image Name</Label>
-                  <Input id="imageName" value={buildConfig.imageName} readOnly />
+                  <Input 
+                    id="imageName" 
+                    value={imageName} 
+                    onChange={(e) => setImageName(e.target.value)}
+                  />
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="imageTag">Tag</Label>
-                  <Input id="imageTag" value={buildConfig.imageTag} readOnly />
+                  <Input 
+                    id="imageTag" 
+                    value={imageTag} 
+                    onChange={(e) => setImageTag(e.target.value)}
+                  />
                 </div>
               </div>
             </CardContent>
@@ -127,40 +144,59 @@ CMD ["ansible-runner"]`;
             <CardContent className="space-y-4">
               <div className="space-y-3">
                 <div>
-                  <h4 className="text-sm font-medium text-foreground mb-2">Collections ({buildConfig.collections.length})</h4>
-                  <div className="flex flex-wrap gap-1">
-                    {buildConfig.collections.map((collection, index) => (
-                      <Badge key={index} variant="outline" className="font-mono text-xs">
-                        {collection}
-                      </Badge>
-                    ))}
-                  </div>
+                  <h4 className="text-sm font-medium text-foreground mb-2">
+                    Collections ({selectedCollections.length})
+                  </h4>
+                  {selectedCollections.length === 0 ? (
+                    <p className="text-sm text-muted-foreground">No collections selected</p>
+                  ) : (
+                    <div className="flex flex-wrap gap-1">
+                      {selectedCollections.map((collection, index) => (
+                        <Badge key={index} variant="outline" className="font-mono text-xs">
+                          {collection.name}
+                          {collection.version && `:${collection.version}`}
+                        </Badge>
+                      ))}
+                    </div>
+                  )}
                 </div>
 
                 <Separator />
 
                 <div>
-                  <h4 className="text-sm font-medium text-foreground mb-2">Requirements ({buildConfig.requirements.length})</h4>
-                  <div className="flex flex-wrap gap-1">
-                    {buildConfig.requirements.map((req, index) => (
-                      <Badge key={index} variant="outline" className="font-mono text-xs">
-                        {req}
-                      </Badge>
-                    ))}
-                  </div>
+                  <h4 className="text-sm font-medium text-foreground mb-2">
+                    Requirements ({requirements.length})
+                  </h4>
+                  {requirements.length === 0 ? (
+                    <p className="text-sm text-muted-foreground">No requirements specified</p>
+                  ) : (
+                    <div className="flex flex-wrap gap-1">
+                      {requirements.map((req, index) => (
+                        <Badge key={index} variant="outline" className="font-mono text-xs">
+                          {req}
+                        </Badge>
+                      ))}
+                    </div>
+                  )}
                 </div>
 
                 <Separator />
 
                 <div>
-                  <h4 className="text-sm font-medium text-foreground mb-2">Packages ({buildConfig.packages.length})</h4>
-                  <div className="flex flex-wrap gap-1">
-                    {buildConfig.packages.map((pkg, index) => (
-                      <Badge key={index} variant="outline" className="font-mono text-xs">
-                        {pkg}
-                      </Badge>
-                    ))}
-                  </div>
+                  <h4 className="text-sm font-medium text-foreground mb-2">
+                    Packages ({selectedPackages.length})
+                  </h4>
+                  {selectedPackages.length === 0 ? (
+                    <p className="text-sm text-muted-foreground">No packages selected</p>
+                  ) : (
+                    <div className="flex flex-wrap gap-1">
+                      {selectedPackages.map((pkg, index) => (
+                        <Badge key={index} variant="outline" className="font-mono text-xs">
+                          {pkg}
+                        </Badge>
+                      ))}
+                    </div>
+                  )}
                 </div>
               </div>
             </CardContent>
@@ -231,20 +267,34 @@ CMD ["ansible-runner"]`;
               <CardTitle className="flex items-center justify-between">
                 <div className="flex items-center space-x-2">
                   <FileText className="h-5 w-5 text-primary" />
-                  <span>Generated Dockerfile</span>
+                  <span>Generated Files</span>
                 </div>
                 <Button variant="outline" size="sm">
                   <Download className="h-4 w-4 mr-2" />
-                  Export
+                  Export All
                 </Button>
               </CardTitle>
             </CardHeader>
-            <CardContent>
-              <Textarea
-                value={generateDockerfile()}
-                readOnly
-                className="font-mono text-sm min-h-48 bg-code text-foreground"
-              />
+            <CardContent className="space-y-4">
+              <div className="space-y-2">
+                <h5 className="text-sm font-medium">Dockerfile</h5>
+                <Textarea
+                  value={generateDockerfile()}
+                  readOnly
+                  className="font-mono text-xs min-h-32 bg-code text-foreground"
+                />
+              </div>
+
+              {requirements.length > 0 && (
+                <div className="space-y-2">
+                  <h5 className="text-sm font-medium">requirements.txt</h5>
+                  <Textarea
+                    value={generateRequirementsTxt()}
+                    readOnly
+                    className="font-mono text-xs min-h-16 bg-code text-foreground"
+                  />
+                </div>
+              )}
             </CardContent>
           </Card>
 
@@ -269,6 +319,4 @@ CMD ["ansible-runner"]`;
       </div>
     </div>
   );
-};
-
-export default Build;
+}

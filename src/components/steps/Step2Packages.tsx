@@ -19,28 +19,28 @@ const systemPackages = [
   { name: "gcc", description: "GNU Compiler Collection", category: "development" },
 ];
 
-const Packages = () => {
-  const [selectedPackages, setSelectedPackages] = useState<string[]>([
-    "git",
-    "curl",
-    "openssh-client"
-  ]);
+interface Step2Props {
+  selectedPackages: string[];
+  onPackagesChange: (packages: string[]) => void;
+}
+
+export function Step2Packages({ selectedPackages, onPackagesChange }: Step2Props) {
   const [searchQuery, setSearchQuery] = useState("");
   const [customPackage, setCustomPackage] = useState("");
 
   const addPackage = (packageName: string) => {
     if (!selectedPackages.includes(packageName)) {
-      setSelectedPackages([...selectedPackages, packageName]);
+      onPackagesChange([...selectedPackages, packageName]);
     }
   };
 
   const removePackage = (packageName: string) => {
-    setSelectedPackages(selectedPackages.filter(p => p !== packageName));
+    onPackagesChange(selectedPackages.filter(p => p !== packageName));
   };
 
   const addCustomPackage = () => {
     if (customPackage.trim() && !selectedPackages.includes(customPackage.trim())) {
-      setSelectedPackages([...selectedPackages, customPackage.trim()]);
+      onPackagesChange([...selectedPackages, customPackage.trim()]);
       setCustomPackage("");
     }
   };
@@ -59,8 +59,8 @@ const Packages = () => {
   }, {} as Record<string, typeof systemPackages>);
 
   return (
-    <div className="container mx-auto p-6">
-      <div className="mb-6">
+    <div className="space-y-6">
+      <div className="text-center mb-8">
         <h1 className="text-3xl font-bold text-foreground mb-2">System Packages</h1>
         <p className="text-muted-foreground">
           Select system packages to install in your execution environment
@@ -179,6 +179,4 @@ const Packages = () => {
       </Card>
     </div>
   );
-};
-
-export default Packages;
+}
