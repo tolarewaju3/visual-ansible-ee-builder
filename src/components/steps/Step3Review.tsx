@@ -41,7 +41,8 @@ dependencies:
   galaxy: requirements.yml
   python: requirements.txt
   system: bindep.txt
-
+options:
+    package_manager_path: /usr/bin/microdnf
 additional_build_steps:
   prepend_base:
     - RUN whoami
