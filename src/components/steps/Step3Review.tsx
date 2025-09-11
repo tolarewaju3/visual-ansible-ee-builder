@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
 import { Separator } from "@/components/ui/separator";
+import JSZip from "jszip";
 
 interface Collection {
   name: string;
@@ -66,6 +67,27 @@ additional_build_steps:
     return `---
 collections:
 ${selectedCollections.map(c => `  - name: ${c.name}${c.version ? `\n    version: "${c.version}"` : ''}`).join('\n')}`;
+  };
+
+  const handleExportAll = async () => {
+    const zip = new JSZip();
+    
+    // Add all generated files to the zip
+    zip.file("execution-environment.yml", generateExecutionEnvironment());
+    zip.file("requirements.yml", generateRequirementsYml());
+    zip.file("requirements.txt", generateRequirementsTxt());
+    zip.file("bindep.txt", generateBindepsTxt());
+    
+    // Generate and download the zip file
+    const content = await zip.generateAsync({ type: "blob" });
+    const url = URL.createObjectURL(content);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = "ee.zip";
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
   };
 
   return (
@@ -163,7 +185,7 @@ ${selectedCollections.map(c => `  - name: ${c.name}${c.version ? `\n    version:
                 <FileText className="h-5 w-5 text-primary" />
                 <span>Generated Files</span>
               </div>
-              <Button variant="outline" size="sm">
+              <Button variant="outline" size="sm" onClick={handleExportAll}>
                 <Download className="h-4 w-4 mr-2" />
                 Export All
               </Button>
