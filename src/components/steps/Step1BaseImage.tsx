@@ -56,8 +56,7 @@ export function Step1BaseImage({ selectedBaseImage, onBaseImageChange }: Step1Ba
         <Container className="mx-auto h-12 w-12 text-primary" />
         <h2 className="text-2xl font-bold">Select Base Container Image</h2>
         <p className="text-muted-foreground max-w-2xl mx-auto">
-          Choose the foundation container image for your Ansible Execution Environment. 
-          Red Hat UBI images are recommended for production workloads.
+          Choose a base image for your Ansible Execution Environment. 
         </p>
       </div>
 
