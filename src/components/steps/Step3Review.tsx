@@ -34,15 +34,20 @@ export function Step3Review({
       '  ansible_core:',
       '    package_pip: ansible-core==2.14.4',
       '  ansible_runner:',
-      '    package_pip: ansible-runner',
-      '  galaxy: requirements.yml'
+      '    package_pip: ansible-runner'
     ];
+
+    if (selectedCollections.length > 0) {
+      dependenciesLines.push('  galaxy: requirements.yml');
+    }
 
     if (requirements.length > 0) {
       dependenciesLines.push('  python: requirements.txt');
     }
 
-    dependenciesLines.push('  system: bindep.txt');
+    if (selectedPackages.length > 0) {
+      dependenciesLines.push('  system: bindep.txt');
+    }
 
     return `---
 version: 3
@@ -56,18 +61,14 @@ ${dependenciesLines.join('\n')}`;
   };
 
   const generateRequirementsTxt = () => {
-    return requirements.join('\n') || '# No Python requirements specified';
+    return requirements.join('\n');
   };
 
   const generateBindepsTxt = () => {
-    return selectedPackages.join('\n') || '# No system packages specified';
+    return selectedPackages.join('\n');
   };
 
   const generateRequirementsYml = () => {
-    if (selectedCollections.length === 0) {
-      return '# No collections specified';
-    }
-    
     return `---
 collections:
 ${selectedCollections.map(c => `  - name: ${c.name}${c.version ? `\n    version: "${c.version}"` : ''}`).join('\n')}`;
@@ -78,14 +79,21 @@ ${selectedCollections.map(c => `  - name: ${c.name}${c.version ? `\n    version:
     
     // Add all generated files to the zip
     zip.file("execution-environment.yml", generateExecutionEnvironment());
-    zip.file("requirements.yml", generateRequirementsYml());
+    
+    // Only include requirements.yml if there are collections
+    if (selectedCollections.length > 0) {
+      zip.file("requirements.yml", generateRequirementsYml());
+    }
     
     // Only include requirements.txt if there are Python requirements
     if (requirements.length > 0) {
       zip.file("requirements.txt", generateRequirementsTxt());
     }
     
-    zip.file("bindep.txt", generateBindepsTxt());
+    // Only include bindep.txt if there are system packages
+    if (selectedPackages.length > 0) {
+      zip.file("bindep.txt", generateBindepsTxt());
+    }
     
     // Generate and download the zip file
     const content = await zip.generateAsync({ type: "blob" });
@@ -216,20 +224,22 @@ ${selectedCollections.map(c => `  - name: ${c.name}${c.version ? `\n    version:
               </CollapsibleContent>
             </Collapsible>
 
-            <Collapsible>
-              <CollapsibleTrigger className="flex items-center justify-between w-full p-3 rounded-md border border-border bg-background hover:bg-muted text-left transition-colors">
-                <span className="text-sm font-medium text-foreground">requirements.yml</span>
-                <ChevronDown className="h-4 w-4 text-muted-foreground transition-transform data-[state=open]:rotate-180" />
-              </CollapsibleTrigger>
-              <CollapsibleContent className="mt-2 px-1">
-                <Textarea
-                  value={generateRequirementsYml()}
-                  readOnly
-                  rows={generateRequirementsYml().split('\n').length}
-                  className="font-mono text-xs bg-muted/30 text-foreground border resize-none"
-                />
-              </CollapsibleContent>
-            </Collapsible>
+            {selectedCollections.length > 0 && (
+              <Collapsible>
+                <CollapsibleTrigger className="flex items-center justify-between w-full p-3 rounded-md border border-border bg-background hover:bg-muted text-left transition-colors">
+                  <span className="text-sm font-medium text-foreground">requirements.yml</span>
+                  <ChevronDown className="h-4 w-4 text-muted-foreground transition-transform data-[state=open]:rotate-180" />
+                </CollapsibleTrigger>
+                <CollapsibleContent className="mt-2 px-1">
+                  <Textarea
+                    value={generateRequirementsYml()}
+                    readOnly
+                    rows={generateRequirementsYml().split('\n').length}
+                    className="font-mono text-xs bg-muted/30 text-foreground border resize-none"
+                  />
+                </CollapsibleContent>
+              </Collapsible>
+            )}
 
             {requirements.length > 0 && (
               <Collapsible>
@@ -248,20 +258,22 @@ ${selectedCollections.map(c => `  - name: ${c.name}${c.version ? `\n    version:
               </Collapsible>
             )}
 
-            <Collapsible>
-              <CollapsibleTrigger className="flex items-center justify-between w-full p-3 rounded-md border border-border bg-background hover:bg-muted text-left transition-colors">
-                <span className="text-sm font-medium text-foreground">bindep.txt</span>
-                <ChevronDown className="h-4 w-4 text-muted-foreground transition-transform data-[state=open]:rotate-180" />
-              </CollapsibleTrigger>
-              <CollapsibleContent className="mt-2 px-1">
-                <Textarea
-                  value={generateBindepsTxt()}
-                  readOnly
-                  rows={generateBindepsTxt().split('\n').length}
-                  className="font-mono text-xs bg-muted/30 text-foreground border resize-none"
-                />
-              </CollapsibleContent>
-            </Collapsible>
+            {selectedPackages.length > 0 && (
+              <Collapsible>
+                <CollapsibleTrigger className="flex items-center justify-between w-full p-3 rounded-md border border-border bg-background hover:bg-muted text-left transition-colors">
+                  <span className="text-sm font-medium text-foreground">bindep.txt</span>
+                  <ChevronDown className="h-4 w-4 text-muted-foreground transition-transform data-[state=open]:rotate-180" />
+                </CollapsibleTrigger>
+                <CollapsibleContent className="mt-2 px-1">
+                  <Textarea
+                    value={generateBindepsTxt()}
+                    readOnly
+                    rows={generateBindepsTxt().split('\n').length}
+                    className="font-mono text-xs bg-muted/30 text-foreground border resize-none"
+                  />
+                </CollapsibleContent>
+              </Collapsible>
+            )}
           </CardContent>
         </Card>
       </div>
