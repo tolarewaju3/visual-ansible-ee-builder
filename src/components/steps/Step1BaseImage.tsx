@@ -128,7 +128,7 @@ export function Step1BaseImage({ selectedBaseImage, onBaseImageChange }: Step1Ba
 
           {/* Base Images */}
           <RadioGroup
-            value={useCustom ? "custom" : selectedBaseImage}
+            value={useCustom ? "custom" : popularBaseImages.find(img => `${img.name}:${img.tag}` === selectedBaseImage)?.id || ""}
             onValueChange={(value) => {
               if (value === "custom") {
                 setUseCustom(true);
