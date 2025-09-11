@@ -1,11 +1,12 @@
 // Ansible Execution Environment Builder
 import { useState } from "react";
-import { Container, Layers, Package, Play, ChevronLeft, ChevronRight } from "lucide-react";
+import { Container, Layers, Package, Play, ChevronLeft, ChevronRight, Eye } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { StepNavigation } from "@/components/StepNavigation";
 import { Step1BaseImage } from "@/components/steps/Step1BaseImage";
 import { Step2CollectionsRequirements } from "@/components/steps/Step2CollectionsRequirements";
-import { Step3Build } from "@/components/steps/Step3Build";
+import { Step3Review } from "@/components/steps/Step3Review";
+import { Step4Build } from "@/components/steps/Step4Build";
 
 interface Collection {
   name: string;
@@ -27,8 +28,14 @@ const steps = [
   },
   {
     id: 3,
+    title: "Review",
+    description: "Review configuration and generated files",
+    icon: Eye,
+  },
+  {
+    id: 4,
     title: "Build & Deploy",
-    description: "Configure and build your execution environment",
+    description: "Build and deploy your execution environment",
     icon: Play,
   },
 ];
@@ -58,6 +65,9 @@ const Builder = () => {
         // Can always proceed from step 2, even with empty selections
         return true;
       case 3:
+        // Can always proceed from review step
+        return true;
+      case 4:
         // Final step, no next
         return false;
       default:
@@ -103,7 +113,16 @@ const Builder = () => {
         );
       case 3:
         return (
-          <Step3Build
+          <Step3Review
+            selectedBaseImage={selectedBaseImage}
+            selectedCollections={selectedCollections}
+            requirements={requirements}
+            selectedPackages={selectedPackages}
+          />
+        );
+      case 4:
+        return (
+          <Step4Build
             selectedBaseImage={selectedBaseImage}
             selectedCollections={selectedCollections}
             requirements={requirements}
