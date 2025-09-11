@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Search, Container } from "lucide-react";
+import { Container } from "lucide-react";
 
 interface BaseImage {
   id: string;
@@ -47,14 +47,8 @@ interface Step1BaseImageProps {
 }
 
 export function Step1BaseImage({ selectedBaseImage, onBaseImageChange }: Step1BaseImageProps) {
-  const [searchTerm, setSearchTerm] = useState("");
   const [customImage, setCustomImage] = useState("");
   const [useCustom, setUseCustom] = useState(false);
-
-  const filteredImages = popularBaseImages.filter(image =>
-    image.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    image.description.toLowerCase().includes(searchTerm.toLowerCase())
-  );
 
   const handleImageSelect = (imageId: string) => {
     const image = popularBaseImages.find(img => img.id === imageId);
@@ -83,27 +77,12 @@ export function Step1BaseImage({ selectedBaseImage, onBaseImageChange }: Step1Ba
 
       <Card>
         <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Search className="h-5 w-5" />
-            Popular Base Images
-          </CardTitle>
+          <CardTitle>Popular Base Images</CardTitle>
           <CardDescription>
             Select from commonly used base images or specify a custom one
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          {/* Search */}
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
-            <Input
-              placeholder="Search base images..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-10"
-            />
-          </div>
-
-          {/* Base Images */}
           <RadioGroup
             value={useCustom ? "custom" : popularBaseImages.find(img => `${img.name}:${img.tag}` === selectedBaseImage)?.id || ""}
             onValueChange={(value) => {
@@ -116,7 +95,7 @@ export function Step1BaseImage({ selectedBaseImage, onBaseImageChange }: Step1Ba
             }}
             className="space-y-3"
           >
-            {filteredImages.map((image) => (
+            {popularBaseImages.map((image) => (
               <div key={image.id} className="flex items-start space-x-3 p-4 rounded-lg border hover:bg-muted/50 transition-colors">
                 <RadioGroupItem value={image.id} className="mt-1" />
                 <div className="flex-1 space-y-2">
