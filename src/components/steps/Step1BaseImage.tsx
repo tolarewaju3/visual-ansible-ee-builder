@@ -17,7 +17,7 @@ const popularBaseImages: BaseImage[] = [
     id: "ubi9/python-311",
     name: "registry.access.redhat.com/ubi9/python-311",
     tag: "latest",
-    description: "Red Hat Universal Base Image 9 w/ Python",
+    description: "Red Hat Universal Base Image 9",
     size: "234 MB",
     popular: true,
   },
@@ -32,7 +32,7 @@ const popularBaseImages: BaseImage[] = [
     id: "ee-minimal-rhel9",
     name: "registry.redhat.io/ansible-automation-platform-25/ee-minimal-rhel9",
     tag: "latest",
-    description: "Official AAP EE base (RHEL 9)",
+    description: "Red Hat AAP EE base (RHEL 9)",
     size: "77 MB",
   },
 ];
