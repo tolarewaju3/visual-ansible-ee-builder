@@ -42,19 +42,10 @@ const steps = [
 
 const Builder = () => {
   const [currentStep, setCurrentStep] = useState(1);
-  const [selectedBaseImage, setSelectedBaseImage] = useState("registry.redhat.io/ubi8/ubi:latest");
-  const [selectedCollections, setSelectedCollections] = useState<Collection[]>([
-    { name: "ansible.posix", version: "1.5.4" }
-  ]);
-  const [requirements, setRequirements] = useState<string[]>([
-    "requests>=2.28.0",
-    "pyyaml>=6.0"
-  ]);
-  const [selectedPackages, setSelectedPackages] = useState<string[]>([
-    "git",
-    "curl",
-    "openssh-client"
-  ]);
+  const [selectedBaseImage, setSelectedBaseImage] = useState("registry.access.redhat.com/ubi9/python-311:latest");
+  const [selectedCollections, setSelectedCollections] = useState<Collection[]>([]);
+  const [requirements, setRequirements] = useState<string[]>([]);
+  const [selectedPackages, setSelectedPackages] = useState<string[]>([]);
 
   const canGoNext = () => {
     switch (currentStep) {
