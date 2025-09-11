@@ -19,7 +19,6 @@ const popularBaseImages: BaseImage[] = [
     tag: "latest",
     description: "Red Hat Universal Base Image 9",
     size: "234 MB",
-    popular: true,
   },
   {
     id: "fedora",
@@ -83,9 +82,6 @@ export function Step1BaseImage({ selectedBaseImage, onBaseImageChange }: Step1Ba
                     <code className="text-sm font-mono bg-muted px-2 py-1 rounded">
                       {image.name}:{image.tag}
                     </code>
-                    {image.popular && (
-                      <Badge variant="secondary" className="text-xs">Popular</Badge>
-                    )}
                     <span className="text-xs text-muted-foreground ml-auto">{image.size}</span>
                   </div>
                   <p className="text-sm text-muted-foreground">{image.description}</p>
