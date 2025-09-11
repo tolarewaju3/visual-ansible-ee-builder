@@ -212,8 +212,7 @@ additional_build_steps:
                 <Textarea
                   value={generateExecutionEnvironment()}
                   readOnly
-                  rows={generateExecutionEnvironment().split('\n').length}
-                  className="font-mono text-xs bg-muted/30 text-foreground border resize-none"
+                  className="font-mono text-xs min-h-32 bg-muted/30 text-foreground border resize-none"
                 />
               </CollapsibleContent>
             </Collapsible>
@@ -227,8 +226,7 @@ additional_build_steps:
                 <Textarea
                   value={generateRequirementsTxt()}
                   readOnly
-                  rows={Math.max(3, generateRequirementsTxt().split('\n').length)}
-                  className="font-mono text-xs bg-muted/30 text-foreground border resize-none"
+                  className="font-mono text-xs min-h-16 bg-muted/30 text-foreground border resize-none"
                 />
               </CollapsibleContent>
             </Collapsible>
@@ -242,32 +240,12 @@ additional_build_steps:
                 <Textarea
                   value={generateBindepsTxt()}
                   readOnly
-                  rows={Math.max(3, generateBindepsTxt().split('\n').length)}
-                  className="font-mono text-xs bg-muted/30 text-foreground border resize-none"
+                  className="font-mono text-xs min-h-16 bg-muted/30 text-foreground border resize-none"
                 />
               </CollapsibleContent>
             </Collapsible>
           </CardContent>
         </Card>
-
-        {/* Build Logs */}
-        {buildLogs && (
-          <Card className="bg-card border-border">
-            <CardHeader>
-              <CardTitle className="flex items-center space-x-2">
-                <FileText className="h-5 w-5 text-primary" />
-                <span>Build Logs</span>
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <Textarea
-                value={buildLogs}
-                readOnly
-                className="font-mono text-sm min-h-32 bg-code text-terminal-green resize-none"
-              />
-            </CardContent>
-          </Card>
-        )}
 
         {/* Build Configuration */}
         <Card className="bg-card border-border">
@@ -345,22 +323,6 @@ additional_build_steps:
                     Build failed. Check the logs for more details.
                   </AlertDescription>
                 </Alert>
-              )}
-
-              {/* Build Logs */}
-              {buildLogs && (
-                <div className="space-y-2">
-                  <Separator />
-                  <div className="space-y-2">
-                    <h4 className="text-sm font-medium text-foreground">Build Logs</h4>
-                    <Textarea
-                      value={buildLogs}
-                      readOnly
-                      rows={Math.min(15, Math.max(8, buildLogs.split('\n').length))}
-                      className="font-mono text-sm bg-code text-terminal-green resize-none"
-                    />
-                  </div>
-                </div>
               )}
             </div>
           </CardContent>
