@@ -282,43 +282,43 @@ additional_build_steps:
             </CardHeader>
             <CardContent className="space-y-3">
               <Collapsible>
-                <CollapsibleTrigger className="flex items-center justify-between w-full p-3 rounded-md border bg-muted/50 hover:bg-muted text-left">
-                  <span className="text-sm font-medium">execution-environment.yml</span>
-                  <ChevronDown className="h-4 w-4 transition-transform data-[state=open]:rotate-180" />
+                <CollapsibleTrigger className="flex items-center justify-between w-full p-3 rounded-md border border-border bg-background hover:bg-muted text-left transition-colors">
+                  <span className="text-sm font-medium text-foreground">execution-environment.yml</span>
+                  <ChevronDown className="h-4 w-4 text-muted-foreground transition-transform data-[state=open]:rotate-180" />
                 </CollapsibleTrigger>
-                <CollapsibleContent className="mt-2">
+                <CollapsibleContent className="mt-2 px-1">
                   <Textarea
                     value={generateExecutionEnvironment()}
                     readOnly
-                    className="font-mono text-xs min-h-32 bg-code text-foreground"
+                    className="font-mono text-xs min-h-32 bg-muted/30 text-foreground border resize-none"
                   />
                 </CollapsibleContent>
               </Collapsible>
 
               <Collapsible>
-                <CollapsibleTrigger className="flex items-center justify-between w-full p-3 rounded-md border bg-muted/50 hover:bg-muted text-left">
-                  <span className="text-sm font-medium">requirements.txt</span>
-                  <ChevronDown className="h-4 w-4 transition-transform data-[state=open]:rotate-180" />
+                <CollapsibleTrigger className="flex items-center justify-between w-full p-3 rounded-md border border-border bg-background hover:bg-muted text-left transition-colors">
+                  <span className="text-sm font-medium text-foreground">requirements.txt</span>
+                  <ChevronDown className="h-4 w-4 text-muted-foreground transition-transform data-[state=open]:rotate-180" />
                 </CollapsibleTrigger>
-                <CollapsibleContent className="mt-2">
+                <CollapsibleContent className="mt-2 px-1">
                   <Textarea
                     value={generateRequirementsTxt()}
                     readOnly
-                    className="font-mono text-xs min-h-16 bg-code text-foreground"
+                    className="font-mono text-xs min-h-16 bg-muted/30 text-foreground border resize-none"
                   />
                 </CollapsibleContent>
               </Collapsible>
 
               <Collapsible>
-                <CollapsibleTrigger className="flex items-center justify-between w-full p-3 rounded-md border bg-muted/50 hover:bg-muted text-left">
-                  <span className="text-sm font-medium">bindep.txt</span>
-                  <ChevronDown className="h-4 w-4 transition-transform data-[state=open]:rotate-180" />
+                <CollapsibleTrigger className="flex items-center justify-between w-full p-3 rounded-md border border-border bg-background hover:bg-muted text-left transition-colors">
+                  <span className="text-sm font-medium text-foreground">bindep.txt</span>
+                  <ChevronDown className="h-4 w-4 text-muted-foreground transition-transform data-[state=open]:rotate-180" />
                 </CollapsibleTrigger>
-                <CollapsibleContent className="mt-2">
+                <CollapsibleContent className="mt-2 px-1">
                   <Textarea
                     value={generateBindepsTxt()}
                     readOnly
-                    className="font-mono text-xs min-h-16 bg-code text-foreground"
+                    className="font-mono text-xs min-h-16 bg-muted/30 text-foreground border resize-none"
                   />
                 </CollapsibleContent>
               </Collapsible>
