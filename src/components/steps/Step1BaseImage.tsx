@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Container } from "lucide-react";
+import { Search, Container } from "lucide-react";
 
 interface BaseImage {
   id: string;
@@ -18,14 +18,6 @@ interface BaseImage {
 
 const popularBaseImages: BaseImage[] = [
   {
-    id: "ubi8",
-    name: "registry.redhat.io/ubi8/ubi",
-    tag: "latest",
-    description: "Red Hat Universal Base Image 8 - Recommended for production",
-    size: "234 MB",
-    popular: true,
-  },
-  {
     id: "ubi9",
     name: "registry.redhat.io/ubi9/ubi",
     tag: "latest", 
@@ -34,10 +26,10 @@ const popularBaseImages: BaseImage[] = [
     popular: true,
   },
   {
-    id: "minimal-ubi8",
-    name: "registry.redhat.io/ubi8/ubi-minimal",
+    id: "minimal-ubi9",
+    name: "registry.redhat.io/ubi9/ubi-minimal",
     tag: "latest",
-    description: "Minimal UBI8 image with reduced footprint",
+    description: "Minimal UBI9 image with reduced footprint",
     size: "103 MB",
     popular: true,
   },
@@ -54,14 +46,7 @@ const popularBaseImages: BaseImage[] = [
     tag: "stream9",
     description: "CentOS Stream 9 - Community distribution",
     size: "156 MB",
-  },
-  {
-    id: "ubuntu",
-    name: "ubuntu",
-    tag: "22.04",
-    description: "Ubuntu 22.04 LTS - Long term support",
-    size: "77 MB",
-  },
+  }
 ];
 
 interface Step1BaseImageProps {
@@ -70,8 +55,14 @@ interface Step1BaseImageProps {
 }
 
 export function Step1BaseImage({ selectedBaseImage, onBaseImageChange }: Step1BaseImageProps) {
+  const [searchTerm, setSearchTerm] = useState("");
   const [customImage, setCustomImage] = useState("");
   const [useCustom, setUseCustom] = useState(false);
+
+  const filteredImages = popularBaseImages.filter(image =>
+    image.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    image.description.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   const handleImageSelect = (imageId: string) => {
     const image = popularBaseImages.find(img => img.id === imageId);
@@ -100,12 +91,27 @@ export function Step1BaseImage({ selectedBaseImage, onBaseImageChange }: Step1Ba
 
       <Card>
         <CardHeader>
-          <CardTitle>Popular Base Images</CardTitle>
+          <CardTitle className="flex items-center gap-2">
+            <Search className="h-5 w-5" />
+            Popular Base Images
+          </CardTitle>
           <CardDescription>
             Select from commonly used base images or specify a custom one
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
+          {/* Search */}
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
+            <Input
+              placeholder="Search base images..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="pl-10"
+            />
+          </div>
+
+          {/* Base Images */}
           <RadioGroup
             value={useCustom ? "custom" : popularBaseImages.find(img => `${img.name}:${img.tag}` === selectedBaseImage)?.id || ""}
             onValueChange={(value) => {
@@ -118,7 +124,7 @@ export function Step1BaseImage({ selectedBaseImage, onBaseImageChange }: Step1Ba
             }}
             className="space-y-3"
           >
-            {popularBaseImages.map((image) => (
+            {filteredImages.map((image) => (
               <div key={image.id} className="flex items-start space-x-3 p-4 rounded-lg border hover:bg-muted/50 transition-colors">
                 <RadioGroupItem value={image.id} className="mt-1" />
                 <div className="flex-1 space-y-2">
