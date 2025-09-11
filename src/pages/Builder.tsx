@@ -1,10 +1,11 @@
 import { useState } from "react";
-import { Layers, Package, Play, ChevronLeft, ChevronRight } from "lucide-react";
+import { Container, Layers, Package, Play, ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { StepNavigation } from "@/components/StepNavigation";
-import { Step1CollectionsRequirements } from "@/components/steps/Step1CollectionsRequirements";
-import { Step2Packages } from "@/components/steps/Step2Packages";
-import { Step3Build } from "@/components/steps/Step3Build";
+import { Step1BaseImage } from "@/components/steps/Step1BaseImage";
+import { Step2CollectionsRequirements } from "@/components/steps/Step2CollectionsRequirements";
+import { Step3Packages } from "@/components/steps/Step3Packages";
+import { Step4Build } from "@/components/steps/Step4Build";
 
 interface Collection {
   name: string;
@@ -14,18 +15,24 @@ interface Collection {
 const steps = [
   {
     id: 1,
+    title: "Base Image",
+    description: "Select container base image",
+    icon: Container,
+  },
+  {
+    id: 2,
     title: "Collections & Requirements",
     description: "Ansible collections and Python dependencies",
     icon: Layers,
   },
   {
-    id: 2,
+    id: 3,
     title: "System Packages",
     description: "Operating system packages and utilities",
     icon: Package,
   },
   {
-    id: 3,
+    id: 4,
     title: "Build & Deploy",
     description: "Configure and build your execution environment",
     icon: Play,
@@ -34,6 +41,7 @@ const steps = [
 
 const Builder = () => {
   const [currentStep, setCurrentStep] = useState(1);
+  const [selectedBaseImage, setSelectedBaseImage] = useState("registry.redhat.io/ubi8/ubi:latest");
   const [selectedCollections, setSelectedCollections] = useState<Collection[]>([
     { name: "ansible.posix", version: "1.5.4" }
   ]);
@@ -50,12 +58,15 @@ const Builder = () => {
   const canGoNext = () => {
     switch (currentStep) {
       case 1:
-        // Can always proceed from step 1, even with empty selections
-        return true;
+        // Can proceed if base image is selected
+        return selectedBaseImage.trim() !== "";
       case 2:
         // Can always proceed from step 2, even with empty selections
         return true;
       case 3:
+        // Can always proceed from step 3, even with empty selections
+        return true;
+      case 4:
         // Final step, no next
         return false;
       default:
@@ -83,23 +94,31 @@ const Builder = () => {
     switch (currentStep) {
       case 1:
         return (
-          <Step1CollectionsRequirements
+          <Step1BaseImage
+            selectedBaseImage={selectedBaseImage}
+            onBaseImageChange={setSelectedBaseImage}
+          />
+        );
+      case 2:
+        return (
+          <Step2CollectionsRequirements
             selectedCollections={selectedCollections}
             requirements={requirements}
             onCollectionsChange={setSelectedCollections}
             onRequirementsChange={setRequirements}
           />
         );
-      case 2:
+      case 3:
         return (
-          <Step2Packages
+          <Step3Packages
             selectedPackages={selectedPackages}
             onPackagesChange={setSelectedPackages}
           />
         );
-      case 3:
+      case 4:
         return (
-          <Step3Build
+          <Step4Build
+            selectedBaseImage={selectedBaseImage}
             selectedCollections={selectedCollections}
             requirements={requirements}
             selectedPackages={selectedPackages}

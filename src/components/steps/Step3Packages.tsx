@@ -19,12 +19,12 @@ const systemPackages = [
   { name: "gcc", description: "GNU Compiler Collection", category: "development" },
 ];
 
-interface Step2Props {
+interface Step3PackagesProps {
   selectedPackages: string[];
   onPackagesChange: (packages: string[]) => void;
 }
 
-export function Step2Packages({ selectedPackages, onPackagesChange }: Step2Props) {
+export function Step3Packages({ selectedPackages, onPackagesChange }: Step3PackagesProps) {
   const [searchQuery, setSearchQuery] = useState("");
   const [customPackage, setCustomPackage] = useState("");
 

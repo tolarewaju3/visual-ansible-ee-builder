@@ -15,17 +15,19 @@ interface Collection {
   version?: string;
 }
 
-interface Step3Props {
+interface Step4BuildProps {
+  selectedBaseImage: string;
   selectedCollections: Collection[];
   requirements: string[];
   selectedPackages: string[];
 }
 
-export function Step3Build({
+export function Step4Build({
+  selectedBaseImage,
   selectedCollections,
   requirements,
   selectedPackages,
-}: Step3Props) {
+}: Step4BuildProps) {
   const [imageName, setImageName] = useState("my-ansible-ee");
   const [imageTag, setImageTag] = useState("latest");
   const [isBuilding, setIsBuilding] = useState(false);

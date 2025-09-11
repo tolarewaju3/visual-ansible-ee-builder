@@ -22,19 +22,19 @@ interface Collection {
   version?: string;
 }
 
-interface Step1Props {
+interface Step2CollectionsRequirementsProps {
   selectedCollections: Collection[];
   requirements: string[];
   onCollectionsChange: (collections: Collection[]) => void;
   onRequirementsChange: (requirements: string[]) => void;
 }
 
-export function Step1CollectionsRequirements({
+export function Step2CollectionsRequirements({
   selectedCollections,
   requirements,
   onCollectionsChange,
   onRequirementsChange,
-}: Step1Props) {
+}: Step2CollectionsRequirementsProps) {
   const [searchQuery, setSearchQuery] = useState("");
   const [newRequirement, setNewRequirement] = useState("");
   const [requirementsText, setRequirementsText] = useState("");
