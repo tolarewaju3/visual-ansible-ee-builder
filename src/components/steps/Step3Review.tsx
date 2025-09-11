@@ -37,7 +37,7 @@ images:
   base_image:
     name: '${selectedBaseImage}'
 
-dependencies
+dependencies:
   ansible_core:
     package_pip: ansible-core==2.14.4
   ansible_runner:
