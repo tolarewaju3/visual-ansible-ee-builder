@@ -1,9 +1,5 @@
-import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Container } from "lucide-react";
 
@@ -47,21 +43,11 @@ interface Step1BaseImageProps {
 }
 
 export function Step1BaseImage({ selectedBaseImage, onBaseImageChange }: Step1BaseImageProps) {
-  const [customImage, setCustomImage] = useState("");
-  const [useCustom, setUseCustom] = useState(false);
-
   const handleImageSelect = (imageId: string) => {
     const image = popularBaseImages.find(img => img.id === imageId);
     if (image) {
       onBaseImageChange(`${image.name}:${image.tag}`);
-      setUseCustom(false);
     }
-  };
-
-  const handleCustomImageChange = (value: string) => {
-    setCustomImage(value);
-    onBaseImageChange(value);
-    setUseCustom(true);
   };
 
   return (
@@ -79,19 +65,14 @@ export function Step1BaseImage({ selectedBaseImage, onBaseImageChange }: Step1Ba
         <CardHeader>
           <CardTitle>Popular Base Images</CardTitle>
           <CardDescription>
-            Select from commonly used base images or specify a custom one
+            Select from commonly used base images
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <RadioGroup
-            value={useCustom ? "custom" : popularBaseImages.find(img => `${img.name}:${img.tag}` === selectedBaseImage)?.id || ""}
+            value={popularBaseImages.find(img => `${img.name}:${img.tag}` === selectedBaseImage)?.id || ""}
             onValueChange={(value) => {
-              if (value === "custom") {
-                setUseCustom(true);
-                onBaseImageChange(customImage);
-              } else {
-                handleImageSelect(value);
-              }
+              handleImageSelect(value);
             }}
             className="space-y-3"
           >
@@ -112,23 +93,6 @@ export function Step1BaseImage({ selectedBaseImage, onBaseImageChange }: Step1Ba
                 </div>
               </div>
             ))}
-
-            {/* Custom Image Option */}
-            <div className="flex items-start space-x-3 p-4 rounded-lg border hover:bg-muted/50 transition-colors">
-              <RadioGroupItem value="custom" className="mt-1" />
-              <div className="flex-1 space-y-3">
-                <div>
-                  <Label className="text-sm font-medium">Custom Base Image</Label>
-                  <p className="text-xs text-muted-foreground">Specify your own container image</p>
-                </div>
-                <Input
-                  placeholder="e.g., my-registry.com/my-image:latest"
-                  value={customImage}
-                  onChange={(e) => handleCustomImageChange(e.target.value)}
-                  className="font-mono text-sm"
-                />
-              </div>
-            </div>
           </RadioGroup>
         </CardContent>
       </Card>
