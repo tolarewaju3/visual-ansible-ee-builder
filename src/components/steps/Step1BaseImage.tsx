@@ -17,7 +17,7 @@ const popularBaseImages: BaseImage[] = [
     id: "ubi9/python-311",
     name: "registry.access.redhat.com/ubi9/python-311",
     tag: "latest",
-    description: "Red Hat Universal Base Image 9",
+    description: "Red Hat Universal Base Image 9 w/ Python",
     size: "234 MB",
   },
   {
