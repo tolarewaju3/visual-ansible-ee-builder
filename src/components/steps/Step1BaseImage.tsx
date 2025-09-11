@@ -18,19 +18,11 @@ interface BaseImage {
 
 const popularBaseImages: BaseImage[] = [
   {
-    id: "ubi9",
-    name: "registry.redhat.io/ubi9/ubi",
-    tag: "latest", 
-    description: "Red Hat Universal Base Image 9 - Latest stable release",
-    size: "189 MB",
-    popular: true,
-  },
-  {
-    id: "minimal-ubi9",
-    name: "registry.redhat.io/ubi9/ubi-minimal",
+    id: "ubi9/python-311",
+    name: "registry.access.redhat.com/ubi9/python-311",
     tag: "latest",
-    description: "Minimal UBI9 image with reduced footprint",
-    size: "103 MB",
+    description: "Red Hat Universal Base Image 9 w/ Python",
+    size: "234 MB",
     popular: true,
   },
   {
@@ -41,12 +33,12 @@ const popularBaseImages: BaseImage[] = [
     size: "197 MB",
   },
   {
-    id: "centos",
-    name: "centos",
-    tag: "stream9",
-    description: "CentOS Stream 9 - Community distribution",
-    size: "156 MB",
-  }
+    id: "ee-minimal-rhel9",
+    name: "registry.redhat.io/ansible-automation-platform-25/ee-minimal-rhel9",
+    tag: "latest",
+    description: "Official AAP EE base (RHEL 9)",
+    size: "77 MB",
+  },
 ];
 
 interface Step1BaseImageProps {
