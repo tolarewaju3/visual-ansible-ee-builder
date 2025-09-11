@@ -20,8 +20,8 @@ const popularBaseImages: BaseImage[] = [
   },
   {
     id: "fedora",
-    name: "fedora",
-    tag: "latest",
+    name: "registry.fedoraproject.org/fedora",
+    tag: "38",
     description: "Latest Fedora Linux distribution",
   },
   {
