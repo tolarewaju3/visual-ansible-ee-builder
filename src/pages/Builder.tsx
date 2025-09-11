@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { Layers, Package, Play } from "lucide-react";
+import { Layers, Package, Play, ChevronLeft, ChevronRight } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { StepNavigation } from "@/components/StepNavigation";
 import { Step1CollectionsRequirements } from "@/components/steps/Step1CollectionsRequirements";
 import { Step2Packages } from "@/components/steps/Step2Packages";
@@ -124,6 +125,32 @@ const Builder = () => {
       <main className="container mx-auto px-6 py-8">
         {renderStep()}
       </main>
+      
+      {/* Navigation buttons at bottom */}
+      <div className="border-t border-border bg-card">
+        <div className="container mx-auto px-6 py-4">
+          <div className="flex justify-between">
+            <Button
+              variant="outline"
+              onClick={handlePrev}
+              disabled={!canGoPrev()}
+              className="flex items-center space-x-2"
+            >
+              <ChevronLeft className="w-4 h-4" />
+              <span>Previous</span>
+            </Button>
+
+            <Button
+              onClick={handleNext}
+              disabled={!canGoNext()}
+              className="flex items-center space-x-2"
+            >
+              <span>{currentStep === steps.length ? "Complete Build" : "Next"}</span>
+              <ChevronRight className="w-4 h-4" />
+            </Button>
+          </div>
+        </div>
+      </div>
     </div>
   );
 };

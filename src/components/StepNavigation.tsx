@@ -1,5 +1,4 @@
-import { Check, ChevronLeft, ChevronRight } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Check } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface Step {
@@ -90,27 +89,6 @@ export function StepNavigation({
           })}
         </div>
 
-        {/* Navigation buttons */}
-        <div className="flex justify-between">
-          <Button
-            variant="outline"
-            onClick={onPrev}
-            disabled={!canGoPrev}
-            className="flex items-center space-x-2"
-          >
-            <ChevronLeft className="w-4 h-4" />
-            <span>Previous</span>
-          </Button>
-
-          <Button
-            onClick={onNext}
-            disabled={!canGoNext}
-            className="flex items-center space-x-2"
-          >
-            <span>{currentStep === steps.length ? "Complete Build" : "Next"}</span>
-            <ChevronRight className="w-4 h-4" />
-          </Button>
-        </div>
       </div>
     </div>
   );
