@@ -212,7 +212,8 @@ additional_build_steps:
                 <Textarea
                   value={generateExecutionEnvironment()}
                   readOnly
-                  className="font-mono text-xs min-h-32 bg-muted/30 text-foreground border resize-none"
+                  rows={generateExecutionEnvironment().split('\n').length}
+                  className="font-mono text-xs bg-muted/30 text-foreground border resize-none"
                 />
               </CollapsibleContent>
             </Collapsible>
@@ -226,7 +227,8 @@ additional_build_steps:
                 <Textarea
                   value={generateRequirementsTxt()}
                   readOnly
-                  className="font-mono text-xs min-h-16 bg-muted/30 text-foreground border resize-none"
+                  rows={Math.max(3, generateRequirementsTxt().split('\n').length)}
+                  className="font-mono text-xs bg-muted/30 text-foreground border resize-none"
                 />
               </CollapsibleContent>
             </Collapsible>
@@ -240,7 +242,8 @@ additional_build_steps:
                 <Textarea
                   value={generateBindepsTxt()}
                   readOnly
-                  className="font-mono text-xs min-h-16 bg-muted/30 text-foreground border resize-none"
+                  rows={Math.max(3, generateBindepsTxt().split('\n').length)}
+                  className="font-mono text-xs bg-muted/30 text-foreground border resize-none"
                 />
               </CollapsibleContent>
             </Collapsible>
