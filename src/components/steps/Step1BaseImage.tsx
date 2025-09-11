@@ -8,7 +8,6 @@ interface BaseImage {
   name: string;
   tag: string;
   description: string;
-  size: string;
   popular?: boolean;
 }
 
@@ -18,21 +17,18 @@ const popularBaseImages: BaseImage[] = [
     name: "registry.access.redhat.com/ubi9/python-311",
     tag: "latest",
     description: "Red Hat Universal Base Image 9 w/ Python",
-    size: "234 MB",
   },
   {
     id: "fedora",
     name: "fedora",
     tag: "latest",
     description: "Latest Fedora Linux distribution",
-    size: "197 MB",
   },
   {
     id: "ee-minimal-rhel9",
     name: "registry.redhat.io/ansible-automation-platform-25/ee-minimal-rhel9",
     tag: "latest",
     description: "Red Hat AAP EE base (RHEL 9)",
-    size: "77 MB",
   },
 ];
 
@@ -82,7 +78,6 @@ export function Step1BaseImage({ selectedBaseImage, onBaseImageChange }: Step1Ba
                     <code className="text-sm font-mono bg-muted px-2 py-1 rounded">
                       {image.name}:{image.tag}
                     </code>
-                    <span className="text-xs text-muted-foreground ml-auto">{image.size}</span>
                   </div>
                   <p className="text-sm text-muted-foreground">{image.description}</p>
                 </div>
