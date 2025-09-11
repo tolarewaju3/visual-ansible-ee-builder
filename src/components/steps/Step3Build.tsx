@@ -346,6 +346,22 @@ additional_build_steps:
                   </AlertDescription>
                 </Alert>
               )}
+
+              {/* Build Logs */}
+              {buildLogs && (
+                <div className="space-y-2">
+                  <Separator />
+                  <div className="space-y-2">
+                    <h4 className="text-sm font-medium text-foreground">Build Logs</h4>
+                    <Textarea
+                      value={buildLogs}
+                      readOnly
+                      rows={Math.min(15, Math.max(8, buildLogs.split('\n').length))}
+                      className="font-mono text-sm bg-code text-terminal-green resize-none"
+                    />
+                  </div>
+                </div>
+              )}
             </div>
           </CardContent>
         </Card>
