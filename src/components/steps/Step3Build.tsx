@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { Play, Download, FileText, Settings, CheckCircle, XCircle, Clock } from "lucide-react";
+import { Play, Download, FileText, Settings, CheckCircle, XCircle, Clock, ChevronDown } from "lucide-react";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -66,36 +67,38 @@ export function Step3Build({
     }, 1500);
   };
 
-  const generateDockerfile = () => {
+  const generateExecutionEnvironment = () => {
     const collections = selectedCollections.map(c => 
       c.version ? `${c.name}:${c.version}` : c.name
     );
 
-    return `FROM quay.io/ansible/ansible-runner:latest
+    return `---
+version: 3
 
-# Install system packages
-${selectedPackages.length > 0 ? `RUN apt-get update && apt-get install -y \\
-    ${selectedPackages.join(' \\\n    ')} \\
-    && apt-get clean \\
-    && rm -rf /var/lib/apt/lists/*` : '# No system packages specified'}
+images:
+  base_image:
+    name: '${selectedBaseImage}'
 
-# Install Python requirements
-${requirements.length > 0 ? `COPY requirements.txt /tmp/requirements.txt
-RUN pip install -r /tmp/requirements.txt` : '# No Python requirements specified'}
+dependencies:
+  galaxy: requirements.yml
+  python: requirements.txt
+  system: bindep.txt
 
-# Install Ansible collections
-${collections.length > 0 ? `RUN ansible-galaxy collection install \\
-    ${collections.join(' \\\n    ')}` : '# No collections specified'}
-
-# Set working directory
-WORKDIR /runner
-
-# Default command
-CMD ["ansible-runner"]`;
+additional_build_steps:
+  prepend_base:
+    - RUN whoami
+    - RUN cat /etc/os-release
+  append_final:
+    - RUN whoami
+    - RUN ls -la /etc`;
   };
 
   const generateRequirementsTxt = () => {
-    return requirements.join('\n') || '# No requirements specified';
+    return requirements.join('\n') || '# No Python requirements specified';
+  };
+
+  const generateBindepsTxt = () => {
+    return selectedPackages.join('\n') || '# No system packages specified';
   };
 
   return (
@@ -277,26 +280,48 @@ CMD ["ansible-runner"]`;
                 </Button>
               </CardTitle>
             </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="space-y-2">
-                <h5 className="text-sm font-medium">Dockerfile</h5>
-                <Textarea
-                  value={generateDockerfile()}
-                  readOnly
-                  className="font-mono text-xs min-h-32 bg-code text-foreground"
-                />
-              </div>
+            <CardContent className="space-y-3">
+              <Collapsible>
+                <CollapsibleTrigger className="flex items-center justify-between w-full p-3 rounded-md border bg-muted/50 hover:bg-muted text-left">
+                  <span className="text-sm font-medium">execution-environment.yml</span>
+                  <ChevronDown className="h-4 w-4 transition-transform data-[state=open]:rotate-180" />
+                </CollapsibleTrigger>
+                <CollapsibleContent className="mt-2">
+                  <Textarea
+                    value={generateExecutionEnvironment()}
+                    readOnly
+                    className="font-mono text-xs min-h-32 bg-code text-foreground"
+                  />
+                </CollapsibleContent>
+              </Collapsible>
 
-              {requirements.length > 0 && (
-                <div className="space-y-2">
-                  <h5 className="text-sm font-medium">requirements.txt</h5>
+              <Collapsible>
+                <CollapsibleTrigger className="flex items-center justify-between w-full p-3 rounded-md border bg-muted/50 hover:bg-muted text-left">
+                  <span className="text-sm font-medium">requirements.txt</span>
+                  <ChevronDown className="h-4 w-4 transition-transform data-[state=open]:rotate-180" />
+                </CollapsibleTrigger>
+                <CollapsibleContent className="mt-2">
                   <Textarea
                     value={generateRequirementsTxt()}
                     readOnly
                     className="font-mono text-xs min-h-16 bg-code text-foreground"
                   />
-                </div>
-              )}
+                </CollapsibleContent>
+              </Collapsible>
+
+              <Collapsible>
+                <CollapsibleTrigger className="flex items-center justify-between w-full p-3 rounded-md border bg-muted/50 hover:bg-muted text-left">
+                  <span className="text-sm font-medium">bindep.txt</span>
+                  <ChevronDown className="h-4 w-4 transition-transform data-[state=open]:rotate-180" />
+                </CollapsibleTrigger>
+                <CollapsibleContent className="mt-2">
+                  <Textarea
+                    value={generateBindepsTxt()}
+                    readOnly
+                    className="font-mono text-xs min-h-16 bg-code text-foreground"
+                  />
+                </CollapsibleContent>
+              </Collapsible>
             </CardContent>
           </Card>
 
