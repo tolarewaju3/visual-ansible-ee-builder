@@ -188,6 +188,84 @@ additional_build_steps:
           </CardContent>
         </Card>
 
+        {/* Generated Files */}
+        <Card className="bg-card border-border">
+          <CardHeader>
+            <CardTitle className="flex items-center justify-between">
+              <div className="flex items-center space-x-2">
+                <FileText className="h-5 w-5 text-primary" />
+                <span>Generated Files</span>
+              </div>
+              <Button variant="outline" size="sm">
+                <Download className="h-4 w-4 mr-2" />
+                Export All
+              </Button>
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            <Collapsible>
+              <CollapsibleTrigger className="flex items-center justify-between w-full p-3 rounded-md border border-border bg-background hover:bg-muted text-left transition-colors">
+                <span className="text-sm font-medium text-foreground">execution-environment.yml</span>
+                <ChevronDown className="h-4 w-4 text-muted-foreground transition-transform data-[state=open]:rotate-180" />
+              </CollapsibleTrigger>
+              <CollapsibleContent className="mt-2 px-1">
+                <Textarea
+                  value={generateExecutionEnvironment()}
+                  readOnly
+                  className="font-mono text-xs min-h-32 bg-muted/30 text-foreground border resize-none"
+                />
+              </CollapsibleContent>
+            </Collapsible>
+
+            <Collapsible>
+              <CollapsibleTrigger className="flex items-center justify-between w-full p-3 rounded-md border border-border bg-background hover:bg-muted text-left transition-colors">
+                <span className="text-sm font-medium text-foreground">requirements.txt</span>
+                <ChevronDown className="h-4 w-4 text-muted-foreground transition-transform data-[state=open]:rotate-180" />
+              </CollapsibleTrigger>
+              <CollapsibleContent className="mt-2 px-1">
+                <Textarea
+                  value={generateRequirementsTxt()}
+                  readOnly
+                  className="font-mono text-xs min-h-16 bg-muted/30 text-foreground border resize-none"
+                />
+              </CollapsibleContent>
+            </Collapsible>
+
+            <Collapsible>
+              <CollapsibleTrigger className="flex items-center justify-between w-full p-3 rounded-md border border-border bg-background hover:bg-muted text-left transition-colors">
+                <span className="text-sm font-medium text-foreground">bindep.txt</span>
+                <ChevronDown className="h-4 w-4 text-muted-foreground transition-transform data-[state=open]:rotate-180" />
+              </CollapsibleTrigger>
+              <CollapsibleContent className="mt-2 px-1">
+                <Textarea
+                  value={generateBindepsTxt()}
+                  readOnly
+                  className="font-mono text-xs min-h-16 bg-muted/30 text-foreground border resize-none"
+                />
+              </CollapsibleContent>
+            </Collapsible>
+          </CardContent>
+        </Card>
+
+        {/* Build Logs */}
+        {buildLogs && (
+          <Card className="bg-card border-border">
+            <CardHeader>
+              <CardTitle className="flex items-center space-x-2">
+                <FileText className="h-5 w-5 text-primary" />
+                <span>Build Logs</span>
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <Textarea
+                value={buildLogs}
+                readOnly
+                className="font-mono text-sm min-h-32 bg-code text-terminal-green resize-none"
+              />
+            </CardContent>
+          </Card>
+        )}
+
         {/* Build Configuration */}
         <Card className="bg-card border-border">
           <CardHeader>
@@ -268,84 +346,6 @@ additional_build_steps:
             </div>
           </CardContent>
         </Card>
-
-        {/* Generated Files */}
-        <Card className="bg-card border-border">
-          <CardHeader>
-            <CardTitle className="flex items-center justify-between">
-              <div className="flex items-center space-x-2">
-                <FileText className="h-5 w-5 text-primary" />
-                <span>Generated Files</span>
-              </div>
-              <Button variant="outline" size="sm">
-                <Download className="h-4 w-4 mr-2" />
-                Export All
-              </Button>
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-3">
-            <Collapsible>
-              <CollapsibleTrigger className="flex items-center justify-between w-full p-3 rounded-md border border-border bg-background hover:bg-muted text-left transition-colors">
-                <span className="text-sm font-medium text-foreground">execution-environment.yml</span>
-                <ChevronDown className="h-4 w-4 text-muted-foreground transition-transform data-[state=open]:rotate-180" />
-              </CollapsibleTrigger>
-              <CollapsibleContent className="mt-2 px-1">
-                <Textarea
-                  value={generateExecutionEnvironment()}
-                  readOnly
-                  className="font-mono text-xs min-h-32 bg-muted/30 text-foreground border resize-none"
-                />
-              </CollapsibleContent>
-            </Collapsible>
-
-            <Collapsible>
-              <CollapsibleTrigger className="flex items-center justify-between w-full p-3 rounded-md border border-border bg-background hover:bg-muted text-left transition-colors">
-                <span className="text-sm font-medium text-foreground">requirements.txt</span>
-                <ChevronDown className="h-4 w-4 text-muted-foreground transition-transform data-[state=open]:rotate-180" />
-              </CollapsibleTrigger>
-              <CollapsibleContent className="mt-2 px-1">
-                <Textarea
-                  value={generateRequirementsTxt()}
-                  readOnly
-                  className="font-mono text-xs min-h-16 bg-muted/30 text-foreground border resize-none"
-                />
-              </CollapsibleContent>
-            </Collapsible>
-
-            <Collapsible>
-              <CollapsibleTrigger className="flex items-center justify-between w-full p-3 rounded-md border border-border bg-background hover:bg-muted text-left transition-colors">
-                <span className="text-sm font-medium text-foreground">bindep.txt</span>
-                <ChevronDown className="h-4 w-4 text-muted-foreground transition-transform data-[state=open]:rotate-180" />
-              </CollapsibleTrigger>
-              <CollapsibleContent className="mt-2 px-1">
-                <Textarea
-                  value={generateBindepsTxt()}
-                  readOnly
-                  className="font-mono text-xs min-h-16 bg-muted/30 text-foreground border resize-none"
-                />
-              </CollapsibleContent>
-            </Collapsible>
-          </CardContent>
-        </Card>
-
-        {/* Build Logs */}
-        {buildLogs && (
-          <Card className="bg-card border-border">
-            <CardHeader>
-              <CardTitle className="flex items-center space-x-2">
-                <FileText className="h-5 w-5 text-primary" />
-                <span>Build Logs</span>
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <Textarea
-                value={buildLogs}
-                readOnly
-                className="font-mono text-sm min-h-32 bg-code text-terminal-green resize-none"
-              />
-            </CardContent>
-          </Card>
-        )}
       </div>
     </div>
   );
