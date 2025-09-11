@@ -5,8 +5,7 @@ import { Button } from "@/components/ui/button";
 import { StepNavigation } from "@/components/StepNavigation";
 import { Step1BaseImage } from "@/components/steps/Step1BaseImage";
 import { Step2CollectionsRequirements } from "@/components/steps/Step2CollectionsRequirements";
-import { Step3Packages } from "@/components/steps/Step3Packages";
-import { Step4Build } from "@/components/steps/Step4Build";
+import { Step3Build } from "@/components/steps/Step3Build";
 
 interface Collection {
   name: string;
@@ -22,18 +21,12 @@ const steps = [
   },
   {
     id: 2,
-    title: "Collections & Requirements",
-    description: "Ansible collections and Python dependencies",
+    title: "Requirements",
+    description: "Ansible collections, Python dependencies, and system packages",
     icon: Layers,
   },
   {
     id: 3,
-    title: "System Packages",
-    description: "Operating system packages and utilities",
-    icon: Package,
-  },
-  {
-    id: 4,
     title: "Build & Deploy",
     description: "Configure and build your execution environment",
     icon: Play,
@@ -65,9 +58,6 @@ const Builder = () => {
         // Can always proceed from step 2, even with empty selections
         return true;
       case 3:
-        // Can always proceed from step 3, even with empty selections
-        return true;
-      case 4:
         // Final step, no next
         return false;
       default:
@@ -105,20 +95,15 @@ const Builder = () => {
           <Step2CollectionsRequirements
             selectedCollections={selectedCollections}
             requirements={requirements}
+            selectedPackages={selectedPackages}
             onCollectionsChange={setSelectedCollections}
             onRequirementsChange={setRequirements}
+            onPackagesChange={setSelectedPackages}
           />
         );
       case 3:
         return (
-          <Step3Packages
-            selectedPackages={selectedPackages}
-            onPackagesChange={setSelectedPackages}
-          />
-        );
-      case 4:
-        return (
-          <Step4Build
+          <Step3Build
             selectedBaseImage={selectedBaseImage}
             selectedCollections={selectedCollections}
             requirements={requirements}

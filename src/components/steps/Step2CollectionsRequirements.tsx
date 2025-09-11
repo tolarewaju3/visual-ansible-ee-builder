@@ -1,12 +1,27 @@
-import { useState } from "react";
-import { Search, Plus, X, Package, FileText, Upload } from "lucide-react";
+import { useState, useRef } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Textarea } from "@/components/ui/textarea";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Plus, X, Upload, Package, Layers, Search, FileText } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
+
+const systemPackages = [
+  { name: "git", description: "Version control system", category: "development" },
+  { name: "curl", description: "Transfer data from servers", category: "network" },
+  { name: "wget", description: "Download files from web", category: "network" },
+  { name: "vim", description: "Text editor", category: "utilities" },
+  { name: "nano", description: "Simple text editor", category: "utilities" },  
+  { name: "openssh-client", description: "SSH client", category: "network" },
+  { name: "rsync", description: "File synchronization", category: "utilities" },
+  { name: "unzip", description: "Archive extraction", category: "utilities" },
+  { name: "python3-dev", description: "Python development headers", category: "development" },
+  { name: "gcc", description: "GNU Compiler Collection", category: "development" },
+];
 
 const popularCollections = [
   { name: "ansible.posix", description: "POSIX utilities and modules", version: "1.5.4" },
@@ -25,20 +40,45 @@ interface Collection {
 interface Step2CollectionsRequirementsProps {
   selectedCollections: Collection[];
   requirements: string[];
+  selectedPackages: string[];
   onCollectionsChange: (collections: Collection[]) => void;
   onRequirementsChange: (requirements: string[]) => void;
+  onPackagesChange: (packages: string[]) => void;
 }
 
 // Step 2: Collections & Requirements Component
 export function Step2CollectionsRequirements({
   selectedCollections,
   requirements,
+  selectedPackages,
   onCollectionsChange,
   onRequirementsChange,
+  onPackagesChange,
 }: Step2CollectionsRequirementsProps) {
   const [searchQuery, setSearchQuery] = useState("");
   const [newRequirement, setNewRequirement] = useState("");
   const [requirementsText, setRequirementsText] = useState("");
+  const [customRequirement, setCustomRequirement] = useState("");
+  const [customPackage, setCustomPackage] = useState("");
+  const [packageSearchQuery, setPackageSearchQuery] = useState("");
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const addPackage = (packageName: string) => {
+    if (!selectedPackages.includes(packageName)) {
+      onPackagesChange([...selectedPackages, packageName]);
+    }
+  };
+
+  const removePackage = (packageName: string) => {
+    onPackagesChange(selectedPackages.filter(p => p !== packageName));
+  };
+
+  const addCustomPackage = () => {
+    if (customPackage.trim() && !selectedPackages.includes(customPackage.trim())) {
+      onPackagesChange([...selectedPackages, customPackage.trim()]);
+      setCustomPackage("");
+    }
+  };
 
   const addCollection = (collection: { name: string; description: string; version: string }) => {
     if (!selectedCollections.find(c => c.name === collection.name)) {
@@ -77,12 +117,25 @@ export function Step2CollectionsRequirements({
     collection.description.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
+  const filteredPackages = systemPackages.filter(pkg =>
+    pkg.name.toLowerCase().includes(packageSearchQuery.toLowerCase()) ||
+    pkg.description.toLowerCase().includes(packageSearchQuery.toLowerCase())
+  );
+
+  const groupedPackages = filteredPackages.reduce((acc, pkg) => {
+    if (!acc[pkg.category]) {
+      acc[pkg.category] = [];
+    }
+    acc[pkg.category].push(pkg);
+    return acc;
+  }, {} as Record<string, typeof systemPackages>);
+
   return (
     <div className="space-y-6">
       <div className="text-center mb-8">
-        <h1 className="text-3xl font-bold text-foreground mb-2">Collections & Requirements</h1>
+        <h1 className="text-3xl font-bold text-foreground mb-2">Requirements</h1>
         <p className="text-muted-foreground">
-          Select Ansible collections and Python dependencies for your execution environment
+          Configure Ansible collections, Python dependencies, and system packages for your execution environment
         </p>
       </div>
 
@@ -230,6 +283,108 @@ export function Step2CollectionsRequirements({
                       <X className="h-4 w-4" />
                     </Button>
                   </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* System Packages */}
+      <Card className="bg-card border-border">
+        <CardHeader>
+          <CardTitle className="flex items-center space-x-2">
+            <Package className="h-5 w-5 text-primary" />
+            <span>System Packages</span>
+          </CardTitle>
+          <CardDescription>
+            Add system packages that your Ansible content requires
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-6">
+          <Tabs defaultValue="browse" className="space-y-4">
+            <TabsList className="grid w-full grid-cols-2">
+              <TabsTrigger value="browse">Browse Packages</TabsTrigger>
+              <TabsTrigger value="custom">Add Custom</TabsTrigger>
+            </TabsList>
+
+            <TabsContent value="browse" className="space-y-4">
+              <div className="relative">
+                <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                <Input
+                  placeholder="Search packages..."
+                  value={packageSearchQuery}
+                  onChange={(e) => setPackageSearchQuery(e.target.value)}
+                  className="pl-10"
+                />
+              </div>
+
+              <div className="space-y-4 max-h-96 overflow-y-auto">
+                {Object.entries(groupedPackages).map(([category, packages]) => (
+                  <div key={category} className="space-y-2">
+                    <h4 className="text-sm font-medium text-foreground capitalize">
+                      {category} ({packages.length})
+                    </h4>
+                    <div className="grid gap-2">
+                      {packages.map((pkg) => (
+                        <div 
+                          key={pkg.name}
+                          className="flex items-center justify-between p-3 border border-border rounded-lg hover:bg-muted/50 transition-colors"
+                        >
+                          <div className="flex-1">
+                            <div className="flex items-center space-x-2">
+                              <code className="text-sm font-mono text-foreground">{pkg.name}</code>
+                              <Badge variant="outline" className="text-xs">{pkg.category}</Badge>
+                            </div>
+                            <p className="text-xs text-muted-foreground mt-1">{pkg.description}</p>
+                          </div>
+                          <Button
+                            size="sm"
+                            onClick={() => addPackage(pkg.name)}
+                            disabled={selectedPackages.includes(pkg.name)}
+                            className="ml-2"
+                          >
+                            <Plus className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </TabsContent>
+
+            <TabsContent value="custom" className="space-y-4">
+              <div className="flex space-x-2">
+                <Input
+                  placeholder="e.g., htop"
+                  value={customPackage}
+                  onChange={(e) => setCustomPackage(e.target.value)}
+                  onKeyPress={(e) => e.key === 'Enter' && addCustomPackage()}
+                  className="flex-1"
+                />
+                <Button onClick={addCustomPackage}>
+                  <Plus className="h-4 w-4 mr-2" />
+                  Add
+                </Button>
+              </div>
+            </TabsContent>
+          </Tabs>
+
+          <div className="space-y-2">
+            <h4 className="text-sm font-medium text-foreground">Selected Packages</h4>
+            {selectedPackages.length === 0 ? (
+              <p className="text-sm text-muted-foreground">No packages selected</p>
+            ) : (
+              <div className="flex flex-wrap gap-2">
+                {selectedPackages.map((pkg) => (
+                  <Badge key={pkg} variant="secondary" className="flex items-center gap-2">
+                    <span className="font-mono">{pkg}</span>
+                    <X 
+                      className="h-3 w-3 cursor-pointer hover:text-destructive" 
+                      onClick={() => removePackage(pkg)}
+                    />
+                  </Badge>
                 ))}
               </div>
             )}
