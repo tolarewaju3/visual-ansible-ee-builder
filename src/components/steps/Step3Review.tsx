@@ -30,6 +30,20 @@ export function Step3Review({
       c.version ? `${c.name}:${c.version}` : c.name
     );
 
+    const dependenciesLines = [
+      '  ansible_core:',
+      '    package_pip: ansible-core==2.14.4',
+      '  ansible_runner:',
+      '    package_pip: ansible-runner',
+      '  galaxy: requirements.yml'
+    ];
+
+    if (requirements.length > 0) {
+      dependenciesLines.push('  python: requirements.txt');
+    }
+
+    dependenciesLines.push('  system: bindep.txt');
+
     return `---
 version: 3
 
@@ -38,13 +52,7 @@ images:
     name: '${selectedBaseImage}'
 
 dependencies:
-  ansible_core:
-    package_pip: ansible-core==2.14.4
-  ansible_runner:
-    package_pip: ansible-runner
-  galaxy: requirements.yml
-  python: requirements.txt
-  system: bindep.txt`
+${dependenciesLines.join('\n')}`;
   };
 
   const generateRequirementsTxt = () => {
@@ -71,7 +79,12 @@ ${selectedCollections.map(c => `  - name: ${c.name}${c.version ? `\n    version:
     // Add all generated files to the zip
     zip.file("execution-environment.yml", generateExecutionEnvironment());
     zip.file("requirements.yml", generateRequirementsYml());
-    zip.file("requirements.txt", generateRequirementsTxt());
+    
+    // Only include requirements.txt if there are Python requirements
+    if (requirements.length > 0) {
+      zip.file("requirements.txt", generateRequirementsTxt());
+    }
+    
     zip.file("bindep.txt", generateBindepsTxt());
     
     // Generate and download the zip file
@@ -218,20 +231,22 @@ ${selectedCollections.map(c => `  - name: ${c.name}${c.version ? `\n    version:
               </CollapsibleContent>
             </Collapsible>
 
-            <Collapsible>
-              <CollapsibleTrigger className="flex items-center justify-between w-full p-3 rounded-md border border-border bg-background hover:bg-muted text-left transition-colors">
-                <span className="text-sm font-medium text-foreground">requirements.txt</span>
-                <ChevronDown className="h-4 w-4 text-muted-foreground transition-transform data-[state=open]:rotate-180" />
-              </CollapsibleTrigger>
-              <CollapsibleContent className="mt-2 px-1">
-                <Textarea
-                  value={generateRequirementsTxt()}
-                  readOnly
-                  rows={generateRequirementsTxt().split('\n').length}
-                  className="font-mono text-xs bg-muted/30 text-foreground border resize-none"
-                />
-              </CollapsibleContent>
-            </Collapsible>
+            {requirements.length > 0 && (
+              <Collapsible>
+                <CollapsibleTrigger className="flex items-center justify-between w-full p-3 rounded-md border border-border bg-background hover:bg-muted text-left transition-colors">
+                  <span className="text-sm font-medium text-foreground">requirements.txt</span>
+                  <ChevronDown className="h-4 w-4 text-muted-foreground transition-transform data-[state=open]:rotate-180" />
+                </CollapsibleTrigger>
+                <CollapsibleContent className="mt-2 px-1">
+                  <Textarea
+                    value={generateRequirementsTxt()}
+                    readOnly
+                    rows={generateRequirementsTxt().split('\n').length}
+                    className="font-mono text-xs bg-muted/30 text-foreground border resize-none"
+                  />
+                </CollapsibleContent>
+              </Collapsible>
+            )}
 
             <Collapsible>
               <CollapsibleTrigger className="flex items-center justify-between w-full p-3 rounded-md border border-border bg-background hover:bg-muted text-left transition-colors">
