@@ -324,6 +324,18 @@ additional_build_steps:
                   </AlertDescription>
                 </Alert>
               )}
+
+              {buildLogs && (
+                <div className="space-y-2">
+                  <Label className="text-sm font-medium">Build Logs</Label>
+                  <Textarea
+                    value={buildLogs}
+                    readOnly
+                    className="font-mono text-xs bg-code text-terminal-green border resize-none"
+                    rows={Math.min(buildLogs.split('\n').length, 15)}
+                  />
+                </div>
+              )}
             </div>
           </CardContent>
         </Card>
