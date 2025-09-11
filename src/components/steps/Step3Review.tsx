@@ -37,19 +37,14 @@ images:
   base_image:
     name: '${selectedBaseImage}'
 
-dependencies:
+dependencies
+  ansible_core:
+    package_pip: ansible-core==2.14.4
+  ansible_runner:
+    package_pip: ansible-runner
   galaxy: requirements.yml
   python: requirements.txt
-  system: bindep.txt
-options:
-    package_manager_path: /usr/bin/microdnf
-additional_build_steps:
-  prepend_base:
-    - RUN whoami
-    - RUN cat /etc/os-release
-  append_final:
-    - RUN whoami
-    - RUN ls -la /etc`;
+  system: bindep.txt`
   };
 
   const generateRequirementsTxt = () => {
