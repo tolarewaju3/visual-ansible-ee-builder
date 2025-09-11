@@ -117,10 +117,10 @@ additional_build_steps:
             <CardHeader>
               <CardTitle className="flex items-center space-x-2">
                 <Settings className="h-5 w-5 text-primary" />
-                <span>Image Configuration</span>
+                <span>Build Configuration</span>
               </CardTitle>
             </CardHeader>
-            <CardContent className="space-y-4">
+            <CardContent className="space-y-6">
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="imageName">Image Name</Label>
@@ -138,6 +138,57 @@ additional_build_steps:
                     onChange={(e) => setImageTag(e.target.value)}
                   />
                 </div>
+              </div>
+
+              <Separator />
+
+              <div className="space-y-4">
+                <Button 
+                  onClick={startBuild} 
+                  disabled={isBuilding}
+                  className="w-full"
+                  size="lg"
+                >
+                  {isBuilding ? (
+                    <>
+                      <Clock className="h-4 w-4 mr-2 animate-spin" />
+                      Building...
+                    </>
+                  ) : (
+                    <>
+                      <Play className="h-4 w-4 mr-2" />
+                      Start Build
+                    </>
+                  )}
+                </Button>
+
+                {buildStatus !== 'idle' && (
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm font-medium">Progress</span>
+                      <span className="text-sm text-muted-foreground">{Math.round(buildProgress)}%</span>
+                    </div>
+                    <Progress value={buildProgress} className="w-full" />
+                  </div>
+                )}
+
+                {buildStatus === 'success' && (
+                  <Alert className="border-success/50 bg-success/10">
+                    <CheckCircle className="h-4 w-4 text-success" />
+                    <AlertDescription className="text-success-foreground">
+                      Build completed successfully! Your execution environment is ready.
+                    </AlertDescription>
+                  </Alert>
+                )}
+
+                {buildStatus === 'error' && (
+                  <Alert className="border-destructive/50 bg-destructive/10">
+                    <XCircle className="h-4 w-4 text-destructive" />
+                    <AlertDescription className="text-destructive-foreground">
+                      Build failed. Check the logs for more details.
+                    </AlertDescription>
+                  </Alert>
+                )}
               </div>
             </CardContent>
           </Card>
@@ -268,62 +319,6 @@ additional_build_steps:
             </CardContent>
           </Card>
 
-          <Card className="bg-card border-border">
-            <CardHeader>
-              <CardTitle className="flex items-center space-x-2">
-                <Play className="h-5 w-5 text-primary" />
-                <span>Build Controls</span>
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <Button 
-                onClick={startBuild} 
-                disabled={isBuilding}
-                className="w-full"
-                size="lg"
-              >
-                {isBuilding ? (
-                  <>
-                    <Clock className="h-4 w-4 mr-2 animate-spin" />
-                    Building...
-                  </>
-                ) : (
-                  <>
-                    <Play className="h-4 w-4 mr-2" />
-                    Start Build
-                  </>
-                )}
-              </Button>
-
-              {buildStatus !== 'idle' && (
-                <div className="space-y-2">
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm font-medium">Progress</span>
-                    <span className="text-sm text-muted-foreground">{Math.round(buildProgress)}%</span>
-                  </div>
-                  <Progress value={buildProgress} className="w-full" />
-                </div>
-              )}
-
-              {buildStatus === 'success' && (
-                <Alert className="border-success/50 bg-success/10">
-                  <CheckCircle className="h-4 w-4 text-success" />
-                  <AlertDescription className="text-success-foreground">
-                    Build completed successfully! Your execution environment is ready.
-                  </AlertDescription>
-                </Alert>
-              )}
-
-              {buildStatus === 'error' && (
-                <Alert className="border-destructive/50 bg-destructive/10">
-                  <XCircle className="h-4 w-4 text-destructive" />
-                  <AlertDescription className="text-destructive-foreground">
-                    Build failed. Check the logs for more details.
-                  </AlertDescription>
-                </Alert>
-              )}
-            </CardContent>
-          </Card>
 
           {buildLogs && (
             <Card className="bg-card border-border">
