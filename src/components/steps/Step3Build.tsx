@@ -111,6 +111,83 @@ additional_build_steps:
       </div>
 
       <div className="space-y-6">
+        {/* Configuration Summary */}
+        <Card className="bg-card border-border">
+          <CardHeader>
+            <CardTitle>Configuration Summary</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="space-y-3">
+              <div>
+                <h4 className="text-sm font-medium text-foreground mb-2">
+                  Base Image
+                </h4>
+                <Badge variant="outline" className="font-mono text-xs">
+                  {selectedBaseImage}
+                </Badge>
+              </div>
+
+              <Separator />
+
+              <div>
+                <h4 className="text-sm font-medium text-foreground mb-2">
+                  Collections ({selectedCollections.length})
+                </h4>
+                {selectedCollections.length === 0 ? (
+                  <p className="text-sm text-muted-foreground">No collections selected</p>
+                ) : (
+                  <div className="flex flex-wrap gap-1">
+                    {selectedCollections.map((collection, index) => (
+                      <Badge key={index} variant="outline" className="font-mono text-xs">
+                        {collection.name}
+                        {collection.version && `:${collection.version}`}
+                      </Badge>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              <Separator />
+
+              <div>
+                <h4 className="text-sm font-medium text-foreground mb-2">
+                  Requirements ({requirements.length})
+                </h4>
+                {requirements.length === 0 ? (
+                  <p className="text-sm text-muted-foreground">No requirements specified</p>
+                ) : (
+                  <div className="flex flex-wrap gap-1">
+                    {requirements.map((req, index) => (
+                      <Badge key={index} variant="outline" className="font-mono text-xs">
+                        {req}
+                      </Badge>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              <Separator />
+
+              <div>
+                <h4 className="text-sm font-medium text-foreground mb-2">
+                  Packages ({selectedPackages.length})
+                </h4>
+                {selectedPackages.length === 0 ? (
+                  <p className="text-sm text-muted-foreground">No packages selected</p>
+                ) : (
+                  <div className="flex flex-wrap gap-1">
+                    {selectedPackages.map((pkg, index) => (
+                      <Badge key={index} variant="outline" className="font-mono text-xs">
+                        {pkg}
+                      </Badge>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
         {/* Build Configuration */}
         <Card className="bg-card border-border">
           <CardHeader>
@@ -188,72 +265,6 @@ additional_build_steps:
                   </AlertDescription>
                 </Alert>
               )}
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Configuration Summary */}
-        <Card className="bg-card border-border">
-          <CardHeader>
-            <CardTitle>Configuration Summary</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="space-y-3">
-              <div>
-                <h4 className="text-sm font-medium text-foreground mb-2">
-                  Collections ({selectedCollections.length})
-                </h4>
-                {selectedCollections.length === 0 ? (
-                  <p className="text-sm text-muted-foreground">No collections selected</p>
-                ) : (
-                  <div className="flex flex-wrap gap-1">
-                    {selectedCollections.map((collection, index) => (
-                      <Badge key={index} variant="outline" className="font-mono text-xs">
-                        {collection.name}
-                        {collection.version && `:${collection.version}`}
-                      </Badge>
-                    ))}
-                  </div>
-                )}
-              </div>
-
-              <Separator />
-
-              <div>
-                <h4 className="text-sm font-medium text-foreground mb-2">
-                  Requirements ({requirements.length})
-                </h4>
-                {requirements.length === 0 ? (
-                  <p className="text-sm text-muted-foreground">No requirements specified</p>
-                ) : (
-                  <div className="flex flex-wrap gap-1">
-                    {requirements.map((req, index) => (
-                      <Badge key={index} variant="outline" className="font-mono text-xs">
-                        {req}
-                      </Badge>
-                    ))}
-                  </div>
-                )}
-              </div>
-
-              <Separator />
-
-              <div>
-                <h4 className="text-sm font-medium text-foreground mb-2">
-                  Packages ({selectedPackages.length})
-                </h4>
-                {selectedPackages.length === 0 ? (
-                  <p className="text-sm text-muted-foreground">No packages selected</p>
-                ) : (
-                  <div className="flex flex-wrap gap-1">
-                    {selectedPackages.map((pkg, index) => (
-                      <Badge key={index} variant="outline" className="font-mono text-xs">
-                        {pkg}
-                      </Badge>
-                    ))}
-                  </div>
-                )}
-              </div>
             </div>
           </CardContent>
         </Card>
