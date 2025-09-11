@@ -29,6 +29,7 @@ interface Step2CollectionsRequirementsProps {
   onRequirementsChange: (requirements: string[]) => void;
 }
 
+// Step 2: Collections & Requirements Component
 export function Step2CollectionsRequirements({
   selectedCollections,
   requirements,
