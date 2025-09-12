@@ -130,41 +130,32 @@ export function Step1BaseImage({ selectedBaseImage, onBaseImageChange }: Step1Ba
                   </div>
                 </div>
               ))}
-            </RadioGroup>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle>Custom Base Image</CardTitle>
-            <CardDescription>
-              Enter a custom container image reference
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="flex items-start space-x-3 p-4 rounded-lg border hover:bg-muted/50 transition-colors">
-              <RadioGroupItem value="custom" className="mt-1" />
-              <div className="flex-1 space-y-2">
-                <Label htmlFor="custom-image" className="text-sm font-medium">
-                  Container Image Reference
-                </Label>
-                <Input
-                  id="custom-image"
-                  placeholder="e.g., quay.io/org/ee:1.0"
-                  value={customImage}
-                  onChange={(e) => handleCustomImageChange(e.target.value)}
-                  className={`${customImage.trim() && !isValidContainerImage(customImage) ? 'border-destructive' : ''}`}
-                />
-                {customImage.trim() && !isValidContainerImage(customImage) && (
-                  <p className="text-xs text-destructive">
-                    Invalid format. Use: [registry[:port]/][namespace/]name[:tag]
+              
+              {/* Custom Image Option */}
+              <div className="flex items-start space-x-3 p-4 rounded-lg border hover:bg-muted/50 transition-colors">
+                <RadioGroupItem value="custom" className="mt-1" />
+                <div className="flex-1 space-y-2">
+                  <Label htmlFor="custom-image" className="text-sm font-medium">
+                    Custom Container Image
+                  </Label>
+                  <Input
+                    id="custom-image"
+                    placeholder="e.g., quay.io/org/ee:1.0"
+                    value={customImage}
+                    onChange={(e) => handleCustomImageChange(e.target.value)}
+                    className={`${customImage.trim() && !isValidContainerImage(customImage) ? 'border-destructive' : ''}`}
+                  />
+                  {customImage.trim() && !isValidContainerImage(customImage) && (
+                    <p className="text-xs text-destructive">
+                      Invalid format. Use: [registry[:port]/][namespace/]name[:tag]
+                    </p>
+                  )}
+                  <p className="text-xs text-muted-foreground">
+                    Examples: registry.com/namespace/image:tag, namespace/image:tag, image:tag
                   </p>
-                )}
-                <p className="text-xs text-muted-foreground">
-                  Examples: registry.com/namespace/image:tag, namespace/image:tag, image:tag
-                </p>
+                </div>
               </div>
-            </div>
+            </RadioGroup>
           </CardContent>
         </Card>
       </div>
