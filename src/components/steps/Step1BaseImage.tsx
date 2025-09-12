@@ -11,6 +11,7 @@ interface BaseImage {
   popular?: boolean;
   fastStart?: boolean;
   subscriptionRequired?: boolean;
+  supported?: boolean;
 }
 
 const popularBaseImages: BaseImage[] = [
@@ -27,6 +28,7 @@ const popularBaseImages: BaseImage[] = [
     tag: "latest",
     description: "Red Hat Ansible Minimal EE base (RHEL 9)",
     subscriptionRequired: true,
+    supported: true,
   },
 ];
 
@@ -86,6 +88,11 @@ export function Step1BaseImage({ selectedBaseImage, onBaseImageChange }: Step1Ba
                       <Badge variant="outline" className="text-xs">
                         <Lock className="w-3 h-3 mr-1" />
                         Subscription Required
+                      </Badge>
+                    )}
+                    {image.supported && (
+                      <Badge variant="secondary" className="text-xs">
+                        Supported
                       </Badge>
                     )}
                   </div>
