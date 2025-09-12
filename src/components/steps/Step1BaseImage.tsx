@@ -87,7 +87,7 @@ export function Step1BaseImage({ selectedBaseImage, onBaseImageChange }: Step1Ba
                     {image.subscriptionRequired && (
                       <Badge variant="outline" className="text-xs">
                         <Lock className="w-3 h-3 mr-1" />
-                        Subscription Required
+                        Subscription
                       </Badge>
                     )}
                     {image.supported && (
