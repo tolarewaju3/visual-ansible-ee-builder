@@ -171,59 +171,6 @@ ${selectedCollections.map(c => `  - name: ${c.name}${c.version ? `\n    version:
           </CardContent>
         </Card>
 
-        {/* Build Configuration */}
-        <Card className="bg-card border-border">
-          <CardHeader>
-            <CardTitle className="flex items-center space-x-2">
-              <Settings className="h-5 w-5 text-primary" />
-              <span>Build Configuration</span>
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-6">
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="imageName">Image Name</Label>
-                <Input 
-                  id="imageName" 
-                  value={imageName} 
-                  onChange={(e) => onImageNameChange(e.target.value)}
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="imageTag">Tag</Label>
-                <Input 
-                  id="imageTag" 
-                  value={imageTag} 
-                  onChange={(e) => onImageTagChange(e.target.value)}
-                />
-              </div>
-            </div>
-
-            <Separator />
-
-            <div className="space-y-4">
-              <Button 
-                onClick={onStartBuild} 
-                disabled={isBuilding}
-                className="w-full"
-                size="lg"
-              >
-                {isBuilding ? (
-                  <>
-                    <Clock className="h-4 w-4 mr-2 animate-spin" />
-                    Building...
-                  </>
-                ) : (
-                  <>
-                    <Play className="h-4 w-4 mr-2" />
-                    Start Build
-                  </>
-                )}
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
-
         {/* Generated Files */}
         <Card className="bg-card border-border">
           <CardHeader>
@@ -278,6 +225,61 @@ ${selectedCollections.map(c => `  - name: ${c.name}${c.version ? `\n    version:
                   <Textarea value={generateBindepsTxt()} readOnly rows={generateBindepsTxt().split('\n').length} className="font-mono text-xs bg-muted/30 text-foreground border resize-none" />
                 </CollapsibleContent>
               </Collapsible>}
+          </CardContent>
+        </Card>
+      </div>
+      
+      <div className="space-y-6">
+        {/* Build Configuration */}
+        <Card className="bg-card border-border">
+          <CardHeader>
+            <CardTitle className="flex items-center space-x-2">
+              <Settings className="h-5 w-5 text-primary" />
+              <span>Build Configuration</span>
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-6">
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="imageName">Image Name</Label>
+                <Input 
+                  id="imageName" 
+                  value={imageName} 
+                  onChange={(e) => onImageNameChange(e.target.value)}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="imageTag">Tag</Label>
+                <Input 
+                  id="imageTag" 
+                  value={imageTag} 
+                  onChange={(e) => onImageTagChange(e.target.value)}
+                />
+              </div>
+            </div>
+
+            <Separator />
+
+            <div className="space-y-4">
+              <Button 
+                onClick={onStartBuild} 
+                disabled={isBuilding}
+                className="w-full"
+                size="lg"
+              >
+                {isBuilding ? (
+                  <>
+                    <Clock className="h-4 w-4 mr-2 animate-spin" />
+                    Building...
+                  </>
+                ) : (
+                  <>
+                    <Play className="h-4 w-4 mr-2" />
+                    Start Build
+                  </>
+                )}
+              </Button>
+            </div>
           </CardContent>
         </Card>
       </div>
