@@ -1,12 +1,10 @@
-import { FileText, Download, ChevronDown, Settings, Play } from "lucide-react";
+import { FileText, Download, ChevronDown } from "lucide-react";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
 import { Separator } from "@/components/ui/separator";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import JSZip from "jszip";
 interface Collection {
   name: string;
@@ -17,24 +15,12 @@ interface Step3ReviewProps {
   selectedCollections: Collection[];
   requirements: string[];
   selectedPackages: string[];
-  imageName: string;
-  imageTag: string;
-  onImageNameChange: (name: string) => void;
-  onImageTagChange: (tag: string) => void;
-  isBuilding: boolean;
-  onStartBuild: () => void;
 }
 export function Step3Review({
   selectedBaseImage,
   selectedCollections,
   requirements,
-  selectedPackages,
-  imageName,
-  imageTag,
-  onImageNameChange,
-  onImageTagChange,
-  isBuilding,
-  onStartBuild
+  selectedPackages
 }: Step3ReviewProps) {
   const generateExecutionEnvironment = () => {
     const collections = selectedCollections.map(c => c.version ? `${c.name}:${c.version}` : c.name);
@@ -105,9 +91,9 @@ ${selectedCollections.map(c => `  - name: ${c.name}${c.version ? `\n    version:
   };
   return <div className="space-y-6">
       <div className="text-center mb-8">
-        <h1 className="text-3xl font-bold text-foreground mb-2">Build & Deploy</h1>
+        <h1 className="text-3xl font-bold text-foreground mb-2">Review Configuration</h1>
         <p className="text-muted-foreground">
-          Review your configuration and deploy your execution environment
+          Review your execution environment configuration before building
         </p>
       </div>
 
@@ -120,9 +106,7 @@ ${selectedCollections.map(c => `  - name: ${c.name}${c.version ? `\n    version:
           <CardContent className="space-y-4">
             <div className="space-y-3">
               <div>
-                <h4 className="text-sm font-medium text-foreground mb-2">
-                  Base Image
-                </h4>
+                <h4 className="text-sm font-medium text-foreground mb-2">Review your configuration and build your execution environment</h4>
                 <Badge variant="outline" className="font-mono text-xs">
                   {selectedBaseImage}
                 </Badge>
@@ -225,49 +209,6 @@ ${selectedCollections.map(c => `  - name: ${c.name}${c.version ? `\n    version:
                   <Textarea value={generateBindepsTxt()} readOnly rows={generateBindepsTxt().split('\n').length} className="font-mono text-xs bg-muted/30 text-foreground border resize-none" />
                 </CollapsibleContent>
               </Collapsible>}
-          </CardContent>
-        </Card>
-      </div>
-      
-      <div className="space-y-6">
-        {/* Build Configuration */}
-        <Card className="bg-card border-border">
-          <CardHeader>
-            <CardTitle className="flex items-center space-x-2">
-              <Settings className="h-5 w-5 text-primary" />
-              <span>Build Configuration</span>
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-6">
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="imageName">Image Name</Label>
-                <Input 
-                  id="imageName" 
-                  value={imageName} 
-                  onChange={(e) => onImageNameChange(e.target.value)}
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="imageTag">Tag</Label>
-                <Input 
-                  id="imageTag" 
-                  value={imageTag} 
-                  onChange={(e) => onImageTagChange(e.target.value)}
-                />
-              </div>
-            </div>
-
-            <Separator />
-
-            <Button 
-              onClick={onStartBuild} 
-              disabled={isBuilding}
-              className="w-full flex items-center justify-center space-x-2"
-            >
-              <Play className="h-4 w-4" />
-              <span>{isBuilding ? "Building..." : "Start Build"}</span>
-            </Button>
           </CardContent>
         </Card>
       </div>
