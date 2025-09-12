@@ -9,8 +9,6 @@ export interface BuilderState {
   selectedCollections: Collection[];
   requirements: string[];
   selectedPackages: string[];
-  imageName: string;
-  imageTag: string;
 }
 
 export const STORAGE_KEY = 'ansible-builder-state';
@@ -20,9 +18,7 @@ export const DEFAULT_STATE: BuilderState = {
   selectedBaseImage: "registry.access.redhat.com/ubi9/python-311:latest",
   selectedCollections: [],
   requirements: [],
-  selectedPackages: [],
-  imageName: "my-ansible-ee",
-  imageTag: "latest"
+  selectedPackages: []
 };
 
 export const clearStoredState = () => {

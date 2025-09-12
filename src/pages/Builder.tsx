@@ -1,12 +1,11 @@
 // Ansible Execution Environment Builder
 import { useState } from "react";
-import { Container, Layers, Package, Play, ChevronLeft, ChevronRight, Eye, RotateCcw } from "lucide-react";
+import { Container, Layers, Package, Play, ChevronLeft, ChevronRight, RotateCcw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { StepNavigation } from "@/components/StepNavigation";
 import { Step1BaseImage } from "@/components/steps/Step1BaseImage";
 import { Step2CollectionsRequirements } from "@/components/steps/Step2CollectionsRequirements";
 import { Step3Review } from "@/components/steps/Step3Review";
-import { BuildModal } from "@/components/BuildModal";
 import { useLocalStorage } from "@/hooks/useLocalStorage";
 import { Collection, STORAGE_KEY, DEFAULT_STATE, clearStoredState } from "@/lib/storage";
 
@@ -25,8 +24,8 @@ const steps = [
   },
   {
     id: 3,
-    title: "Build & Deploy",
-    description: "Review configuration and build execution environment",
+    title: "Build Execution Environment",
+    description: "Generate execution environment files and dependencies",
     icon: Play,
   },
 ];
@@ -38,15 +37,6 @@ const Builder = () => {
   const [selectedCollections, setSelectedCollections] = useLocalStorage<Collection[]>(`${STORAGE_KEY}-selectedCollections`, DEFAULT_STATE.selectedCollections);
   const [requirements, setRequirements] = useLocalStorage<string[]>(`${STORAGE_KEY}-requirements`, DEFAULT_STATE.requirements);
   const [selectedPackages, setSelectedPackages] = useLocalStorage<string[]>(`${STORAGE_KEY}-selectedPackages`, DEFAULT_STATE.selectedPackages);
-  const [imageName, setImageName] = useLocalStorage(`${STORAGE_KEY}-imageName`, DEFAULT_STATE.imageName);
-  const [imageTag, setImageTag] = useLocalStorage(`${STORAGE_KEY}-imageTag`, DEFAULT_STATE.imageTag);
-  
-  // Non-persistent build state
-  const [isBuilding, setIsBuilding] = useState(false);
-  const [buildProgress, setBuildProgress] = useState(0);
-  const [buildStatus, setBuildStatus] = useState<'idle' | 'building' | 'success' | 'error'>('idle');
-  const [buildLogs, setBuildLogs] = useState("");
-  const [buildModalOpen, setBuildModalOpen] = useState(false);
 
   const canGoNext = () => {
     switch (currentStep) {
@@ -90,47 +80,6 @@ const Builder = () => {
     setSelectedCollections(DEFAULT_STATE.selectedCollections);
     setRequirements(DEFAULT_STATE.requirements);
     setSelectedPackages(DEFAULT_STATE.selectedPackages);
-    setImageName(DEFAULT_STATE.imageName);
-    setImageTag(DEFAULT_STATE.imageTag);
-    
-    // Reset build state
-    setIsBuilding(false);
-    setBuildProgress(0);
-    setBuildStatus('idle');
-    setBuildLogs("");
-    setBuildModalOpen(false);
-  };
-
-  const startBuild = () => {
-    setBuildModalOpen(true);
-    setIsBuilding(true);
-    setBuildStatus('building');
-    setBuildProgress(0);
-    setBuildLogs("Starting build process...\n");
-
-    // Simulate build process
-    const steps = [
-      "Setting up build environment...",
-      "Installing collections...",
-      "Installing Python requirements...",
-      "Installing system packages...",
-      "Building container image...",
-      "Pushing to registry..."
-    ];
-
-    let currentStep = 0;
-    const interval = setInterval(() => {
-      currentStep++;
-      setBuildProgress((currentStep / steps.length) * 100);
-      setBuildLogs(prev => prev + `${steps[currentStep - 1]}\n`);
-
-      if (currentStep >= steps.length) {
-        clearInterval(interval);
-        setIsBuilding(false);
-        setBuildStatus('success');
-        setBuildLogs(prev => prev + "Build completed successfully!\n");
-      }
-    }, 1500);
   };
 
   const renderStep = () => {
@@ -160,12 +109,6 @@ const Builder = () => {
             selectedCollections={selectedCollections}
             requirements={requirements}
             selectedPackages={selectedPackages}
-            imageName={imageName}
-            imageTag={imageTag}
-            onImageNameChange={setImageName}
-            onImageTagChange={setImageTag}
-            isBuilding={isBuilding}
-            onStartBuild={startBuild}
           />
         );
       default:
@@ -225,16 +168,6 @@ const Builder = () => {
           </div>
         </div>
       </div>
-
-      {/* Build Modal */}
-      <BuildModal
-        isOpen={buildModalOpen}
-        onClose={() => setBuildModalOpen(false)}
-        buildProgress={buildProgress}
-        buildStatus={buildStatus}
-        buildLogs={buildLogs}
-        isBuilding={isBuilding}
-      />
     </div>
   );
 };
