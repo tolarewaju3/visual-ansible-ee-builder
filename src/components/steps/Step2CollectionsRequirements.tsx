@@ -367,10 +367,10 @@ export function Step2CollectionsRequirements({
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
-          <Tabs defaultValue="browse" className="space-y-4">
+          <Tabs defaultValue="custom" className="space-y-4">
             <TabsList className="grid w-full grid-cols-2">
-              <TabsTrigger value="browse">Browse Packages</TabsTrigger>
               <TabsTrigger value="custom">Add Custom</TabsTrigger>
+              <TabsTrigger value="browse">Browse Packages</TabsTrigger>
             </TabsList>
 
             <TabsContent value="browse" className="space-y-4">
