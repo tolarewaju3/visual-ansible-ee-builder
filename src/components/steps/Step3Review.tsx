@@ -105,9 +105,9 @@ ${selectedCollections.map(c => `  - name: ${c.name}${c.version ? `\n    version:
   };
   return <div className="space-y-6">
       <div className="text-center mb-8">
-        <h1 className="text-3xl font-bold text-foreground mb-2">Review Configuration</h1>
+        <h1 className="text-3xl font-bold text-foreground mb-2">Build & Deploy</h1>
         <p className="text-muted-foreground">
-          Review your execution environment configuration before building
+          Review your configuration and deploy your execution environment
         </p>
       </div>
 
