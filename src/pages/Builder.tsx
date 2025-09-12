@@ -6,7 +6,7 @@ import { StepNavigation } from "@/components/StepNavigation";
 import { Step1BaseImage } from "@/components/steps/Step1BaseImage";
 import { Step2CollectionsRequirements } from "@/components/steps/Step2CollectionsRequirements";
 import { Step3Review } from "@/components/steps/Step3Review";
-import { Step4Build } from "@/components/steps/Step4Build";
+import { BuildModal } from "@/components/BuildModal";
 import { useLocalStorage } from "@/hooks/useLocalStorage";
 import { Collection, STORAGE_KEY, DEFAULT_STATE, clearStoredState } from "@/lib/storage";
 
@@ -29,12 +29,6 @@ const steps = [
     description: "Review configuration and generated files",
     icon: Eye,
   },
-  {
-    id: 4,
-    title: "Build & Deploy",
-    description: "Build and deploy your execution environment",
-    icon: Play,
-  },
 ];
 
 const Builder = () => {
@@ -52,6 +46,7 @@ const Builder = () => {
   const [buildProgress, setBuildProgress] = useState(0);
   const [buildStatus, setBuildStatus] = useState<'idle' | 'building' | 'success' | 'error'>('idle');
   const [buildLogs, setBuildLogs] = useState("");
+  const [buildModalOpen, setBuildModalOpen] = useState(false);
 
   const canGoNext = () => {
     switch (currentStep) {
@@ -62,9 +57,6 @@ const Builder = () => {
         // Can always proceed from step 2, even with empty selections
         return true;
       case 3:
-        // Can always proceed from review step
-        return true;
-      case 4:
         // Final step, no next
         return false;
       default:
@@ -78,10 +70,6 @@ const Builder = () => {
 
   const handleNext = () => {
     if (canGoNext() && currentStep < steps.length) {
-      // If on step 3 (Review), start the build when proceeding
-      if (currentStep === 3) {
-        startBuild();
-      }
       setCurrentStep(currentStep + 1);
     }
   };
@@ -110,9 +98,11 @@ const Builder = () => {
     setBuildProgress(0);
     setBuildStatus('idle');
     setBuildLogs("");
+    setBuildModalOpen(false);
   };
 
   const startBuild = () => {
+    setBuildModalOpen(true);
     setIsBuilding(true);
     setBuildStatus('building');
     setBuildProgress(0);
@@ -175,15 +165,7 @@ const Builder = () => {
             onImageNameChange={setImageName}
             onImageTagChange={setImageTag}
             isBuilding={isBuilding}
-          />
-        );
-      case 4:
-        return (
-          <Step4Build
-            buildProgress={buildProgress}
-            buildStatus={buildStatus}
-            buildLogs={buildLogs}
-            isBuilding={isBuilding}
+            onStartBuild={startBuild}
           />
         );
       default:
@@ -236,13 +218,23 @@ const Builder = () => {
                 disabled={!canGoNext()}
                 className="flex items-center space-x-2"
               >
-                <span>{currentStep === 3 ? "Start Build" : "Next"}</span>
+                <span>Next</span>
                 <ChevronRight className="w-4 h-4" />
               </Button>
             )}
           </div>
         </div>
       </div>
+
+      {/* Build Modal */}
+      <BuildModal
+        isOpen={buildModalOpen}
+        onClose={() => setBuildModalOpen(false)}
+        buildProgress={buildProgress}
+        buildStatus={buildStatus}
+        buildLogs={buildLogs}
+        isBuilding={isBuilding}
+      />
     </div>
   );
 };
