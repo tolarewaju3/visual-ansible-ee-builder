@@ -92,10 +92,19 @@ export function Step2CollectionsRequirements({
     onCollectionsChange(selectedCollections.filter(c => c.name !== name));
   };
 
+  const isValidCollectionName = (name: string): boolean => {
+    const collectionPattern = /^[a-zA-Z0-9_]+\.[a-zA-Z0-9_]+$/;
+    return collectionPattern.test(name);
+  };
+
   const addCustomCollection = () => {
-    if (customCollection.trim() && !selectedCollections.find(c => c.name === customCollection.trim())) {
+    const trimmedName = customCollection.trim();
+    if (trimmedName && !selectedCollections.find(c => c.name === trimmedName)) {
+      if (!isValidCollectionName(trimmedName)) {
+        return; // Invalid format, don't add
+      }
       const newCollection: Collection = {
-        name: customCollection.trim(),
+        name: trimmedName,
         version: customCollectionVersion.trim() || undefined
       };
       onCollectionsChange([...selectedCollections, newCollection]);
@@ -174,13 +183,18 @@ export function Step2CollectionsRequirements({
             <TabsContent value="individual" className="space-y-4">
               <div className="space-y-2">
                 <div className="flex space-x-2">
-                  <Input
-                    placeholder="e.g., community.general"
-                    value={customCollection}
-                    onChange={(e) => setCustomCollection(e.target.value)}
-                    onKeyPress={(e) => e.key === 'Enter' && addCustomCollection()}
-                    className="flex-1"
-                  />
+                  <div className="flex-1 space-y-1">
+                    <Input
+                      placeholder="e.g., community.general"
+                      value={customCollection}
+                      onChange={(e) => setCustomCollection(e.target.value)}
+                      onKeyPress={(e) => e.key === 'Enter' && addCustomCollection()}
+                      className={`flex-1 ${customCollection.trim() && !isValidCollectionName(customCollection.trim()) ? 'border-destructive' : ''}`}
+                    />
+                    {customCollection.trim() && !isValidCollectionName(customCollection.trim()) && (
+                      <p className="text-xs text-destructive">Format must be namespace.collection</p>
+                    )}
+                  </div>
                   <Input
                     placeholder="Version (optional)"
                     value={customCollectionVersion}
@@ -188,7 +202,10 @@ export function Step2CollectionsRequirements({
                     onKeyPress={(e) => e.key === 'Enter' && addCustomCollection()}
                     className="w-32"
                   />
-                  <Button onClick={addCustomCollection}>
+                  <Button 
+                    onClick={addCustomCollection}
+                    disabled={!customCollection.trim() || !isValidCollectionName(customCollection.trim())}
+                  >
                     <Plus className="h-4 w-4 mr-2" />
                     Add
                   </Button>
