@@ -19,7 +19,7 @@ const steps = [
   {
     id: 2,
     title: "Requirements",
-    description: "Collections, dependencies, and packages",
+    description: "Choose collections & packages",
     icon: Layers,
   },
   {
