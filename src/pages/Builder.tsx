@@ -7,11 +7,8 @@ import { Step1BaseImage } from "@/components/steps/Step1BaseImage";
 import { Step2CollectionsRequirements } from "@/components/steps/Step2CollectionsRequirements";
 import { Step3Review } from "@/components/steps/Step3Review";
 import { Step4Build } from "@/components/steps/Step4Build";
-
-interface Collection {
-  name: string;
-  version?: string;
-}
+import { useLocalStorage } from "@/hooks/useLocalStorage";
+import { Collection, STORAGE_KEY, DEFAULT_STATE, clearStoredState } from "@/lib/storage";
 
 const steps = [
   {
@@ -41,15 +38,16 @@ const steps = [
 ];
 
 const Builder = () => {
-  const [currentStep, setCurrentStep] = useState(1);
-  const [selectedBaseImage, setSelectedBaseImage] = useState("registry.access.redhat.com/ubi9/python-311:latest");
-  const [selectedCollections, setSelectedCollections] = useState<Collection[]>([]);
-  const [requirements, setRequirements] = useState<string[]>([]);
-  const [selectedPackages, setSelectedPackages] = useState<string[]>([]);
+  // Persistent state using localStorage
+  const [currentStep, setCurrentStep] = useLocalStorage(`${STORAGE_KEY}-currentStep`, DEFAULT_STATE.currentStep);
+  const [selectedBaseImage, setSelectedBaseImage] = useLocalStorage(`${STORAGE_KEY}-selectedBaseImage`, DEFAULT_STATE.selectedBaseImage);
+  const [selectedCollections, setSelectedCollections] = useLocalStorage<Collection[]>(`${STORAGE_KEY}-selectedCollections`, DEFAULT_STATE.selectedCollections);
+  const [requirements, setRequirements] = useLocalStorage<string[]>(`${STORAGE_KEY}-requirements`, DEFAULT_STATE.requirements);
+  const [selectedPackages, setSelectedPackages] = useLocalStorage<string[]>(`${STORAGE_KEY}-selectedPackages`, DEFAULT_STATE.selectedPackages);
+  const [imageName, setImageName] = useLocalStorage(`${STORAGE_KEY}-imageName`, DEFAULT_STATE.imageName);
+  const [imageTag, setImageTag] = useLocalStorage(`${STORAGE_KEY}-imageTag`, DEFAULT_STATE.imageTag);
   
-  // Build state
-  const [imageName, setImageName] = useState("my-ansible-ee");
-  const [imageTag, setImageTag] = useState("latest");
+  // Non-persistent build state
   const [isBuilding, setIsBuilding] = useState(false);
   const [buildProgress, setBuildProgress] = useState(0);
   const [buildStatus, setBuildStatus] = useState<'idle' | 'building' | 'success' | 'error'>('idle');
@@ -95,18 +93,23 @@ const Builder = () => {
   };
 
   const handleReset = () => {
+    // Clear localStorage
+    clearStoredState();
+    
     // Reset all state to defaults
-    setSelectedBaseImage("registry.access.redhat.com/ubi9/python-311:latest");
-    setSelectedCollections([]);
-    setRequirements([]);
-    setSelectedPackages([]);
-    setImageName("my-ansible-ee");
-    setImageTag("latest");
+    setCurrentStep(DEFAULT_STATE.currentStep);
+    setSelectedBaseImage(DEFAULT_STATE.selectedBaseImage);
+    setSelectedCollections(DEFAULT_STATE.selectedCollections);
+    setRequirements(DEFAULT_STATE.requirements);
+    setSelectedPackages(DEFAULT_STATE.selectedPackages);
+    setImageName(DEFAULT_STATE.imageName);
+    setImageTag(DEFAULT_STATE.imageTag);
+    
+    // Reset build state
     setIsBuilding(false);
     setBuildProgress(0);
     setBuildStatus('idle');
     setBuildLogs("");
-    setCurrentStep(1);
   };
 
   const startBuild = () => {
