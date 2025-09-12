@@ -80,6 +80,10 @@ const Builder = () => {
 
   const handleNext = () => {
     if (canGoNext() && currentStep < steps.length) {
+      // If on step 3 (Review), start the build when proceeding
+      if (currentStep === 3) {
+        startBuild();
+      }
       setCurrentStep(currentStep + 1);
     }
   };
@@ -152,7 +156,6 @@ const Builder = () => {
             imageTag={imageTag}
             onImageNameChange={setImageName}
             onImageTagChange={setImageTag}
-            onStartBuild={startBuild}
             isBuilding={isBuilding}
           />
         );
@@ -206,7 +209,7 @@ const Builder = () => {
                 disabled={!canGoNext()}
                 className="flex items-center space-x-2"
               >
-                <span>Next</span>
+                <span>{currentStep === 3 ? "Start Build" : "Next"}</span>
                 <ChevronRight className="w-4 h-4" />
               </Button>
             )}

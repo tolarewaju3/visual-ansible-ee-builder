@@ -1,4 +1,4 @@
-import { FileText, Download, ChevronDown, Settings, Play, Clock } from "lucide-react";
+import { FileText, Download, ChevronDown, Settings } from "lucide-react";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -21,7 +21,6 @@ interface Step3ReviewProps {
   imageTag: string;
   onImageNameChange: (name: string) => void;
   onImageTagChange: (tag: string) => void;
-  onStartBuild: () => void;
   isBuilding: boolean;
 }
 export function Step3Review({
@@ -33,7 +32,6 @@ export function Step3Review({
   imageTag,
   onImageNameChange,
   onImageTagChange,
-  onStartBuild,
   isBuilding
 }: Step3ReviewProps) {
   const generateExecutionEnvironment = () => {
@@ -260,26 +258,11 @@ ${selectedCollections.map(c => `  - name: ${c.name}${c.version ? `\n    version:
 
             <Separator />
 
-            <div className="space-y-4">
-              <Button 
-                onClick={onStartBuild} 
-                disabled={isBuilding}
-                className="w-full"
-                size="lg"
-              >
-                {isBuilding ? (
-                  <>
-                    <Clock className="h-4 w-4 mr-2 animate-spin" />
-                    Building...
-                  </>
-                ) : (
-                  <>
-                    <Play className="h-4 w-4 mr-2" />
-                    Start Build
-                  </>
-                )}
-              </Button>
-            </div>
+            {isBuilding && (
+              <p className="text-sm text-muted-foreground text-center">
+                Build will start when you proceed to the next step
+              </p>
+            )}
           </CardContent>
         </Card>
       </div>
