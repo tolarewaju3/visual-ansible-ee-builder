@@ -1,7 +1,7 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Container, Lock, Zap } from "lucide-react";
+import { Container } from "lucide-react";
 
 interface BaseImage {
   id: string;
@@ -9,8 +9,6 @@ interface BaseImage {
   tag: string;
   description: string;
   popular?: boolean;
-  requiresSubscription?: boolean;
-  fastStart?: boolean;
 }
 
 const popularBaseImages: BaseImage[] = [
@@ -19,20 +17,12 @@ const popularBaseImages: BaseImage[] = [
     name: "registry.access.redhat.com/ubi9/python-311",
     tag: "latest",
     description: "Red Hat Universal Base Image 9 w/ Python",
-    fastStart: true,
-  },
-  {
-    id: "fedora",
-    name: "registry.fedoraproject.org/fedora",
-    tag: "38",
-    description: "Latest Fedora Linux distribution",
   },
   {
     id: "ee-minimal-rhel9",
     name: "registry.redhat.io/ansible-automation-platform-25/ee-minimal-rhel9",
     tag: "latest",
     description: "Red Hat AAP EE base (RHEL 9)",
-    requiresSubscription: true,
   },
 ];
 
@@ -82,18 +72,6 @@ export function Step1BaseImage({ selectedBaseImage, onBaseImageChange }: Step1Ba
                     <code className="text-sm font-mono bg-muted px-2 py-1 rounded">
                       {image.name}:{image.tag}
                     </code>
-                    {image.fastStart && (
-                      <Badge variant="default" className="text-xs flex items-center gap-1">
-                        <Zap className="h-3 w-3" />
-                        Fast Start
-                      </Badge>
-                    )}
-                    {image.requiresSubscription && (
-                      <Badge variant="secondary" className="text-xs flex items-center gap-1">
-                        <Lock className="h-3 w-3" />
-                        Requires Subscription
-                      </Badge>
-                    )}
                   </div>
                   <p className="text-sm text-muted-foreground">{image.description}</p>
                 </div>
