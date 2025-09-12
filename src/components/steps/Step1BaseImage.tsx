@@ -1,7 +1,7 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Container, Zap } from "lucide-react";
+import { Container, Zap, Lock } from "lucide-react";
 
 interface BaseImage {
   id: string;
@@ -10,6 +10,7 @@ interface BaseImage {
   description: string;
   popular?: boolean;
   fastStart?: boolean;
+  subscriptionRequired?: boolean;
 }
 
 const popularBaseImages: BaseImage[] = [
@@ -25,6 +26,7 @@ const popularBaseImages: BaseImage[] = [
     name: "registry.redhat.io/ansible-automation-platform-25/ee-minimal-rhel9",
     tag: "latest",
     description: "Red Hat Ansible Minimal EE base (RHEL 9)",
+    subscriptionRequired: true,
   },
 ];
 
@@ -78,6 +80,12 @@ export function Step1BaseImage({ selectedBaseImage, onBaseImageChange }: Step1Ba
                       <Badge variant="default" className="text-xs">
                         <Zap className="w-3 h-3 mr-1" />
                         Fast Start
+                      </Badge>
+                    )}
+                    {image.subscriptionRequired && (
+                      <Badge variant="outline" className="text-xs">
+                        <Lock className="w-3 h-3 mr-1" />
+                        Subscription Required
                       </Badge>
                     )}
                   </div>
