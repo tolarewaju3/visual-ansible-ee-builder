@@ -27,7 +27,7 @@ const steps = [
     id: 3,
     title: "Build & Deploy",
     description: "Review configuration and build execution environment",
-    icon: Eye,
+    icon: Play,
   },
 ];
 
