@@ -1,6 +1,7 @@
 # Visual Ansible EE Builder 
 
-**TL;DR:** Generates **Ansible EE files** only (`execution-environment.yml`, `requirements.yml`, `requirements.txt`, optional `bindep.txt`).  
+UI for generating Ansible Execution Environment files.
+
 **No builds. No pushes. No creds.**
 
 ---
@@ -81,6 +82,3 @@ bindep.txt   # only if you added RPMs
 ## 🔐 Security & Privacy
 - No credential collection.  
 - Files are generated client‑side and downloaded to your machine.
-
-## 📄 License
-MIT
