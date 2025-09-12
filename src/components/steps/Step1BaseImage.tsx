@@ -75,7 +75,7 @@ export function Step1BaseImage({ selectedBaseImage, onBaseImageChange }: Step1Ba
                       {image.name}:{image.tag}
                     </code>
                     {image.fastStart && (
-                      <Badge variant="secondary" className="text-xs">
+                      <Badge variant="default" className="text-xs">
                         <Zap className="w-3 h-3 mr-1" />
                         Fast Start
                       </Badge>
