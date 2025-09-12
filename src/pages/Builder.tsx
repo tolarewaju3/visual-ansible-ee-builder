@@ -20,7 +20,7 @@ const steps = [
   {
     id: 2,
     title: "Requirements",
-    description: "Ansible collections, Python dependencies, and system packages",
+    description: "Collections, dependencies, and packages",
     icon: Layers,
   },
   {
