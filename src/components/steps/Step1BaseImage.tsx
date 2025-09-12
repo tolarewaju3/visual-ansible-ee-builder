@@ -22,7 +22,7 @@ const popularBaseImages: BaseImage[] = [
     id: "ee-minimal-rhel9",
     name: "registry.redhat.io/ansible-automation-platform-25/ee-minimal-rhel9",
     tag: "latest",
-    description: "Red Hat AAP EE base (RHEL 9)",
+    description: "Red Hat Ansible Minimal EE base (RHEL 9)",
   },
 ];
 
