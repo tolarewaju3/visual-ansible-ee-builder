@@ -1,7 +1,7 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Container, Zap, Lock } from "lucide-react";
+import { Container, Zap, Lock, CheckCircle } from "lucide-react";
 
 interface BaseImage {
   id: string;
@@ -92,6 +92,7 @@ export function Step1BaseImage({ selectedBaseImage, onBaseImageChange }: Step1Ba
                     )}
                     {image.supported && (
                       <Badge variant="secondary" className="text-xs">
+                        <CheckCircle className="w-3 h-3 mr-1" />
                         Supported
                       </Badge>
                     )}
