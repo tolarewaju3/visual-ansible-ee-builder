@@ -260,16 +260,14 @@ ${selectedCollections.map(c => `  - name: ${c.name}${c.version ? `\n    version:
 
             <Separator />
 
-            <div className="flex justify-center">
-              <Button 
-                onClick={onStartBuild} 
-                disabled={isBuilding}
-                className="flex items-center space-x-2"
-              >
-                <Play className="h-4 w-4" />
-                <span>{isBuilding ? "Building..." : "Start Build"}</span>
-              </Button>
-            </div>
+            <Button 
+              onClick={onStartBuild} 
+              disabled={isBuilding}
+              className="w-full flex items-center justify-center space-x-2"
+            >
+              <Play className="h-4 w-4" />
+              <span>{isBuilding ? "Building..." : "Start Build"}</span>
+            </Button>
           </CardContent>
         </Card>
       </div>
