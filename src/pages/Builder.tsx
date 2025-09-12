@@ -155,14 +155,16 @@ const Builder = () => {
               <span>Previous</span>
             </Button>
 
-            <Button
-              onClick={handleNext}
-              disabled={!canGoNext()}
-              className="flex items-center space-x-2"
-            >
-              <span>{currentStep === steps.length ? "Complete Build" : "Next"}</span>
-              <ChevronRight className="w-4 h-4" />
-            </Button>
+            {currentStep < steps.length && (
+              <Button
+                onClick={handleNext}
+                disabled={!canGoNext()}
+                className="flex items-center space-x-2"
+              >
+                <span>Next</span>
+                <ChevronRight className="w-4 h-4" />
+              </Button>
+            )}
           </div>
         </div>
       </div>
