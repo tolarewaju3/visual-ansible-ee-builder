@@ -25,7 +25,7 @@ const steps = [
   {
     id: 3,
     title: "Build Execution Environment",
-    description: "Generate execution environment files and dependencies",
+    description: "Generate execution environment files",
     icon: Play,
   },
 ];
