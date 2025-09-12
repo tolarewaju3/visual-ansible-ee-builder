@@ -1,7 +1,7 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Container } from "lucide-react";
+import { Container, Lock } from "lucide-react";
 
 interface BaseImage {
   id: string;
@@ -81,7 +81,8 @@ export function Step1BaseImage({ selectedBaseImage, onBaseImageChange }: Step1Ba
                       {image.name}:{image.tag}
                     </code>
                     {image.requiresSubscription && (
-                      <Badge variant="secondary" className="text-xs">
+                      <Badge variant="secondary" className="text-xs flex items-center gap-1">
+                        <Lock className="h-3 w-3" />
                         Requires Subscription
                       </Badge>
                     )}
