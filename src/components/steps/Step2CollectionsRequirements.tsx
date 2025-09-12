@@ -61,6 +61,8 @@ export function Step2CollectionsRequirements({
   const [customRequirement, setCustomRequirement] = useState("");
   const [customPackage, setCustomPackage] = useState("");
   const [packageSearchQuery, setPackageSearchQuery] = useState("");
+  const [customCollection, setCustomCollection] = useState("");
+  const [customCollectionVersion, setCustomCollectionVersion] = useState("");
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const addPackage = (packageName: string) => {
@@ -88,6 +90,18 @@ export function Step2CollectionsRequirements({
 
   const removeCollection = (name: string) => {
     onCollectionsChange(selectedCollections.filter(c => c.name !== name));
+  };
+
+  const addCustomCollection = () => {
+    if (customCollection.trim() && !selectedCollections.find(c => c.name === customCollection.trim())) {
+      const newCollection: Collection = {
+        name: customCollection.trim(),
+        version: customCollectionVersion.trim() || undefined
+      };
+      onCollectionsChange([...selectedCollections, newCollection]);
+      setCustomCollection("");
+      setCustomCollectionVersion("");
+    }
   };
 
   const addRequirement = () => {
@@ -150,18 +164,80 @@ export function Step2CollectionsRequirements({
             Select the Ansible collections to include in your execution environment
           </CardDescription>
         </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="relative">
-            <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-            <Input
-              placeholder="Search collections..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-10"
-            />
-          </div>
+        <CardContent>
+          <Tabs defaultValue="individual" className="space-y-4">
+            <TabsList className="grid w-full grid-cols-2">
+              <TabsTrigger value="individual">Add Individual</TabsTrigger>
+              <TabsTrigger value="browse">Browse Popular</TabsTrigger>
+            </TabsList>
 
-          <div className="space-y-2">
+            <TabsContent value="individual" className="space-y-4">
+              <div className="space-y-2">
+                <div className="flex space-x-2">
+                  <Input
+                    placeholder="e.g., community.general"
+                    value={customCollection}
+                    onChange={(e) => setCustomCollection(e.target.value)}
+                    onKeyPress={(e) => e.key === 'Enter' && addCustomCollection()}
+                    className="flex-1"
+                  />
+                  <Input
+                    placeholder="Version (optional)"
+                    value={customCollectionVersion}
+                    onChange={(e) => setCustomCollectionVersion(e.target.value)}
+                    onKeyPress={(e) => e.key === 'Enter' && addCustomCollection()}
+                    className="w-32"
+                  />
+                  <Button onClick={addCustomCollection}>
+                    <Plus className="h-4 w-4 mr-2" />
+                    Add
+                  </Button>
+                </div>
+              </div>
+            </TabsContent>
+
+            <TabsContent value="browse" className="space-y-4">
+              <div className="relative">
+                <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                <Input
+                  placeholder="Search collections..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="pl-10"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <h4 className="text-sm font-medium text-foreground">Popular Collections</h4>
+                <div className="grid gap-2 max-h-48 overflow-y-auto">
+                  {filteredCollections.map((collection) => (
+                    <div 
+                      key={collection.name}
+                      className="flex items-center justify-between p-3 border border-border rounded-lg hover:bg-muted/50 transition-colors"
+                    >
+                      <div className="flex-1">
+                        <div className="flex items-center space-x-2">
+                          <span className="font-mono text-sm text-foreground">{collection.name}</span>
+                          <Badge variant="outline" className="text-xs">v{collection.version}</Badge>
+                        </div>
+                        <p className="text-xs text-muted-foreground mt-1">{collection.description}</p>
+                      </div>
+                      <Button
+                        size="sm"
+                        onClick={() => addCollection(collection)}
+                        disabled={selectedCollections.some(c => c.name === collection.name)}
+                        className="ml-2"
+                      >
+                        <Plus className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </TabsContent>
+          </Tabs>
+
+          <div className="mt-6 space-y-2">
             <h4 className="text-sm font-medium text-foreground">Selected Collections</h4>
             {selectedCollections.length === 0 ? (
               <p className="text-sm text-muted-foreground">No collections selected</p>
@@ -181,34 +257,6 @@ export function Step2CollectionsRequirements({
                 ))}
               </div>
             )}
-          </div>
-
-          <div className="space-y-2">
-            <h4 className="text-sm font-medium text-foreground">Popular Collections</h4>
-            <div className="grid gap-2 max-h-48 overflow-y-auto">
-              {filteredCollections.map((collection) => (
-                <div 
-                  key={collection.name}
-                  className="flex items-center justify-between p-3 border border-border rounded-lg hover:bg-muted/50 transition-colors"
-                >
-                  <div className="flex-1">
-                    <div className="flex items-center space-x-2">
-                      <span className="font-mono text-sm text-foreground">{collection.name}</span>
-                      <Badge variant="outline" className="text-xs">v{collection.version}</Badge>
-                    </div>
-                    <p className="text-xs text-muted-foreground mt-1">{collection.description}</p>
-                  </div>
-                  <Button
-                    size="sm"
-                    onClick={() => addCollection(collection)}
-                    disabled={selectedCollections.some(c => c.name === collection.name)}
-                    className="ml-2"
-                  >
-                    <Plus className="h-4 w-4" />
-                  </Button>
-                </div>
-              ))}
-            </div>
           </div>
         </CardContent>
       </Card>
