@@ -9,6 +9,7 @@ interface BaseImage {
   tag: string;
   description: string;
   popular?: boolean;
+  requiresSubscription?: boolean;
 }
 
 const popularBaseImages: BaseImage[] = [
@@ -29,6 +30,7 @@ const popularBaseImages: BaseImage[] = [
     name: "registry.redhat.io/ansible-automation-platform-25/ee-minimal-rhel9",
     tag: "latest",
     description: "Red Hat AAP EE base (RHEL 9)",
+    requiresSubscription: true,
   },
 ];
 
@@ -78,6 +80,11 @@ export function Step1BaseImage({ selectedBaseImage, onBaseImageChange }: Step1Ba
                     <code className="text-sm font-mono bg-muted px-2 py-1 rounded">
                       {image.name}:{image.tag}
                     </code>
+                    {image.requiresSubscription && (
+                      <Badge variant="secondary" className="text-xs">
+                        Requires Subscription
+                      </Badge>
+                    )}
                   </div>
                   <p className="text-sm text-muted-foreground">{image.description}</p>
                 </div>
