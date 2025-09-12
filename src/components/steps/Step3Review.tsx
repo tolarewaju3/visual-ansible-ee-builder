@@ -1,10 +1,12 @@
-import { FileText, Download, ChevronDown } from "lucide-react";
+import { FileText, Download, ChevronDown, Settings, Play, Clock } from "lucide-react";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
 import { Separator } from "@/components/ui/separator";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import JSZip from "jszip";
 interface Collection {
   name: string;
@@ -15,12 +17,24 @@ interface Step3ReviewProps {
   selectedCollections: Collection[];
   requirements: string[];
   selectedPackages: string[];
+  imageName: string;
+  imageTag: string;
+  onImageNameChange: (name: string) => void;
+  onImageTagChange: (tag: string) => void;
+  onStartBuild: () => void;
+  isBuilding: boolean;
 }
 export function Step3Review({
   selectedBaseImage,
   selectedCollections,
   requirements,
-  selectedPackages
+  selectedPackages,
+  imageName,
+  imageTag,
+  onImageNameChange,
+  onImageTagChange,
+  onStartBuild,
+  isBuilding
 }: Step3ReviewProps) {
   const generateExecutionEnvironment = () => {
     const collections = selectedCollections.map(c => c.version ? `${c.name}:${c.version}` : c.name);
@@ -153,6 +167,59 @@ ${selectedCollections.map(c => `  - name: ${c.name}${c.version ? `\n    version:
                       </Badge>)}
                   </div>}
               </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Build Configuration */}
+        <Card className="bg-card border-border">
+          <CardHeader>
+            <CardTitle className="flex items-center space-x-2">
+              <Settings className="h-5 w-5 text-primary" />
+              <span>Build Configuration</span>
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-6">
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="imageName">Image Name</Label>
+                <Input 
+                  id="imageName" 
+                  value={imageName} 
+                  onChange={(e) => onImageNameChange(e.target.value)}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="imageTag">Tag</Label>
+                <Input 
+                  id="imageTag" 
+                  value={imageTag} 
+                  onChange={(e) => onImageTagChange(e.target.value)}
+                />
+              </div>
+            </div>
+
+            <Separator />
+
+            <div className="space-y-4">
+              <Button 
+                onClick={onStartBuild} 
+                disabled={isBuilding}
+                className="w-full"
+                size="lg"
+              >
+                {isBuilding ? (
+                  <>
+                    <Clock className="h-4 w-4 mr-2 animate-spin" />
+                    Building...
+                  </>
+                ) : (
+                  <>
+                    <Play className="h-4 w-4 mr-2" />
+                    Start Build
+                  </>
+                )}
+              </Button>
             </div>
           </CardContent>
         </Card>

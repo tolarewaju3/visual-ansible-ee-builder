@@ -46,6 +46,14 @@ const Builder = () => {
   const [selectedCollections, setSelectedCollections] = useState<Collection[]>([]);
   const [requirements, setRequirements] = useState<string[]>([]);
   const [selectedPackages, setSelectedPackages] = useState<string[]>([]);
+  
+  // Build state
+  const [imageName, setImageName] = useState("my-ansible-ee");
+  const [imageTag, setImageTag] = useState("latest");
+  const [isBuilding, setIsBuilding] = useState(false);
+  const [buildProgress, setBuildProgress] = useState(0);
+  const [buildStatus, setBuildStatus] = useState<'idle' | 'building' | 'success' | 'error'>('idle');
+  const [buildLogs, setBuildLogs] = useState("");
 
   const canGoNext = () => {
     switch (currentStep) {
@@ -82,6 +90,37 @@ const Builder = () => {
     }
   };
 
+  const startBuild = () => {
+    setIsBuilding(true);
+    setBuildStatus('building');
+    setBuildProgress(0);
+    setBuildLogs("Starting build process...\n");
+
+    // Simulate build process
+    const steps = [
+      "Setting up build environment...",
+      "Installing collections...",
+      "Installing Python requirements...",
+      "Installing system packages...",
+      "Building container image...",
+      "Pushing to registry..."
+    ];
+
+    let currentStep = 0;
+    const interval = setInterval(() => {
+      currentStep++;
+      setBuildProgress((currentStep / steps.length) * 100);
+      setBuildLogs(prev => prev + `${steps[currentStep - 1]}\n`);
+
+      if (currentStep >= steps.length) {
+        clearInterval(interval);
+        setIsBuilding(false);
+        setBuildStatus('success');
+        setBuildLogs(prev => prev + "Build completed successfully!\n");
+      }
+    }, 1500);
+  };
+
   const renderStep = () => {
     switch (currentStep) {
       case 1:
@@ -109,15 +148,21 @@ const Builder = () => {
             selectedCollections={selectedCollections}
             requirements={requirements}
             selectedPackages={selectedPackages}
+            imageName={imageName}
+            imageTag={imageTag}
+            onImageNameChange={setImageName}
+            onImageTagChange={setImageTag}
+            onStartBuild={startBuild}
+            isBuilding={isBuilding}
           />
         );
       case 4:
         return (
           <Step4Build
-            selectedBaseImage={selectedBaseImage}
-            selectedCollections={selectedCollections}
-            requirements={requirements}
-            selectedPackages={selectedPackages}
+            buildProgress={buildProgress}
+            buildStatus={buildStatus}
+            buildLogs={buildLogs}
+            isBuilding={isBuilding}
           />
         );
       default:
