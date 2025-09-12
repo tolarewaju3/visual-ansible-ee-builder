@@ -1,7 +1,7 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Container } from "lucide-react";
+import { Container, Zap } from "lucide-react";
 
 interface BaseImage {
   id: string;
@@ -9,6 +9,7 @@ interface BaseImage {
   tag: string;
   description: string;
   popular?: boolean;
+  fastStart?: boolean;
 }
 
 const popularBaseImages: BaseImage[] = [
@@ -17,6 +18,7 @@ const popularBaseImages: BaseImage[] = [
     name: "registry.access.redhat.com/ubi9/python-311",
     tag: "latest",
     description: "Red Hat Universal Base Image 9 w/ Python",
+    fastStart: true,
   },
   {
     id: "ee-minimal-rhel9",
@@ -72,6 +74,12 @@ export function Step1BaseImage({ selectedBaseImage, onBaseImageChange }: Step1Ba
                     <code className="text-sm font-mono bg-muted px-2 py-1 rounded">
                       {image.name}:{image.tag}
                     </code>
+                    {image.fastStart && (
+                      <Badge variant="secondary" className="text-xs">
+                        <Zap className="w-3 h-3 mr-1" />
+                        Fast Start
+                      </Badge>
+                    )}
                   </div>
                   <p className="text-sm text-muted-foreground">{image.description}</p>
                 </div>
