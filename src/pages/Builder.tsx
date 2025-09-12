@@ -1,6 +1,6 @@
 // Ansible Execution Environment Builder
 import { useState } from "react";
-import { Container, Layers, Package, Play, ChevronLeft, ChevronRight, Eye } from "lucide-react";
+import { Container, Layers, Package, Play, ChevronLeft, ChevronRight, Eye, RotateCcw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { StepNavigation } from "@/components/StepNavigation";
 import { Step1BaseImage } from "@/components/steps/Step1BaseImage";
@@ -92,6 +92,21 @@ const Builder = () => {
     if (canGoPrev()) {
       setCurrentStep(currentStep - 1);
     }
+  };
+
+  const handleReset = () => {
+    // Reset all state to defaults
+    setSelectedBaseImage("registry.access.redhat.com/ubi9/python-311:latest");
+    setSelectedCollections([]);
+    setRequirements([]);
+    setSelectedPackages([]);
+    setImageName("my-ansible-ee");
+    setImageTag("latest");
+    setIsBuilding(false);
+    setBuildProgress(0);
+    setBuildStatus('idle');
+    setBuildLogs("");
+    setCurrentStep(1);
   };
 
   const startBuild = () => {
@@ -192,7 +207,7 @@ const Builder = () => {
       {/* Navigation buttons at bottom */}
       <div className="border-t border-border bg-card">
         <div className="container mx-auto px-6 py-4">
-          <div className="flex justify-between">
+          <div className="flex justify-between items-center">
             <Button
               variant="outline"
               onClick={handlePrev}
@@ -201,6 +216,15 @@ const Builder = () => {
             >
               <ChevronLeft className="w-4 h-4" />
               <span>Previous</span>
+            </Button>
+
+            <Button
+              variant="outline"
+              onClick={handleReset}
+              className="flex items-center space-x-2"
+            >
+              <RotateCcw className="w-4 h-4" />
+              <span>Reset</span>
             </Button>
 
             {currentStep < steps.length && (
