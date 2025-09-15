@@ -1,6 +1,5 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { PRESETS, Preset } from "@/lib/presets";
 import { Wrench } from "lucide-react";
 
@@ -65,22 +64,20 @@ export function Step0Presets({ selectedPreset, onPresetChange }: Step0PresetsPro
               <div className="space-y-3">
                 <div>
                   <div className="text-sm font-medium mb-1">Includes:</div>
-                  <div className="flex flex-wrap gap-1">
-                    <Badge variant="secondary" className="text-xs">
-                      {preset.collections.length} collections
-                    </Badge>
-                    <Badge variant="secondary" className="text-xs">
-                      {preset.requirements.length} packages
-                    </Badge>
-                    {preset.packages.length > 0 && (
-                      <Badge variant="secondary" className="text-xs">
-                        {preset.packages.length} system packages
-                      </Badge>
+                  <div className="text-sm text-muted-foreground">
+                    {preset.id === 'basic-automation' && (
+                      <>POSIX & General collections, HTTP & templating tools, Git & Curl</>
+                    )}
+                    {preset.id === 'network-automation' && (
+                      <>Cisco, Arista & Juniper support, SSH & network tools</>
+                    )}
+                    {preset.id === 'cloud-management' && (
+                      <>AWS, Azure & GCP collections, Cloud SDKs & CLI tools</>
                     )}
                   </div>
                 </div>
                 <div className="text-xs text-muted-foreground">
-                  Base: {preset.baseImage.split('/').pop()}
+                  Base: Python 3.11 on RHEL 9
                 </div>
               </div>
             </CardContent>
@@ -88,44 +85,6 @@ export function Step0Presets({ selectedPreset, onPresetChange }: Step0PresetsPro
         ))}
       </div>
 
-      {selectedPreset && selectedPreset !== 'scratch' && (
-        <Card className="bg-muted/50">
-          <CardHeader>
-            <CardTitle className="text-lg">Preset Preview</CardTitle>
-          </CardHeader>
-          <CardContent>
-            {(() => {
-              const preset = PRESETS.find(p => p.id === selectedPreset);
-              if (!preset) return null;
-              
-              return (
-                <div className="space-y-3">
-                  <div>
-                    <div className="text-sm font-medium mb-1">Collections ({preset.collections.length}):</div>
-                    <div className="text-sm text-muted-foreground">
-                      {preset.collections.map(c => c.name).join(', ')}
-                    </div>
-                  </div>
-                  <div>
-                    <div className="text-sm font-medium mb-1">Python Requirements ({preset.requirements.length}):</div>
-                    <div className="text-sm text-muted-foreground">
-                      {preset.requirements.join(', ')}
-                    </div>
-                  </div>
-                  {preset.packages.length > 0 && (
-                    <div>
-                      <div className="text-sm font-medium mb-1">System Packages ({preset.packages.length}):</div>
-                      <div className="text-sm text-muted-foreground">
-                        {preset.packages.join(', ')}
-                      </div>
-                    </div>
-                  )}
-                </div>
-              );
-            })()}
-          </CardContent>
-        </Card>
-      )}
     </div>
   );
 }
