@@ -66,7 +66,7 @@ export function Step0Presets({ selectedPreset, onPresetChange }: Step0PresetsPro
                   <div className="text-sm font-medium mb-1">Includes:</div>
                   <div className="text-sm text-muted-foreground">
                     {preset.id === 'basic-automation' && (
-                      <>POSIX & General collections, HTTP & templating tools, Git & Curl</>
+                      <>POSIX & General collections, HTTP & templating tools</>
                     )}
                     {preset.id === 'network-automation' && (
                       <>Cisco, Arista & Juniper support, SSH & network tools</>
