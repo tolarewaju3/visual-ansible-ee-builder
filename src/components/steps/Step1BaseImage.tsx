@@ -104,9 +104,7 @@ export function Step1BaseImage({ selectedBaseImage, onBaseImageChange }: Step1Ba
                   <RadioGroupItem value={image.id} className="mt-1" />
                   <div className="flex-1 space-y-2">
                     <div className="flex items-center gap-2">
-                      <code className="text-sm font-mono bg-muted px-2 py-1 rounded">
-                        {image.name}:{image.tag}
-                      </code>
+                      <span className="font-medium">{image.description}</span>
                       {image.fastStart && (
                         <Badge variant="default" className="text-xs">
                           <Zap className="w-3 h-3 mr-1" />
@@ -126,7 +124,9 @@ export function Step1BaseImage({ selectedBaseImage, onBaseImageChange }: Step1Ba
                         </Badge>
                       )}
                     </div>
-                    <p className="text-sm text-muted-foreground">{image.description}</p>
+                    <code className="text-sm font-mono bg-muted px-2 py-1 rounded text-muted-foreground">
+                      {image.name}:{image.tag}
+                    </code>
                   </div>
                 </div>
               ))}
