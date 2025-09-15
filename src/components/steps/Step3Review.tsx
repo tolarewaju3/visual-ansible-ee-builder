@@ -168,12 +168,10 @@ ${selectedCollections.map(c => `  - name: ${c.name}${c.version ? `\n    version:
         </Card>
 
         {/* Export All Button */}
-        <div className="flex justify-center">
-          <Button size="lg" onClick={handleExportAll}>
-            <Download className="h-5 w-5 mr-2" />
-            Export All
-          </Button>
-        </div>
+        <Button size="lg" className="w-full" onClick={handleExportAll}>
+          <Download className="h-5 w-5 mr-2" />
+          Export All
+        </Button>
       </div>
     </div>
   );
