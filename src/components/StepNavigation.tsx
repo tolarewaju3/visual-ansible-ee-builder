@@ -4,7 +4,6 @@ import { cn } from "@/lib/utils";
 interface Step {
   id: number;
   title: string;
-  description: string;
   icon: React.ComponentType<{ className?: string }>;
 }
 
@@ -73,7 +72,6 @@ export function StepNavigation({
                     >
                       {step.title}
                     </p>
-                    <p className="text-xs text-muted-foreground">{step.description}</p>
                   </div>
                 </button>
                 {index < steps.length - 1 && (

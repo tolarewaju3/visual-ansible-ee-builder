@@ -15,25 +15,21 @@ const steps = [
   {
     id: 0,
     title: "Choose Preset",
-    description: "Select starting template",
     icon: Sparkles,
   },
   {
     id: 1,
     title: "Base Image",
-    description: "Select container base image",
     icon: Container,
   },
   {
     id: 2,
     title: "Requirements",
-    description: "Choose collections & packages",
     icon: Layers,
   },
   {
     id: 3,
     title: "Build Execution Environment",
-    description: "Generate execution environment",
     icon: Play,
   },
 ];
