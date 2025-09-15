@@ -86,7 +86,7 @@ export const PRESETS: Preset[] = [
       { name: 'kubernetes.core', version: '3.0.1' },
       { name: 'community.docker', version: '3.4.11' },
       { name: 'redhat.openshift', version: '2.0.1' },
-      { name: 'community.general', version: '8.1.0' },
+      { name: 'community.general', version: '8.1.0' }
     ],
     requirements: [
       'kubernetes>=28.1.0',
