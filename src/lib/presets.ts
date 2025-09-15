@@ -28,10 +28,7 @@ export const PRESETS: Preset[] = [
       'jmespath>=1.0',
       'PyYAML>=6.0'
     ],
-    packages: [
-      'git',
-      'curl'
-    ]
+    packages: []
   },
   {
     id: 'network-automation',
@@ -53,7 +50,6 @@ export const PRESETS: Preset[] = [
       'jinja2>=3.0.0'
     ],
     packages: [
-      'openssh-clients',
       'telnet'
     ]
   },
@@ -77,7 +73,6 @@ export const PRESETS: Preset[] = [
       'requests>=2.25.1'
     ],
     packages: [
-      'curl',
       'jq'
     ]
   },
@@ -91,17 +86,16 @@ export const PRESETS: Preset[] = [
       { name: 'kubernetes.core', version: '3.0.1' },
       { name: 'community.docker', version: '3.4.11' },
       { name: 'redhat.openshift', version: '2.0.1' },
-      { name: 'community.general', version: '8.1.0' }
+      { name: 'community.general', version: '8.1.0' },
     ],
     requirements: [
       'kubernetes>=28.1.0',
       'docker>=6.1.0',
       'openshift>=0.13.2',
-      'pyyaml>=6.0'
+      'pyyaml>=6.0',
+      'requests>=2.28',
     ],
-    packages: [
-      'git'
-    ]
+    packages: []
   },
   {
     id: 'security-compliance',
@@ -113,14 +107,16 @@ export const PRESETS: Preset[] = [
       { name: 'community.crypto', version: '2.16.1' },
       { name: 'community.general', version: '8.1.0' },
       { name: 'ansible.posix', version: '1.5.4' }
+      { name: 'devsec.hardening'}
     ],
     requirements: [
       'cryptography>=41.0.0',
       'passlib>=1.7.4',
-      'requests>=2.25.1'
+      'requests>=2.25.1',
+      'PyYAML>=6.0',
+      'jmespath>=1.0'
     ],
     packages: [
-      'openssl',
       'ca-certificates'
     ]
   }
