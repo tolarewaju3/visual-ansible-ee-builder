@@ -32,7 +32,7 @@ export function StepNavigation({
         {/* Step indicators */}
         <div className="flex items-center justify-between mb-4">
           {steps.map((step, index) => {
-            const stepNumber = index + 1;
+            const stepNumber = index;
             const isActive = stepNumber === currentStep;
             const isCompleted = stepNumber < currentStep;
             const isClickable = stepNumber <= currentStep;
