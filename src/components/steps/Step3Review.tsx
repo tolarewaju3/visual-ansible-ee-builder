@@ -1,9 +1,10 @@
-import { FileText, Download } from "lucide-react";
+import { FileText, Download, AlertTriangle } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
 import { Separator } from "@/components/ui/separator";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import JSZip from "jszip";
 
 interface Collection {
@@ -24,6 +25,17 @@ export function Step3Review({
   requirements,
   selectedPackages
 }: Step3ReviewProps) {
+  // Packages that require Red Hat subscription
+  const redHatSubscriptionPackages = ['telnet', 'tcpdump'];
+  
+  // Check if any selected packages require Red Hat subscription
+  const hasRedHatPackages = selectedPackages.some(pkg => 
+    redHatSubscriptionPackages.includes(pkg.toLowerCase())
+  );
+  
+  const redHatPackagesFound = selectedPackages.filter(pkg => 
+    redHatSubscriptionPackages.includes(pkg.toLowerCase())
+  );
   const generateExecutionEnvironment = () => {
     const collections = selectedCollections.map(c => c.version ? `${c.name}:${c.version}` : c.name);
     const dependenciesLines = ['  ansible_core:', '    package_pip: ansible-core==2.14.4', '  ansible_runner:', '    package_pip: ansible-runner'];
@@ -106,6 +118,19 @@ ${selectedCollections.map(c => `  - name: ${c.name}${c.version ? `\n    version:
       </div>
 
       <div className="space-y-6">
+        {/* Red Hat Subscription Warning */}
+        {hasRedHatPackages && (
+          <Alert variant="destructive">
+            <AlertTriangle className="h-4 w-4" />
+            <AlertTitle>Red Hat Subscription Required</AlertTitle>
+            <AlertDescription>
+              The following packages require a Red Hat subscription: <strong>{redHatPackagesFound.join(', ')}</strong>
+              <br />
+              Make sure you have a valid Red Hat Enterprise Linux subscription to use these packages in your execution environment.
+            </AlertDescription>
+          </Alert>
+        )}
+
         {/* Generated Files */}
         <Card className="bg-card border-border">
           <CardHeader>
