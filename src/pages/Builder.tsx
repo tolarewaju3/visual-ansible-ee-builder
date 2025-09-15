@@ -1,15 +1,23 @@
 // Ansible Execution Environment Builder
 import { useState } from "react";
-import { Container, Layers, Package, Play, ChevronLeft, ChevronRight, RotateCcw } from "lucide-react";
+import { Container, Layers, Package, Play, ChevronLeft, ChevronRight, RotateCcw, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { StepNavigation } from "@/components/StepNavigation";
+import { Step0Presets } from "@/components/steps/Step0Presets";
 import { Step1BaseImage } from "@/components/steps/Step1BaseImage";
 import { Step2CollectionsRequirements } from "@/components/steps/Step2CollectionsRequirements";
 import { Step3Review } from "@/components/steps/Step3Review";
 import { useLocalStorage } from "@/hooks/useLocalStorage";
 import { Collection, STORAGE_KEY, DEFAULT_STATE, clearStoredState } from "@/lib/storage";
+import { getPresetById } from "@/lib/presets";
 
 const steps = [
+  {
+    id: 0,
+    title: "Choose Preset",
+    description: "Select starting template",
+    icon: Sparkles,
+  },
   {
     id: 1,
     title: "Base Image",
@@ -33,13 +41,40 @@ const steps = [
 const Builder = () => {
   // Persistent state using localStorage
   const [currentStep, setCurrentStep] = useLocalStorage(`${STORAGE_KEY}-currentStep`, DEFAULT_STATE.currentStep);
+  const [selectedPreset, setSelectedPreset] = useLocalStorage(`${STORAGE_KEY}-selectedPreset`, DEFAULT_STATE.selectedPreset);
   const [selectedBaseImage, setSelectedBaseImage] = useLocalStorage(`${STORAGE_KEY}-selectedBaseImage`, DEFAULT_STATE.selectedBaseImage);
   const [selectedCollections, setSelectedCollections] = useLocalStorage<Collection[]>(`${STORAGE_KEY}-selectedCollections`, DEFAULT_STATE.selectedCollections);
   const [requirements, setRequirements] = useLocalStorage<string[]>(`${STORAGE_KEY}-requirements`, DEFAULT_STATE.requirements);
   const [selectedPackages, setSelectedPackages] = useLocalStorage<string[]>(`${STORAGE_KEY}-selectedPackages`, DEFAULT_STATE.selectedPackages);
 
+  const applyPreset = (presetId: string) => {
+    if (presetId === 'scratch') {
+      // Reset to default values for scratch
+      setSelectedBaseImage(DEFAULT_STATE.selectedBaseImage);
+      setSelectedCollections(DEFAULT_STATE.selectedCollections);
+      setRequirements(DEFAULT_STATE.requirements);
+      setSelectedPackages(DEFAULT_STATE.selectedPackages);
+    } else {
+      const preset = getPresetById(presetId);
+      if (preset) {
+        setSelectedBaseImage(preset.baseImage);
+        setSelectedCollections(preset.collections);
+        setRequirements(preset.requirements);
+        setSelectedPackages(preset.packages);
+      }
+    }
+  };
+
+  const handlePresetChange = (presetId: string) => {
+    setSelectedPreset(presetId);
+    applyPreset(presetId);
+  };
+
   const canGoNext = () => {
     switch (currentStep) {
+      case 0:
+        // Can proceed if a preset is selected
+        return selectedPreset.trim() !== "";
       case 1:
         // Can proceed if base image is selected
         return selectedBaseImage.trim() !== "";
@@ -55,7 +90,7 @@ const Builder = () => {
   };
 
   const canGoPrev = () => {
-    return currentStep > 1;
+    return currentStep > 0;
   };
 
   const handleNext = () => {
@@ -76,6 +111,7 @@ const Builder = () => {
     
     // Reset all state to defaults
     setCurrentStep(DEFAULT_STATE.currentStep);
+    setSelectedPreset(DEFAULT_STATE.selectedPreset);
     setSelectedBaseImage(DEFAULT_STATE.selectedBaseImage);
     setSelectedCollections(DEFAULT_STATE.selectedCollections);
     setRequirements(DEFAULT_STATE.requirements);
@@ -84,6 +120,13 @@ const Builder = () => {
 
   const renderStep = () => {
     switch (currentStep) {
+      case 0:
+        return (
+          <Step0Presets
+            selectedPreset={selectedPreset}
+            onPresetChange={handlePresetChange}
+          />
+        );
       case 1:
         return (
           <Step1BaseImage

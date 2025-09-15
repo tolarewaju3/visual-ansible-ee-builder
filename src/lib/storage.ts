@@ -5,6 +5,7 @@ export interface Collection {
 
 export interface BuilderState {
   currentStep: number;
+  selectedPreset: string;
   selectedBaseImage: string;
   selectedCollections: Collection[];
   requirements: string[];
@@ -14,7 +15,8 @@ export interface BuilderState {
 export const STORAGE_KEY = 'ansible-builder-state';
 
 export const DEFAULT_STATE: BuilderState = {
-  currentStep: 1,
+  currentStep: 0,
+  selectedPreset: '',
   selectedBaseImage: "registry.access.redhat.com/ubi9/python-311:latest",
   selectedCollections: [],
   requirements: [],
