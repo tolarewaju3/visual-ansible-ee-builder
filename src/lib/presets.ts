@@ -19,8 +19,8 @@ export const PRESETS: Preset[] = [
     icon: '🚀',
     baseImage: 'registry.access.redhat.com/ubi9/python-311:latest',
     collections: [
-      { name: 'ansible.posix', version: '1.5.4' },
-      { name: 'community.general', version: '8.1.0' }
+      { name: 'ansible.posix'},
+      { name: 'community.general'}
     ],
     requirements: [
       'requests>=2.25.1',
@@ -37,10 +37,10 @@ export const PRESETS: Preset[] = [
     icon: '🌐',
     baseImage: 'registry.access.redhat.com/ubi9/python-311:latest',
     collections: [
-      { name: 'cisco.ios', version: '5.3.0' },
-      { name: 'arista.eos', version: '6.2.2' },
-      { name: 'junipernetworks.junos', version: '5.3.1' },
-      { name: 'ansible.netcommon', version: '5.3.0' }
+      { name: 'cisco.ios'},
+      { name: 'arista.eos'},
+      { name: 'junipernetworks.junos'},
+      { name: 'ansible.netcommon'}
     ],
     requirements: [
       'netmiko>=4.2.0',
@@ -60,16 +60,14 @@ export const PRESETS: Preset[] = [
     icon: '☁️',
     baseImage: 'registry.access.redhat.com/ubi9/python-311:latest',
     collections: [
-      { name: 'amazon.aws', version: '7.0.0' },
-      { name: 'azure.azcollection', version: '1.19.0' },
-      { name: 'google.cloud', version: '1.3.0' },
-      { name: 'community.general', version: '8.1.0' }
+      { name: 'amazon.aws'},
+      { name: 'azure.azcollection'},
+      { name: 'google.cloud'},
+      { name: 'community.general'}
     ],
     requirements: [
       'boto3>=1.28.0',
       'botocore>=1.31.0',
-      'azure-cli>=2.50.0',
-      'google-cloud-compute>=1.14.0',
       'requests>=2.25.1'
     ],
     packages: [
@@ -83,12 +81,15 @@ export const PRESETS: Preset[] = [
     icon: '🐳',
     baseImage: 'registry.access.redhat.com/ubi9/python-311:latest',
     collections: [
-      { name: 'kubernetes.core', version: '3.0.1' },
-      { name: 'community.docker', version: '3.4.11' },
-      { name: 'redhat.openshift', version: '2.0.1' },
-      { name: 'community.general', version: '8.1.0' }
+      { name: 'kubernetes.core'},
+      { name: 'community.docker'},
+      { name: 'redhat.openshift'},
+      { name: 'community.general'}
     ],
     requirements: [
+      'kubernetes>=28.1.0',
+      'docker>=6.1.0',
+      'openshift>=0.13.2',
       'pyyaml>=6.0',
       'requests>=2.28',
     ],
@@ -101,9 +102,9 @@ export const PRESETS: Preset[] = [
     icon: '🔒',
     baseImage: 'registry.access.redhat.com/ubi9/python-311:latest',
     collections: [
-      { name: 'community.crypto', version: '2.16.1' },
-      { name: 'community.general', version: '8.1.0' },
-      { name: 'ansible.posix', version: '1.5.4' },
+      { name: 'community.crypto'},
+      { name: 'community.general'},
+      { name: 'ansible.posix'},
       { name: 'devsec.hardening'}
     ],
     requirements: [
