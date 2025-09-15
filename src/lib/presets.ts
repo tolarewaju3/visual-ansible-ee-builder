@@ -83,7 +83,7 @@ export const PRESETS: Preset[] = [
     collections: [
       { name: 'kubernetes.core'},
       { name: 'community.docker'},
-      { name: 'redhat.openshift'},
+      { name: 'community.okd'},
       { name: 'community.general'}
     ],
     requirements: [
