@@ -83,15 +83,12 @@ export const PRESETS: Preset[] = [
     icon: '🐳',
     baseImage: 'registry.access.redhat.com/ubi9/python-311:latest',
     collections: [
-      { name: 'kubernetes.core'},
-      { name: 'community.docker'},
-      { name: 'community.okd'},
-      { name: 'community.general'}
+      { name: 'kubernetes.core', version: '3.0.1' },
+      { name: 'community.docker', version: '3.4.11' },
+      { name: 'redhat.openshift', version: '2.0.1' },
+      { name: 'community.general', version: '8.1.0' }
     ],
     requirements: [
-      'kubernetes>=28.1.0',
-      'docker>=6.1.0',
-      'openshift>=0.13.2',
       'pyyaml>=6.0',
       'requests>=2.28',
     ],
