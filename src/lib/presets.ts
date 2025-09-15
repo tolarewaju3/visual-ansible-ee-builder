@@ -24,7 +24,9 @@ export const PRESETS: Preset[] = [
     ],
     requirements: [
       'requests>=2.25.1',
-      'jinja2>=3.0.0'
+      'jinja2>=3.0.0',
+      'jmespath>=1.0'
+      'PyYAML>=6.0'
     ],
     packages: [
       'git',
@@ -47,6 +49,7 @@ export const PRESETS: Preset[] = [
       'netmiko>=4.2.0',
       'paramiko>=3.3.1',
       'textfsm>=1.1.3',
+      'ncclient>=0.6.13',
       'jinja2>=3.0.0'
     ],
     packages: [
