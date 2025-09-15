@@ -126,7 +126,7 @@ ${selectedCollections.map(c => `  - name: ${c.name}${c.version ? `\n    version:
             <AlertDescription>
               The following packages require a Red Hat subscription: <strong>{redHatPackagesFound.join(', ')}</strong>
               <br />
-              Make sure you have a valid Red Hat Enterprise Linux subscription to use these packages in your execution environment.
+              Make sure you are building the exeuction environment on Red Hat Enterprise Linux with a valid subscription.
             </AlertDescription>
           </Alert>
         )}
