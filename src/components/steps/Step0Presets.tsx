@@ -30,7 +30,7 @@ export function Step0Presets({ selectedPreset, onPresetChange }: Step0PresetsPro
             <div className="text-4xl mb-2">🛠️</div>
             <CardTitle className="text-xl">Start from Scratch</CardTitle>
             <CardDescription>
-              Build your execution environment from the ground up with full control
+              Build from the ground up with full control
             </CardDescription>
           </CardHeader>
           <CardContent>
