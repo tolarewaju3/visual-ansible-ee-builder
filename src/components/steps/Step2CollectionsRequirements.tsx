@@ -11,8 +11,6 @@ import { Plus, X, Upload, Package, Layers, Search, FileText } from "lucide-react
 import { Separator } from "@/components/ui/separator";
 
 const systemPackages = [
-  { name: "git", description: "Version control system", category: "development" },
-  { name: "curl", description: "Transfer data from servers", category: "network" },
   { name: "wget", description: "Download files from web", category: "network" },
   { name: "vim", description: "Text editor", category: "utilities" },
   { name: "nano", description: "Simple text editor", category: "utilities" },  
