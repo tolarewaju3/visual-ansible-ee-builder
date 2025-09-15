@@ -25,7 +25,7 @@ export const PRESETS: Preset[] = [
     requirements: [
       'requests>=2.25.1',
       'jinja2>=3.0.0',
-      'jmespath>=1.0'
+      'jmespath>=1.0',
       'PyYAML>=6.0'
     ],
     packages: [
