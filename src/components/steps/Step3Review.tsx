@@ -1,5 +1,4 @@
-import { FileText, Download, ChevronDown } from "lucide-react";
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import { FileText, Download } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -110,85 +109,71 @@ ${selectedCollections.map(c => `  - name: ${c.name}${c.version ? `\n    version:
         {/* Generated Files */}
         <Card className="bg-card border-border">
           <CardHeader>
-            <CardTitle className="flex items-center justify-between">
-              <div className="flex items-center space-x-2">
-                <FileText className="h-5 w-5 text-primary" />
-                <span>Generated Files</span>
-              </div>
-              <Button variant="outline" size="sm" onClick={handleExportAll}>
-                <Download className="h-4 w-4 mr-2" />
-                Export All
-              </Button>
+            <CardTitle className="flex items-center space-x-2">
+              <FileText className="h-5 w-5 text-primary" />
+              <span>Generated Files</span>
             </CardTitle>
           </CardHeader>
-          <CardContent className="space-y-3">
-            <Collapsible>
-              <CollapsibleTrigger className="flex items-center justify-between w-full p-3 rounded-md border border-border bg-background hover:bg-muted text-left transition-colors">
-                <span className="text-sm font-medium text-foreground">execution-environment.yml</span>
-                <ChevronDown className="h-4 w-4 text-muted-foreground transition-transform data-[state=open]:rotate-180" />
-              </CollapsibleTrigger>
-              <CollapsibleContent className="mt-2 px-1">
+          <CardContent className="space-y-6">
+            {/* execution-environment.yml */}
+            <div className="space-y-2">
+              <h4 className="text-sm font-medium text-foreground">execution-environment.yml</h4>
+              <Textarea 
+                value={generateExecutionEnvironment()} 
+                readOnly 
+                rows={generateExecutionEnvironment().split('\n').length} 
+                className="font-mono text-xs bg-muted/30 text-foreground border resize-none" 
+              />
+            </div>
+
+            {/* requirements.yml */}
+            {selectedCollections.length > 0 && (
+              <div className="space-y-2">
+                <h4 className="text-sm font-medium text-foreground">requirements.yml</h4>
                 <Textarea 
-                  value={generateExecutionEnvironment()} 
+                  value={generateRequirementsYml()} 
                   readOnly 
-                  rows={generateExecutionEnvironment().split('\n').length} 
+                  rows={generateRequirementsYml().split('\n').length} 
                   className="font-mono text-xs bg-muted/30 text-foreground border resize-none" 
                 />
-              </CollapsibleContent>
-            </Collapsible>
-
-            {selectedCollections.length > 0 && (
-              <Collapsible>
-                <CollapsibleTrigger className="flex items-center justify-between w-full p-3 rounded-md border border-border bg-background hover:bg-muted text-left transition-colors">
-                  <span className="text-sm font-medium text-foreground">requirements.yml</span>
-                  <ChevronDown className="h-4 w-4 text-muted-foreground transition-transform data-[state=open]:rotate-180" />
-                </CollapsibleTrigger>
-                <CollapsibleContent className="mt-2 px-1">
-                  <Textarea 
-                    value={generateRequirementsYml()} 
-                    readOnly 
-                    rows={generateRequirementsYml().split('\n').length} 
-                    className="font-mono text-xs bg-muted/30 text-foreground border resize-none" 
-                  />
-                </CollapsibleContent>
-              </Collapsible>
+              </div>
             )}
 
+            {/* requirements.txt */}
             {requirements.length > 0 && (
-              <Collapsible>
-                <CollapsibleTrigger className="flex items-center justify-between w-full p-3 rounded-md border border-border bg-background hover:bg-muted text-left transition-colors">
-                  <span className="text-sm font-medium text-foreground">requirements.txt</span>
-                  <ChevronDown className="h-4 w-4 text-muted-foreground transition-transform data-[state=open]:rotate-180" />
-                </CollapsibleTrigger>
-                <CollapsibleContent className="mt-2 px-1">
-                  <Textarea 
-                    value={generateRequirementsTxt()} 
-                    readOnly 
-                    rows={generateRequirementsTxt().split('\n').length} 
-                    className="font-mono text-xs bg-muted/30 text-foreground border resize-none" 
-                  />
-                </CollapsibleContent>
-              </Collapsible>
+              <div className="space-y-2">
+                <h4 className="text-sm font-medium text-foreground">requirements.txt</h4>
+                <Textarea 
+                  value={generateRequirementsTxt()} 
+                  readOnly 
+                  rows={generateRequirementsTxt().split('\n').length} 
+                  className="font-mono text-xs bg-muted/30 text-foreground border resize-none" 
+                />
+              </div>
             )}
 
+            {/* bindep.txt */}
             {selectedPackages.length > 0 && (
-              <Collapsible>
-                <CollapsibleTrigger className="flex items-center justify-between w-full p-3 rounded-md border border-border bg-background hover:bg-muted text-left transition-colors">
-                  <span className="text-sm font-medium text-foreground">bindep.txt</span>
-                  <ChevronDown className="h-4 w-4 text-muted-foreground transition-transform data-[state=open]:rotate-180" />
-                </CollapsibleTrigger>
-                <CollapsibleContent className="mt-2 px-1">
-                  <Textarea 
-                    value={generateBindepsTxt()} 
-                    readOnly 
-                    rows={generateBindepsTxt().split('\n').length} 
-                    className="font-mono text-xs bg-muted/30 text-foreground border resize-none" 
-                  />
-                </CollapsibleContent>
-              </Collapsible>
+              <div className="space-y-2">
+                <h4 className="text-sm font-medium text-foreground">bindep.txt</h4>
+                <Textarea 
+                  value={generateBindepsTxt()} 
+                  readOnly 
+                  rows={generateBindepsTxt().split('\n').length} 
+                  className="font-mono text-xs bg-muted/30 text-foreground border resize-none" 
+                />
+              </div>
             )}
           </CardContent>
         </Card>
+
+        {/* Export All Button */}
+        <div className="flex justify-center">
+          <Button size="lg" onClick={handleExportAll}>
+            <Download className="h-5 w-5 mr-2" />
+            Export All
+          </Button>
+        </div>
       </div>
     </div>
   );
