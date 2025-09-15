@@ -77,6 +77,49 @@ export const PRESETS: Preset[] = [
       'curl',
       'jq'
     ]
+  },
+  {
+    id: 'container-orchestration',
+    name: 'Container Orchestration',
+    description: 'Built for Kubernetes and container management with Docker and OpenShift collections.',
+    icon: '🐳',
+    baseImage: 'registry.access.redhat.com/ubi9/python-311:latest',
+    collections: [
+      { name: 'kubernetes.core', version: '3.0.1' },
+      { name: 'community.docker', version: '3.4.11' },
+      { name: 'redhat.openshift', version: '2.0.1' },
+      { name: 'community.general', version: '8.1.0' }
+    ],
+    requirements: [
+      'kubernetes>=28.1.0',
+      'docker>=6.1.0',
+      'openshift>=0.13.2',
+      'pyyaml>=6.0'
+    ],
+    packages: [
+      'git'
+    ]
+  },
+  {
+    id: 'security-compliance',
+    name: 'Security & Compliance',
+    description: 'Security-focused setup with vulnerability scanning and compliance automation tools.',
+    icon: '🔒',
+    baseImage: 'registry.access.redhat.com/ubi9/python-311:latest',
+    collections: [
+      { name: 'community.crypto', version: '2.16.1' },
+      { name: 'community.general', version: '8.1.0' },
+      { name: 'ansible.posix', version: '1.5.4' }
+    ],
+    requirements: [
+      'cryptography>=41.0.0',
+      'passlib>=1.7.4',
+      'requests>=2.25.1'
+    ],
+    packages: [
+      'openssl',
+      'ca-certificates'
+    ]
   }
 ];
 

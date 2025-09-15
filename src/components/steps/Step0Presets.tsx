@@ -74,6 +74,12 @@ export function Step0Presets({ selectedPreset, onPresetChange }: Step0PresetsPro
                     {preset.id === 'cloud-management' && (
                       <>AWS, Azure & GCP collections, Cloud SDKs & CLI tools</>
                     )}
+                    {preset.id === 'container-orchestration' && (
+                      <>Kubernetes, Docker & OpenShift collections, Container SDKs</>
+                    )}
+                    {preset.id === 'security-compliance' && (
+                      <>Crypto & POSIX collections, Security tools & certificates</>
+                    )}
                   </div>
                 </div>
                 <div className="text-xs text-muted-foreground">
