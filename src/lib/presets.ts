@@ -106,7 +106,7 @@ export const PRESETS: Preset[] = [
     collections: [
       { name: 'community.crypto', version: '2.16.1' },
       { name: 'community.general', version: '8.1.0' },
-      { name: 'ansible.posix', version: '1.5.4' }
+      { name: 'ansible.posix', version: '1.5.4' },
       { name: 'devsec.hardening'}
     ],
     requirements: [
