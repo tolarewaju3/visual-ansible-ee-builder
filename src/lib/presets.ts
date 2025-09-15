@@ -68,8 +68,6 @@ export const PRESETS: Preset[] = [
     requirements: [
       'boto3>=1.28.0',
       'botocore>=1.31.0',
-      'azure-cli>=2.50.0',
-      'google-cloud-compute>=1.14.0',
       'requests>=2.25.1'
     ],
     packages: [
@@ -89,9 +87,6 @@ export const PRESETS: Preset[] = [
       { name: 'community.general', version: '8.1.0' }
     ],
     requirements: [
-      'kubernetes>=28.1.0',
-      'docker>=6.1.0',
-      'openshift>=0.13.2',
       'pyyaml>=6.0',
       'requests>=2.28',
     ],
