@@ -245,7 +245,7 @@ const Builder = () => {
                   {currentStep === 3 ? (
                     <>
                       <Save className="w-4 h-4" />
-                      <span>{user ? "Save as Preset" : "Sign in to save preset"}</span>
+                      <span>{user ? "Save as Preset" : "Sign in to Save Preset"}</span>
                     </>
                   ) : (
                     <>
