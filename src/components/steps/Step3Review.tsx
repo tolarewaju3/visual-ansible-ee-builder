@@ -418,12 +418,9 @@ You can modify the build options by editing the variables at the top of the \`bu
           <div className="space-y-3">
             <div className="p-4 bg-muted/50 rounded-lg border">
               <pre className="font-mono text-sm text-foreground whitespace-pre-wrap">
-{`unzip ee-build-package.zip -d ee-build-package && \
-
-cd ee-build-package && \
-
-chmod +x build.sh && \
-
+{`unzip ee-build-package.zip -d ee-build-package && \\
+cd ee-build-package && \\
+chmod +x build.sh && \\
 ./build.sh`}
               </pre>
             </div>
