@@ -358,7 +358,7 @@ You can modify the build options by editing the variables at the top of the \`bu
           <CardTitle className="flex items-center space-x-2">
             <div className="flex items-center justify-center w-6 h-6 rounded-full bg-primary text-primary-foreground text-sm font-medium">3</div>
             
-            <span>Run Build Command
+            <span>Build Execution Environment
           </span>
           </CardTitle>
           <CardDescription>
