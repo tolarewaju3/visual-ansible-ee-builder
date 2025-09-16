@@ -12,7 +12,6 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { SavePresetDialog } from "@/components/SavePresetDialog";
 import { PayWhatYouWant } from "@/components/PayWhatYouWant";
-
 import { useAuth } from "@/contexts/AuthContext";
 import { useUsageLimit } from "@/hooks/useUsageLimit";
 import { useToast } from "@/hooks/use-toast";
@@ -33,9 +32,15 @@ export function Step3Review({
   selectedPackages
 }: Step3ReviewProps) {
   // Component cleaned of all Pro gates - everything is now free
-  const { user } = useAuth();
-  const { incrementExport } = useUsageLimit();
-  const { toast } = useToast();
+  const {
+    user
+  } = useAuth();
+  const {
+    incrementExport
+  } = useUsageLimit();
+  const {
+    toast
+  } = useToast();
   const navigate = useNavigate();
   const [showSaveDialog, setShowSaveDialog] = useState(false);
   const [isGeneratedFilesOpen, setIsGeneratedFilesOpen] = useState(false);
@@ -146,11 +151,9 @@ echo "Done!"
   };
   const handleExportBuildPackage = async () => {
     setIsExporting(true);
-    
     try {
       // Increment export count for analytics tracking
       await incrementExport();
-
       const zip = new JSZip();
 
       // Add all generated files to the zip
@@ -223,24 +226,21 @@ You can modify the build options by editing the variables at the top of the \`bu
       link.click();
       document.body.removeChild(link);
       URL.revokeObjectURL(url);
-
       toast({
         title: "Export successful!",
-        description: "Your build package has been downloaded.",
+        description: "Your build package has been downloaded."
       });
-
     } catch (error) {
       console.error('Export failed:', error);
       toast({
         title: "Export failed",
         description: "There was an error creating your build package. Please try again.",
-        variant: "destructive",
+        variant: "destructive"
       });
     } finally {
       setIsExporting(false);
     }
   };
-
   const handleSavePreset = () => {
     setShowSaveDialog(true);
   };
@@ -261,7 +261,7 @@ You can modify the build options by editing the variables at the top of the \`bu
         <CardHeader>
           <CardTitle className="flex items-center space-x-2">
             <div className="flex items-center justify-center w-6 h-6 rounded-full bg-primary text-primary-foreground text-sm font-medium">1</div>
-            <Settings className="h-5 w-5 text-primary" />
+            
             <span>Set Build Information</span>
           </CardTitle>
           <CardDescription>
@@ -296,7 +296,7 @@ You can modify the build options by editing the variables at the top of the \`bu
         <CardHeader>
           <CardTitle className="flex items-center space-x-2">
             <div className="flex items-center justify-center w-6 h-6 rounded-full bg-primary text-primary-foreground text-sm font-medium">2</div>
-            <Archive className="h-5 w-5 text-primary" />
+            
             <span>Download Build Package</span>
           </CardTitle>
           <CardDescription>
@@ -357,7 +357,7 @@ You can modify the build options by editing the variables at the top of the \`bu
         <CardHeader>
           <CardTitle className="flex items-center space-x-2">
             <div className="flex items-center justify-center w-6 h-6 rounded-full bg-primary text-primary-foreground text-sm font-medium">3</div>
-            <Play className="h-5 w-5 text-primary" />
+            
             <span>Run Build Command
           </span>
           </CardTitle>
