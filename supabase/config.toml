@@ -3,6 +3,9 @@ project_id = "bbscffnivgfwelxudlzy"
 [functions.create-checkout-session]
 verify_jwt = true
 
+[functions.create-anonymous-checkout]
+verify_jwt = false
+
 [functions.create-portal-session]
 verify_jwt = true
 
