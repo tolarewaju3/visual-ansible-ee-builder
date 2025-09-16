@@ -1,5 +1,6 @@
 // Ansible Execution Environment Builder
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useLocation } from "react-router-dom";
 import { Container, Layers, Package, Play, ChevronLeft, ChevronRight, RotateCcw, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { StepNavigation } from "@/components/StepNavigation";
@@ -35,6 +36,8 @@ const steps = [
 ];
 
 const Builder = () => {
+  const location = useLocation();
+  
   // Persistent state using localStorage
   const [currentStep, setCurrentStep] = useLocalStorage(`${STORAGE_KEY}-currentStep`, DEFAULT_STATE.currentStep);
   const [selectedPreset, setSelectedPreset] = useLocalStorage(`${STORAGE_KEY}-selectedPreset`, DEFAULT_STATE.selectedPreset);
@@ -43,6 +46,22 @@ const Builder = () => {
   const [requirements, setRequirements] = useLocalStorage<string[]>(`${STORAGE_KEY}-requirements`, DEFAULT_STATE.requirements);
   const [selectedPackages, setSelectedPackages] = useLocalStorage<string[]>(`${STORAGE_KEY}-selectedPackages`, DEFAULT_STATE.selectedPackages);
 
+  // Handle preset from Templates page
+  useEffect(() => {
+    const state = location.state as any;
+    if (state?.usePreset) {
+      const preset = state.usePreset;
+      setSelectedPreset(preset.id);
+      setSelectedBaseImage(preset.baseImage);
+      setSelectedCollections(preset.collections);
+      setRequirements(preset.requirements);
+      setSelectedPackages(preset.packages);
+      
+      // Clear the state to prevent reapplying on refresh
+      window.history.replaceState({}, document.title);
+    }
+  }, [location.state]);
+
   const applyPreset = (presetId: string) => {
     if (presetId === 'scratch') {
       // Reset to default values for scratch
@@ -50,7 +69,11 @@ const Builder = () => {
       setSelectedCollections(DEFAULT_STATE.selectedCollections);
       setRequirements(DEFAULT_STATE.requirements);
       setSelectedPackages(DEFAULT_STATE.selectedPackages);
+    } else if (presetId.startsWith('user_')) {
+      // Handle user preset - data should already be loaded from useEffect
+      // No need to do anything here as the data is already set
     } else {
+      // Handle built-in preset
       const preset = getPresetById(presetId);
       if (preset) {
         setSelectedBaseImage(preset.baseImage);
@@ -157,53 +180,55 @@ const Builder = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <StepNavigation
-        steps={steps}
-        currentStep={currentStep}
-        onStepChange={setCurrentStep}
-        canGoNext={canGoNext()}
-        canGoPrev={canGoPrev()}
-        onNext={handleNext}
-        onPrev={handlePrev}
-      />
-      
-      <main className="container mx-auto px-6 py-8">
-        {renderStep()}
-      </main>
-      
-      {/* Navigation buttons at bottom */}
-      <div className="border-t border-border bg-card">
-        <div className="container mx-auto px-6 py-4">
-          <div className="flex justify-between items-center">
-            <Button
-              variant="outline"
-              onClick={handlePrev}
-              disabled={!canGoPrev()}
-              className="flex items-center space-x-2"
-            >
-              <ChevronLeft className="w-4 h-4" />
-              <span>Previous</span>
-            </Button>
-
-            <Button
-              variant="outline"
-              onClick={handleReset}
-              className="flex items-center space-x-2"
-            >
-              <RotateCcw className="w-4 h-4" />
-              <span>Reset</span>
-            </Button>
-
-            {currentStep < steps.length && (
+      <div className="container mx-auto px-6 py-8">
+        <StepNavigation
+          steps={steps}
+          currentStep={currentStep}
+          onStepChange={setCurrentStep}
+          canGoNext={canGoNext()}
+          canGoPrev={canGoPrev()}
+          onNext={handleNext}
+          onPrev={handlePrev}
+        />
+        
+        <main className="mt-8">
+          {renderStep()}
+        </main>
+        
+        {/* Navigation buttons at bottom */}
+        <div className="border-t border-border bg-card mt-8">
+          <div className="py-4">
+            <div className="flex justify-between items-center">
               <Button
-                onClick={handleNext}
-                disabled={!canGoNext()}
+                variant="outline"
+                onClick={handlePrev}
+                disabled={!canGoPrev()}
                 className="flex items-center space-x-2"
               >
-                <span>Next</span>
-                <ChevronRight className="w-4 h-4" />
+                <ChevronLeft className="w-4 h-4" />
+                <span>Previous</span>
               </Button>
-            )}
+
+              <Button
+                variant="outline"
+                onClick={handleReset}
+                className="flex items-center space-x-2"
+              >
+                <RotateCcw className="w-4 h-4" />
+                <span>Reset</span>
+              </Button>
+
+              {currentStep < steps.length && (
+                <Button
+                  onClick={handleNext}
+                  disabled={!canGoNext()}
+                  className="flex items-center space-x-2"
+                >
+                  <span>Next</span>
+                  <ChevronRight className="w-4 h-4" />
+                </Button>
+              )}
+            </div>
           </div>
         </div>
       </div>

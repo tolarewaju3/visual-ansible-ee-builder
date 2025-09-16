@@ -1,16 +1,15 @@
-import { FileText, Download, AlertTriangle } from "lucide-react";
+import { FileText, Download, AlertTriangle, Save } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
 import { Separator } from "@/components/ui/separator";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { SavePresetDialog } from "@/components/SavePresetDialog";
+import { useAuth } from "@/contexts/AuthContext";
+import { Collection } from "@/lib/storage";
+import { useState } from "react";
 import JSZip from "jszip";
-
-interface Collection {
-  name: string;
-  version?: string;
-}
 
 interface Step3ReviewProps {
   selectedBaseImage: string;
@@ -25,6 +24,8 @@ export function Step3Review({
   requirements,
   selectedPackages
 }: Step3ReviewProps) {
+  const { user } = useAuth();
+  const [showSaveDialog, setShowSaveDialog] = useState(false);
   // Packages that require Red Hat subscription
   const redHatSubscriptionPackages = ['telnet', 'tcpdump'];
   
@@ -192,12 +193,38 @@ ${selectedCollections.map(c => `  - name: ${c.name}${c.version ? `\n    version:
           </CardContent>
         </Card>
 
-        {/* Export All Button */}
-        <Button size="lg" className="w-full" onClick={handleExportAll}>
-          <Download className="h-5 w-5 mr-2" />
-          Export All
-        </Button>
+        {/* Export Actions */}
+        <div className="flex gap-3">
+          {user && (
+            <Button 
+              variant="outline" 
+              size="lg" 
+              onClick={() => setShowSaveDialog(true)}
+              className="flex-1"
+            >
+              <Save className="h-5 w-5 mr-2" />
+              Save as Preset
+            </Button>
+          )}
+          <Button size="lg" className={user ? "flex-1" : "w-full"} onClick={handleExportAll}>
+            <Download className="h-5 w-5 mr-2" />
+            Export All
+          </Button>
+        </div>
       </div>
+
+      {/* Save Preset Dialog */}
+      <SavePresetDialog
+        open={showSaveDialog}
+        onOpenChange={setShowSaveDialog}
+        baseImage={selectedBaseImage}
+        collections={selectedCollections}
+        requirements={requirements}
+        packages={selectedPackages}
+        onSuccess={() => {
+          // Optional: Add any additional success handling
+        }}
+      />
     </div>
   );
 }
