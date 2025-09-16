@@ -4,16 +4,20 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { subscriptionService } from '@/lib/subscriptionService';
 import { useToast } from '@/hooks/use-toast';
-
 export const PayWhatYouWant = () => {
   const [loading, setLoading] = useState(false);
-  const { toast } = useToast();
-
-  const predefinedAmounts = [
-    { amount: 5, label: 'Coffee', icon: Coffee },
-    { amount: 25, label: 'Support', icon: Zap },
-  ];
-
+  const {
+    toast
+  } = useToast();
+  const predefinedAmounts = [{
+    amount: 5,
+    label: 'Coffee',
+    icon: Coffee
+  }, {
+    amount: 25,
+    label: 'Support',
+    icon: Zap
+  }];
   const handlePayment = async (amount: number) => {
     setLoading(true);
     try {
@@ -25,15 +29,13 @@ export const PayWhatYouWant = () => {
       toast({
         title: 'Error',
         description: 'Failed to start payment process. Please try again.',
-        variant: 'destructive',
+        variant: 'destructive'
       });
     } finally {
       setLoading(false);
     }
   };
-
-  return (
-    <Card className="border-dashed border-2 border-muted-foreground/20 bg-gradient-to-br from-background to-muted/20">
+  return <Card className="border-dashed border-2 border-muted-foreground/20 bg-gradient-to-br from-background to-muted/20">
       <CardContent className="p-4">
         <div className="flex items-center justify-between gap-4">
           <div className="text-left">
@@ -44,26 +46,18 @@ export const PayWhatYouWant = () => {
           </div>
           
           <div className="flex gap-2">
-            {predefinedAmounts.map(({ amount, label, icon: Icon }) => (
-              <Button
-                key={amount}
-                variant="outline"
-                size="sm"
-                onClick={() => handlePayment(amount)}
-                disabled={loading}
-                className="flex items-center gap-1 hover:bg-primary/5"
-              >
+            {predefinedAmounts.map(({
+            amount,
+            label,
+            icon: Icon
+          }) => <Button key={amount} variant="outline" size="sm" onClick={() => handlePayment(amount)} disabled={loading} className="flex items-center gap-1 hover:bg-primary/5">
                 <Icon className="w-3 h-3" />
                 ${amount}
-              </Button>
-            ))}
+              </Button>)}
           </div>
         </div>
         
-        <p className="text-xs text-center text-muted-foreground mt-3">
-          Optional • Secure via Stripe
-        </p>
+        
       </CardContent>
-    </Card>
-  );
+    </Card>;
 };
