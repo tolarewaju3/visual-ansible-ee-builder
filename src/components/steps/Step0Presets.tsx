@@ -68,7 +68,7 @@ export function Step0Presets({ selectedPreset, onPresetChange }: Step0PresetsPro
         >
           <CardHeader className="text-center">
             <div className="flex items-center justify-between mb-2">
-              <Badge variant="secondary" className="text-xs">Default</Badge>
+              <Badge variant="secondary" className="text-xs">Custom</Badge>
             </div>
             <div className="text-4xl mb-2">🛠️</div>
             <CardTitle className="text-xl">Start from Scratch</CardTitle>
@@ -123,7 +123,7 @@ export function Step0Presets({ selectedPreset, onPresetChange }: Step0PresetsPro
                       <>AWS, Azure & GCP collections, Cloud SDKs & CLI tools</>
                     )}
                     {preset.id === 'container-orchestration' && (
-                      <>Kubernetes, Docker & OpenShift collections</>
+                      <>Kubernetes, Docker & OpenShift collections, Container SDKs</>
                     )}
                     {preset.id === 'security-compliance' && (
                       <>Crypto & POSIX collections, Security tools & certificates</>
