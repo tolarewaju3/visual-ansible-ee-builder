@@ -1,4 +1,4 @@
-import { FileText, Download, AlertTriangle, Save, Package, ChevronDown } from "lucide-react";
+import { FileText, Download, AlertTriangle, Save, Package, ChevronDown, Settings, Play, Archive } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -258,45 +258,94 @@ You can modify the build options by editing the variables at the top of the \`bu
   };
 
   return (
-    <div className="space-y-6">
-      <div className="space-y-6">
-        {/* Red Hat Subscription Warning */}
-        {hasRedHatPackages && (
-          <Alert variant="destructive">
-            <AlertTriangle className="h-4 w-4" />
-            <AlertTitle>Red Hat Subscription Required</AlertTitle>
-            <AlertDescription>
-              The following packages require a Red Hat subscription: <strong>{redHatPackagesFound.join(', ')}</strong>
-              <br />
-              Make sure you are building the exeuction environment on Red Hat Enterprise Linux with a valid subscription.
-            </AlertDescription>
-          </Alert>
-        )}
+    <div className="space-y-8">
+      {/* Red Hat Subscription Warning */}
+      {hasRedHatPackages && (
+        <Alert variant="destructive">
+          <AlertTriangle className="h-4 w-4" />
+          <AlertTitle>Red Hat Subscription Required</AlertTitle>
+          <AlertDescription>
+            The following packages require a Red Hat subscription: <strong>{redHatPackagesFound.join(', ')}</strong>
+            <br />
+            Make sure you are building the execution environment on Red Hat Enterprise Linux with a valid subscription.
+          </AlertDescription>
+        </Alert>
+      )}
 
-        {/* Generated Files */}
-        <Collapsible open={isGeneratedFilesOpen} onOpenChange={setIsGeneratedFilesOpen}>
-          <Card className="bg-card border-border">
+      {/* Step 1: Set Build Information */}
+      <Card className="bg-card border-border">
+        <CardHeader>
+          <CardTitle className="flex items-center space-x-2">
+            <div className="flex items-center justify-center w-6 h-6 rounded-full bg-primary text-primary-foreground text-sm font-medium">1</div>
+            <Settings className="h-5 w-5 text-primary" />
+            <span>Set Build Information</span>
+          </CardTitle>
+          <CardDescription>
+            Configure the image tag and container runtime for building
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="grid gap-4 md:grid-cols-2">
+            <div className="space-y-2">
+              <Label htmlFor="image-tag">Image Tag</Label>
+              <Input
+                id="image-tag"
+                placeholder="my-ee:latest"
+                value={imageTag}
+                onChange={(e) => setImageTag(e.target.value)}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="runtime">Runtime</Label>
+              <Select value={runtime} onValueChange={setRuntime}>
+                <SelectTrigger id="runtime" className="bg-background border-border">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent className="bg-background border-border shadow-lg z-50">
+                  <SelectItem value="auto">Auto</SelectItem>
+                  <SelectItem value="podman">Podman</SelectItem>
+                  <SelectItem value="docker">Docker</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Step 2: Download Build Package */}
+      <Card className="bg-card border-border">
+        <CardHeader>
+          <CardTitle className="flex items-center space-x-2">
+            <div className="flex items-center justify-center w-6 h-6 rounded-full bg-primary text-primary-foreground text-sm font-medium">2</div>
+            <Archive className="h-5 w-5 text-primary" />
+            <span>Download Build Package</span>
+          </CardTitle>
+          <CardDescription>
+            Review generated files and download the build package
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          {/* Generated Files Dropdown */}
+          <Collapsible open={isGeneratedFilesOpen} onOpenChange={setIsGeneratedFilesOpen}>
             <CollapsibleTrigger asChild>
-              <CardHeader className="cursor-pointer hover:bg-muted/50 transition-colors">
-                <CardTitle className="flex items-center justify-between">
-                  <div className="flex items-center space-x-2">
-                    <FileText className="h-5 w-5 text-primary" />
-                    <span>Generated Files</span>
-                  </div>
-                  <ChevronDown className={`h-4 w-4 transition-transform duration-200 ${isGeneratedFilesOpen ? 'rotate-180' : ''}`} />
-                </CardTitle>
-              </CardHeader>
+              <Button variant="outline" className="w-full justify-between bg-background border-border">
+                <div className="flex items-center space-x-2">
+                  <FileText className="h-4 w-4" />
+                  <span>View Generated Files</span>
+                </div>
+                <ChevronDown className={`h-4 w-4 transition-transform duration-200 ${isGeneratedFilesOpen ? 'rotate-180' : ''}`} />
+              </Button>
             </CollapsibleTrigger>
-            <CollapsibleContent>
-              <CardContent className="space-y-6">
+            <CollapsibleContent className="mt-4">
+              <div className="space-y-4 p-4 border border-border rounded-lg bg-muted/30">
                 {/* execution-environment.yml */}
                 <div className="space-y-2">
                   <h4 className="text-sm font-medium text-foreground">execution-environment.yml</h4>
                   <Textarea 
                     value={generateExecutionEnvironment()} 
                     readOnly 
-                    rows={generateExecutionEnvironment().split('\n').length} 
-                    className="font-mono text-xs bg-muted/30 text-foreground border resize-none" 
+                    rows={Math.min(generateExecutionEnvironment().split('\n').length, 10)} 
+                    className="font-mono text-xs bg-background text-foreground border resize-none" 
                   />
                 </div>
 
@@ -307,8 +356,8 @@ You can modify the build options by editing the variables at the top of the \`bu
                     <Textarea 
                       value={generateRequirementsYml()} 
                       readOnly 
-                      rows={generateRequirementsYml().split('\n').length} 
-                      className="font-mono text-xs bg-muted/30 text-foreground border resize-none" 
+                      rows={Math.min(generateRequirementsYml().split('\n').length, 8)} 
+                      className="font-mono text-xs bg-background text-foreground border resize-none" 
                     />
                   </div>
                 )}
@@ -320,8 +369,8 @@ You can modify the build options by editing the variables at the top of the \`bu
                     <Textarea 
                       value={generateRequirementsTxt()} 
                       readOnly 
-                      rows={generateRequirementsTxt().split('\n').length} 
-                      className="font-mono text-xs bg-muted/30 text-foreground border resize-none" 
+                      rows={Math.min(generateRequirementsTxt().split('\n').length, 6)} 
+                      className="font-mono text-xs bg-background text-foreground border resize-none" 
                     />
                   </div>
                 )}
@@ -333,82 +382,74 @@ You can modify the build options by editing the variables at the top of the \`bu
                     <Textarea 
                       value={generateBindepsTxt()} 
                       readOnly 
-                      rows={generateBindepsTxt().split('\n').length} 
-                      className="font-mono text-xs bg-muted/30 text-foreground border resize-none" 
+                      rows={Math.min(generateBindepsTxt().split('\n').length, 6)} 
+                      className="font-mono text-xs bg-background text-foreground border resize-none" 
                     />
                   </div>
                 )}
-              </CardContent>
+              </div>
             </CollapsibleContent>
-          </Card>
-        </Collapsible>
+          </Collapsible>
 
-        {/* Build Locally Panel */}
-        <Card className="bg-card border-border">
-          <CardHeader>
-            <CardTitle className="flex items-center space-x-2">
-              <Package className="h-5 w-5 text-primary" />
-              <span>Build Locally</span>
-            </CardTitle>
-            <CardDescription>
-              Configure options for building the execution environment locally
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="grid gap-4 md:grid-cols-2">
-              <div className="space-y-2">
-                <Label htmlFor="image-tag">Image Tag</Label>
-                <Input
-                  id="image-tag"
-                  placeholder="my-ee:latest"
-                  value={imageTag}
-                  onChange={(e) => setImageTag(e.target.value)}
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="runtime">Runtime</Label>
-                <Select value={runtime} onValueChange={setRuntime}>
-                  <SelectTrigger id="runtime">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="auto">Auto</SelectItem>
-                    <SelectItem value="podman">Podman</SelectItem>
-                    <SelectItem value="docker">Docker</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
+          <Button 
+            size="lg" 
+            onClick={handleExportBuildPackage}
+            className="w-full"
+          >
+            <Download className="h-5 w-5 mr-2" />
+            Download Build Package
+          </Button>
+        </CardContent>
+      </Card>
+
+      {/* Step 3: Run Build Commands */}
+      <Card className="bg-card border-border">
+        <CardHeader>
+          <CardTitle className="flex items-center space-x-2">
+            <div className="flex items-center justify-center w-6 h-6 rounded-full bg-primary text-primary-foreground text-sm font-medium">3</div>
+            <Play className="h-5 w-5 text-primary" />
+            <span>Run Build Commands</span>
+          </CardTitle>
+          <CardDescription>
+            Execute these commands in your terminal to build the execution environment
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-3">
+            <div className="p-4 bg-muted/50 rounded-lg border">
+              <pre className="font-mono text-sm text-foreground whitespace-pre-wrap">
+{`unzip ee-build-package.zip
+cd ee-build-package
+chmod +x build.sh
+./build.sh`}
+              </pre>
             </div>
-          </CardContent>
-        </Card>
+          </div>
+        </CardContent>
+      </Card>
 
-        {/* Export Actions */}
-        <div className="flex gap-3">
-          {user && (
-            <Button 
-              variant="outline" 
-              size="lg" 
-              onClick={() => setShowSaveDialog(true)}
-              className="flex-1"
-            >
-              <Save className="h-5 w-5 mr-2" />
-              Save as Preset
-            </Button>
-          )}
+      {/* Additional Actions */}
+      <div className="flex gap-3">
+        {user && (
           <Button 
             variant="outline" 
             size="lg" 
-            onClick={handleExportBuildPackage}
-            className={user ? "flex-1" : "w-full"}
+            onClick={() => setShowSaveDialog(true)}
+            className="flex-1"
           >
-            <Package className="h-5 w-5 mr-2" />
-            Export Build Package
+            <Save className="h-5 w-5 mr-2" />
+            Save as Preset
           </Button>
-          <Button size="lg" className={user ? "flex-1" : "w-full"} onClick={handleExportAll}>
-            <Download className="h-5 w-5 mr-2" />
-            Export All
-          </Button>
-        </div>
+        )}
+        <Button 
+          variant="outline" 
+          size="lg" 
+          onClick={handleExportAll}
+          className={user ? "flex-1" : "w-full"}
+        >
+          <FileText className="h-5 w-5 mr-2" />
+          Export Files Only
+        </Button>
       </div>
 
       {/* Save Preset Dialog */}
