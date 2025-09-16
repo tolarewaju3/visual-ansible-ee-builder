@@ -1,20 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
-import { useSubscription } from '@/hooks/useSubscription';
 import { UserPreset, userPresetsService } from '@/lib/userPresets';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
-import { SubscriptionBadge } from '@/components/SubscriptionBadge';
 import { toast } from '@/hooks/use-toast';
-import { Loader2, Trash2, Edit, Download, Plus, Crown, Lock } from 'lucide-react';
+import { Loader2, Trash2, Edit, Download, Plus } from 'lucide-react';
 import { format } from 'date-fns';
 
 const Templates = () => {
   const { user, loading: authLoading } = useAuth();
-  const { isPro } = useSubscription();
   const navigate = useNavigate();
   const [presets, setPresets] = useState<UserPreset[]>([]);
   const [loading, setLoading] = useState(true);
@@ -128,14 +125,11 @@ const Templates = () => {
       <div className="border-b">
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <div>
-                <h1 className="text-2xl font-bold">My Templates</h1>
-                <p className="text-muted-foreground">
-                  Manage your saved preset configurations
-                </p>
-              </div>
-              <SubscriptionBadge />
+            <div>
+              <h1 className="text-2xl font-bold">My Templates</h1>
+              <p className="text-muted-foreground">
+                Manage your saved preset configurations
+              </p>
             </div>
             <Button onClick={() => navigate('/')}>
               <Plus className="mr-2 h-4 w-4" />
@@ -222,34 +216,17 @@ const Templates = () => {
                       size="sm"
                       variant="outline"
                       onClick={() => exportPreset(preset)}
-                      disabled={!isPro}
                     >
-                      {isPro ? (
-                        <Download className="h-4 w-4" />
-                      ) : (
-                        <Lock className="h-4 w-4" />
-                      )}
+                      <Download className="h-4 w-4" />
                     </Button>
                     <Button
                       size="sm"
                       variant="outline"
                       onClick={() => setDeleteId(preset.id)}
-                      disabled={!isPro}
                     >
-                      {isPro ? (
-                        <Trash2 className="h-4 w-4" />
-                      ) : (
-                        <Lock className="h-4 w-4" />
-                      )}
+                      <Trash2 className="h-4 w-4" />
                     </Button>
                   </div>
-                  
-                  {!isPro && (
-                    <div className="flex items-center justify-center gap-1 text-xs text-muted-foreground mt-2">
-                      <Crown className="w-3 h-3 text-amber-500" />
-                      <span>Pro required for editing and downloading</span>
-                    </div>
-                  )}
                 </CardContent>
               </Card>
             ))}

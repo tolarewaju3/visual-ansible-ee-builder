@@ -4,35 +4,16 @@ import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
-import { User, LogOut, Settings, FileText, Crown, CreditCard } from 'lucide-react';
-import { SubscriptionBadge } from '@/components/SubscriptionBadge';
-import { useSubscription } from '@/hooks/useSubscription';
-import { subscriptionService } from '@/lib/subscriptionService';
-import { useToast } from '@/hooks/use-toast';
+import { User, LogOut, Settings, FileText } from 'lucide-react';
 
 export const Navigation = () => {
   const { user, signOut } = useAuth();
-  const { isPro } = useSubscription();
-  const { toast } = useToast();
   const location = useLocation();
   const navigate = useNavigate();
 
   const handleSignOut = async () => {
     await signOut();
     navigate('/');
-  };
-
-  const handleManageBilling = async () => {
-    try {
-      const portalUrl = await subscriptionService.createPortalSession();
-      window.open(portalUrl, '_blank');
-    } catch (error) {
-      toast({
-        title: 'Error',
-        description: 'Unable to open billing portal. Please try again.',
-        variant: 'destructive',
-      });
-    }
   };
 
   const getInitials = (email: string) => {
@@ -77,7 +58,6 @@ export const Navigation = () => {
 
           {/* User Menu */}
           <div className="flex items-center gap-4">
-            {user && <SubscriptionBadge />}
             {user ? (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
@@ -100,12 +80,6 @@ export const Navigation = () => {
                     <FileText className="mr-2 h-4 w-4" />
                     My Templates
                   </DropdownMenuItem>
-                  {isPro && (
-                    <DropdownMenuItem onClick={handleManageBilling}>
-                      <CreditCard className="mr-2 h-4 w-4" />
-                      Manage Billing
-                    </DropdownMenuItem>
-                  )}
                   <DropdownMenuSeparator />
                   <DropdownMenuItem onClick={handleSignOut}>
                     <LogOut className="mr-2 h-4 w-4" />
