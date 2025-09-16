@@ -98,7 +98,7 @@ export const PRESETS: Preset[] = [
   {
     id: 'security-compliance',
     name: 'Security & Compliance',
-    description: 'Vulnerability scanning and compliance automation tools.',
+    description: 'Vulnerability scanning and compliance automation.',
     icon: '🔒',
     baseImage: 'registry.access.redhat.com/ubi9/python-311:latest',
     collections: [
