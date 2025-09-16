@@ -36,7 +36,6 @@ export function Step3Review({
   // Build options state
   const [imageTag, setImageTag] = useState('my-ee:latest');
   const [runtime, setRuntime] = useState('auto');
-  const [pushAfterBuild, setPushAfterBuild] = useState(false);
   
   // Packages that require Red Hat subscription
   const redHatSubscriptionPackages = ['telnet', 'tcpdump'];
@@ -96,12 +95,10 @@ set -e  # Exit on any error
 
 IMAGE_TAG="${imageTag}"
 RUNTIME="${runtime}"
-PUSH_AFTER_BUILD="${pushAfterBuild}"
 
 echo "Building Ansible Execution Environment..."
 echo "Image tag: $IMAGE_TAG"
 echo "Runtime: $RUNTIME"
-echo "Push after build: $PUSH_AFTER_BUILD"
 echo ""
 
 # Check if ansible-builder is installed
@@ -135,19 +132,11 @@ fi
 echo "Building execution environment with ansible-builder using $RUNTIME..."
 
 # Build with ansible-builder
-if [ "$PUSH_AFTER_BUILD" = "true" ]; then
-  echo "Building and pushing image..."
-  ansible-builder build -v3 -t "$IMAGE_TAG" --container-runtime "$RUNTIME" --push
-else
-  echo "Building image..."
-  ansible-builder build -v3 -t "$IMAGE_TAG" --container-runtime "$RUNTIME"
-fi
+echo "Building image..."
+ansible-builder build -v3 -t "$IMAGE_TAG" --container-runtime "$RUNTIME"
 
 if [ $? -eq 0 ]; then
   echo "Build completed successfully!"
-  if [ "$PUSH_AFTER_BUILD" = "true" ]; then
-    echo "Image pushed successfully!"
-  fi
 else
   echo "Error: Build failed"
   exit 1
@@ -203,19 +192,18 @@ ${selectedCollections.length > 0 ? '- `requirements.yml`: Ansible collections to
    ./build.sh
    \`\`\`
 
-The script will automatically detect whether to use podman or docker, build the image with tag \`${imageTag}\`${pushAfterBuild ? ', and push it to the registry' : ''}.
+The script will automatically detect whether to use podman or docker and build the image with tag \`${imageTag}\`.
 
 ## Requirements
 
 - Either podman or docker must be installed
 - Access to the internet for downloading base images and dependencies
-${pushAfterBuild ? '- Registry credentials configured if pushing the image\n' : ''}
+
 ## Customization
 
 You can modify the build options by editing the variables at the top of the \`build.sh\` script:
 - \`IMAGE_TAG\`: Change the image name and tag
 - \`RUNTIME\`: Force a specific runtime (podman/docker)
-- \`PUSH_AFTER_BUILD\`: Enable/disable pushing to registry
 `;
 
     zip.file("README.md", readme);
@@ -390,14 +378,6 @@ You can modify the build options by editing the variables at the top of the \`bu
                   </SelectContent>
                 </Select>
               </div>
-            </div>
-            <div className="flex items-center space-x-2">
-              <Checkbox 
-                id="push-after-build" 
-                checked={pushAfterBuild}
-                onCheckedChange={(checked) => setPushAfterBuild(checked === true)}
-              />
-              <Label htmlFor="push-after-build">Push after build</Label>
             </div>
           </CardContent>
         </Card>
