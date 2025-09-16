@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Coffee, Zap, Heart } from 'lucide-react';
+import { Coffee, Donut, Zap, Heart, Pizza } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { subscriptionService } from '@/lib/subscriptionService';
@@ -15,12 +15,12 @@ export const PayWhatYouWant = () => {
     icon: Coffee
   }, {
     amount: 5,
-    label: 'Support',
+    label: 'Donut',
     icon: Zap
   },
   {
     amount: 10,
-    label: 'Love',
+    label: 'Pizza',
     icon: Heart
   }];
   const handlePayment = async (amount: number) => {
