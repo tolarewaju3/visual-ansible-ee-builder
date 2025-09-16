@@ -153,13 +153,6 @@ export function Step2CollectionsRequirements({
 
   return (
     <div className="space-y-6">
-      <div className="text-center mb-8">
-        <h1 className="text-3xl font-bold text-foreground mb-2">Requirements</h1>
-        <p className="text-muted-foreground">
-          Configure Ansible collections, Python dependencies, and system packages for your execution environment
-        </p>
-      </div>
-
       {/* Ansible Collections */}
       <Card className="bg-card border-border">
         <CardHeader>

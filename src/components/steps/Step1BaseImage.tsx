@@ -77,14 +77,6 @@ export function Step1BaseImage({ selectedBaseImage, onBaseImageChange }: Step1Ba
 
   return (
     <div className="space-y-6">
-      <div className="text-center space-y-2">
-        <Container className="mx-auto h-12 w-12 text-primary" />
-        <h2 className="text-2xl font-bold">Select Base Container Image</h2>
-        <p className="text-muted-foreground max-w-2xl mx-auto">
-          Choose a base image for your Ansible Execution Environment. 
-        </p>
-      </div>
-
       <div className="space-y-6">
         <Card>
           <CardHeader>

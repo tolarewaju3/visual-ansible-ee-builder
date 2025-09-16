@@ -111,13 +111,6 @@ ${selectedCollections.map(c => `  - name: ${c.name}${c.version ? `\n    version:
 
   return (
     <div className="space-y-6">
-      <div className="text-center mb-8">
-        <h1 className="text-3xl font-bold text-foreground mb-2">Build Execution Environment</h1>
-        <p className="text-muted-foreground">
-          Generate execution environment files
-        </p>
-      </div>
-
       <div className="space-y-6">
         {/* Red Hat Subscription Warning */}
         {hasRedHatPackages && (

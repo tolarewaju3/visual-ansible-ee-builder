@@ -58,13 +58,6 @@ export function Step0Presets({ selectedPreset, onPresetChange }: Step0PresetsPro
   };
   return (
     <div className="space-y-6">
-      <div className="text-center space-y-2">
-        <h2 className="text-3xl font-bold">Choose Your Starting Point</h2>
-        <p className="text-muted-foreground text-lg">
-          Select a preset to get started quickly, or build from scratch
-        </p>
-      </div>
-
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
         {/* Start from scratch option */}
         <Card 
