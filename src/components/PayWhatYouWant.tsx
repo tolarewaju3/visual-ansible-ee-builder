@@ -39,7 +39,7 @@ export const PayWhatYouWant = () => {
       <CardContent className="p-4">
         <div className="flex items-center justify-between gap-4">
           <div className="flex items-center gap-2 text-left">
-            <Heart className="w-4 h-4 text-red-500 fill-red-500" />
+            <Heart className="w-6 h-6 text-red-500 fill-red-500" />
             <div>
               <h3 className="text-base font-semibold leading-none tracking-tight">Did this save you time?</h3>
               <p className="text-xs text-muted-foreground mt-1">
