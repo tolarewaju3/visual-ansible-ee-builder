@@ -340,6 +340,21 @@ You can modify the build options by editing the variables at the top of the \`bu
                     <h4 className="text-sm font-medium text-foreground">bindep.txt</h4>
                     <Textarea value={generateBindepsTxt()} readOnly rows={Math.min(generateBindepsTxt().split('\n').length, 6)} className="font-mono text-xs bg-background text-foreground border resize-none" />
                   </div>}
+                
+                {/* Save Preset Button */}
+                <div className="pt-4 border-t border-border">
+                  {user ? (
+                    <Button variant="outline" size="lg" onClick={handleSavePreset} className="w-full">
+                      <Save className="h-5 w-5 mr-2" />
+                      Save as Preset
+                    </Button>
+                  ) : (
+                    <Button variant="outline" size="lg" onClick={() => navigate('/auth')} className="w-full">
+                      <Save className="h-5 w-5 mr-2" />
+                      Sign in to Save Preset
+                    </Button>
+                  )}
+                </div>
               </div>
             </CollapsibleContent>
           </Collapsible>
@@ -373,21 +388,6 @@ cd ee-build-package && \\
 chmod +x build.sh && \\
 ./build.sh`}
               </pre>
-            </div>
-            
-            {/* Save Preset Button */}
-            <div className="pt-4 border-t border-border">
-              {user ? (
-                <Button variant="outline" size="lg" onClick={handleSavePreset} className="w-full">
-                  <Save className="h-5 w-5 mr-2" />
-                  Save as Preset
-                </Button>
-              ) : (
-                <Button variant="outline" size="lg" onClick={() => navigate('/auth')} className="w-full">
-                  <Save className="h-5 w-5 mr-2" />
-                  Sign in to Save Preset
-                </Button>
-              )}
             </div>
           </div>
         </CardContent>
