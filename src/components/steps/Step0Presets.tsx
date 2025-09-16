@@ -67,6 +67,9 @@ export function Step0Presets({ selectedPreset, onPresetChange }: Step0PresetsPro
           onClick={() => onPresetChange('scratch')}
         >
           <CardHeader className="text-center">
+            <div className="flex items-center justify-between mb-2">
+              <Badge variant="secondary" className="text-xs">Default</Badge>
+            </div>
             <div className="text-4xl mb-2">🛠️</div>
             <CardTitle className="text-xl">Start from Scratch</CardTitle>
             <CardDescription>
@@ -74,13 +77,15 @@ export function Step0Presets({ selectedPreset, onPresetChange }: Step0PresetsPro
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="space-y-2">
-              <div className="flex items-center gap-2">
-                <Wrench className="w-4 h-4" />
-                <span className="text-sm">Full customization</span>
+            <div className="space-y-3">
+              <div>
+                <div className="text-sm font-medium mb-1">Includes:</div>
+                <div className="text-sm text-muted-foreground">
+                  Empty environment with Python 3.11 runtime only
+                </div>
               </div>
               <div className="text-xs text-muted-foreground">
-                Perfect for specific requirements or learning
+                Base: Python 3.11 on RHEL 9
               </div>
             </div>
           </CardContent>
