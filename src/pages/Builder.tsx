@@ -1,6 +1,7 @@
 // Ansible Execution Environment Builder
 import { useState, useEffect } from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
+import { useAuth } from "@/contexts/AuthContext";
 import { Container, Layers, Package, Play, ChevronLeft, ChevronRight, RotateCcw, Sparkles, Save } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { StepNavigation } from "@/components/StepNavigation";
@@ -38,6 +39,8 @@ const steps = [
 
 const Builder = () => {
   const location = useLocation();
+  const navigate = useNavigate();
+  const { user } = useAuth();
   
   // Persistent state using localStorage
   const [currentStep, setCurrentStep] = useLocalStorage(`${STORAGE_KEY}-currentStep`, DEFAULT_STATE.currentStep);
@@ -115,7 +118,11 @@ const Builder = () => {
 
   const handleNext = () => {
     if (currentStep === 3) {
-      // On final step, trigger save preset dialog
+      // On final step, check auth before saving preset
+      if (!user) {
+        navigate('/auth');
+        return;
+      }
       handleSavePreset();
     } else if (canGoNext() && currentStep < steps.length) {
       setCurrentStep(currentStep + 1);
@@ -238,7 +245,7 @@ const Builder = () => {
                   {currentStep === 3 ? (
                     <>
                       <Save className="w-4 h-4" />
-                      <span>Save as Preset</span>
+                      <span>{user ? "Save as Preset" : "Sign in to save preset"}</span>
                     </>
                   ) : (
                     <>
