@@ -1,13 +1,14 @@
 // Ansible Execution Environment Builder
 import { useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
-import { Container, Layers, Package, Play, ChevronLeft, ChevronRight, RotateCcw, Sparkles } from "lucide-react";
+import { Container, Layers, Package, Play, ChevronLeft, ChevronRight, RotateCcw, Sparkles, Save } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { StepNavigation } from "@/components/StepNavigation";
 import { Step0Presets } from "@/components/steps/Step0Presets";
 import { Step1BaseImage } from "@/components/steps/Step1BaseImage";
 import { Step2CollectionsRequirements } from "@/components/steps/Step2CollectionsRequirements";
 import { Step3Review } from "@/components/steps/Step3Review";
+import { SavePresetDialog } from "@/components/SavePresetDialog";
 import { useLocalStorage } from "@/hooks/useLocalStorage";
 import { Collection, STORAGE_KEY, DEFAULT_STATE, clearStoredState } from "@/lib/storage";
 import { getPresetById } from "@/lib/presets";
@@ -101,8 +102,8 @@ const Builder = () => {
         // Can always proceed from step 2, even with empty selections
         return true;
       case 3:
-        // Final step, no next
-        return false;
+        // Final step, show save preset button
+        return true;
       default:
         return false;
     }
@@ -113,9 +114,18 @@ const Builder = () => {
   };
 
   const handleNext = () => {
-    if (canGoNext() && currentStep < steps.length) {
+    if (currentStep === 3) {
+      // On final step, trigger save preset dialog
+      handleSavePreset();
+    } else if (canGoNext() && currentStep < steps.length) {
       setCurrentStep(currentStep + 1);
     }
+  };
+
+  const [showSaveDialog, setShowSaveDialog] = useState(false);
+
+  const handleSavePreset = () => {
+    setShowSaveDialog(true);
   };
 
   const handlePrev = () => {
@@ -225,13 +235,35 @@ const Builder = () => {
                   disabled={!canGoNext()}
                   className="flex items-center space-x-2"
                 >
-                  <span>Next</span>
-                  <ChevronRight className="w-4 h-4" />
+                  {currentStep === 3 ? (
+                    <>
+                      <Save className="w-4 h-4" />
+                      <span>Save as Preset</span>
+                    </>
+                  ) : (
+                    <>
+                      <span>Next</span>
+                      <ChevronRight className="w-4 h-4" />
+                    </>
+                  )}
                 </Button>
               )}
             </div>
           </div>
         </div>
+
+        {/* Save Preset Dialog */}
+        <SavePresetDialog 
+          open={showSaveDialog} 
+          onOpenChange={setShowSaveDialog}
+          baseImage={selectedBaseImage}
+          collections={selectedCollections}
+          requirements={requirements}
+          packages={selectedPackages}
+          onSuccess={() => {
+            // Optional: Add any additional success handling
+          }}
+        />
       </div>
     </div>
   );
