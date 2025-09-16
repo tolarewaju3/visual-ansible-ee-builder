@@ -40,7 +40,8 @@ export const useUsageLimit = () => {
       return newCount;
     } catch (error) {
       console.error('Error incrementing export count:', error);
-      throw error;
+      // Don't throw error for unauthenticated users
+      return 0;
     }
   };
 

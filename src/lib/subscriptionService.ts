@@ -102,7 +102,8 @@ export const subscriptionService = {
   async incrementExportCount(): Promise<number> {
     const { data: session } = await supabase.auth.getSession();
     if (!session?.session?.user) {
-      throw new Error('User not authenticated');
+      // Return 0 for unauthenticated users (no tracking)
+      return 0;
     }
 
     const { data, error } = await supabase.rpc('increment_export_count', {
