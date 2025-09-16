@@ -1,4 +1,4 @@
-import { FileText, Download, AlertTriangle, Save, Package } from "lucide-react";
+import { FileText, Download, AlertTriangle, Save, Package, ChevronDown } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { SavePresetDialog } from "@/components/SavePresetDialog";
 import { useAuth } from "@/contexts/AuthContext";
 import { Collection } from "@/lib/storage";
@@ -30,6 +31,7 @@ export function Step3Review({
 }: Step3ReviewProps) {
   const { user } = useAuth();
   const [showSaveDialog, setShowSaveDialog] = useState(false);
+  const [isGeneratedFilesOpen, setIsGeneratedFilesOpen] = useState(false);
   
   // Build options state
   const [imageTag, setImageTag] = useState('my-ee:latest');
@@ -278,65 +280,74 @@ You can modify the build options by editing the variables at the top of the \`bu
         )}
 
         {/* Generated Files */}
-        <Card className="bg-card border-border">
-          <CardHeader>
-            <CardTitle className="flex items-center space-x-2">
-              <FileText className="h-5 w-5 text-primary" />
-              <span>Generated Files</span>
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-6">
-            {/* execution-environment.yml */}
-            <div className="space-y-2">
-              <h4 className="text-sm font-medium text-foreground">execution-environment.yml</h4>
-              <Textarea 
-                value={generateExecutionEnvironment()} 
-                readOnly 
-                rows={generateExecutionEnvironment().split('\n').length} 
-                className="font-mono text-xs bg-muted/30 text-foreground border resize-none" 
-              />
-            </div>
+        <Collapsible open={isGeneratedFilesOpen} onOpenChange={setIsGeneratedFilesOpen}>
+          <Card className="bg-card border-border">
+            <CollapsibleTrigger asChild>
+              <CardHeader className="cursor-pointer hover:bg-muted/50 transition-colors">
+                <CardTitle className="flex items-center justify-between">
+                  <div className="flex items-center space-x-2">
+                    <FileText className="h-5 w-5 text-primary" />
+                    <span>Generated Files</span>
+                  </div>
+                  <ChevronDown className={`h-4 w-4 transition-transform duration-200 ${isGeneratedFilesOpen ? 'rotate-180' : ''}`} />
+                </CardTitle>
+              </CardHeader>
+            </CollapsibleTrigger>
+            <CollapsibleContent>
+              <CardContent className="space-y-6">
+                {/* execution-environment.yml */}
+                <div className="space-y-2">
+                  <h4 className="text-sm font-medium text-foreground">execution-environment.yml</h4>
+                  <Textarea 
+                    value={generateExecutionEnvironment()} 
+                    readOnly 
+                    rows={generateExecutionEnvironment().split('\n').length} 
+                    className="font-mono text-xs bg-muted/30 text-foreground border resize-none" 
+                  />
+                </div>
 
-            {/* requirements.yml */}
-            {selectedCollections.length > 0 && (
-              <div className="space-y-2">
-                <h4 className="text-sm font-medium text-foreground">requirements.yml</h4>
-                <Textarea 
-                  value={generateRequirementsYml()} 
-                  readOnly 
-                  rows={generateRequirementsYml().split('\n').length} 
-                  className="font-mono text-xs bg-muted/30 text-foreground border resize-none" 
-                />
-              </div>
-            )}
+                {/* requirements.yml */}
+                {selectedCollections.length > 0 && (
+                  <div className="space-y-2">
+                    <h4 className="text-sm font-medium text-foreground">requirements.yml</h4>
+                    <Textarea 
+                      value={generateRequirementsYml()} 
+                      readOnly 
+                      rows={generateRequirementsYml().split('\n').length} 
+                      className="font-mono text-xs bg-muted/30 text-foreground border resize-none" 
+                    />
+                  </div>
+                )}
 
-            {/* requirements.txt */}
-            {requirements.length > 0 && (
-              <div className="space-y-2">
-                <h4 className="text-sm font-medium text-foreground">requirements.txt</h4>
-                <Textarea 
-                  value={generateRequirementsTxt()} 
-                  readOnly 
-                  rows={generateRequirementsTxt().split('\n').length} 
-                  className="font-mono text-xs bg-muted/30 text-foreground border resize-none" 
-                />
-              </div>
-            )}
+                {/* requirements.txt */}
+                {requirements.length > 0 && (
+                  <div className="space-y-2">
+                    <h4 className="text-sm font-medium text-foreground">requirements.txt</h4>
+                    <Textarea 
+                      value={generateRequirementsTxt()} 
+                      readOnly 
+                      rows={generateRequirementsTxt().split('\n').length} 
+                      className="font-mono text-xs bg-muted/30 text-foreground border resize-none" 
+                    />
+                  </div>
+                )}
 
-            {/* bindep.txt */}
-            {selectedPackages.length > 0 && (
-              <div className="space-y-2">
-                <h4 className="text-sm font-medium text-foreground">bindep.txt</h4>
-                <Textarea 
-                  value={generateBindepsTxt()} 
-                  readOnly 
-                  rows={generateBindepsTxt().split('\n').length} 
-                  className="font-mono text-xs bg-muted/30 text-foreground border resize-none" 
-                />
-              </div>
-            )}
-          </CardContent>
-        </Card>
+                {/* bindep.txt */}
+                {selectedPackages.length > 0 && (
+                  <div className="space-y-2">
+                    <h4 className="text-sm font-medium text-foreground">bindep.txt</h4>
+                    <Textarea 
+                      value={generateBindepsTxt()} 
+                      readOnly 
+                      rows={generateBindepsTxt().split('\n').length} 
+                      className="font-mono text-xs bg-muted/30 text-foreground border resize-none" 
+                    />
+                  </div>
+                )}
+              </CardContent>
+            </CollapsibleContent>
+          </Card>
+        </Collapsible>
 
         {/* Build Locally Panel */}
         <Card className="bg-card border-border">
