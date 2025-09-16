@@ -123,7 +123,7 @@ export function Step0Presets({ selectedPreset, onPresetChange }: Step0PresetsPro
                       <>AWS, Azure & GCP collections, Cloud SDKs & CLI tools</>
                     )}
                     {preset.id === 'container-orchestration' && (
-                      <>Kubernetes, Docker & OpenShift collections, Container SDKs</>
+                      <>Kubernetes, Docker & OpenShift collections</>
                     )}
                     {preset.id === 'security-compliance' && (
                       <>Crypto & POSIX collections, Security tools & certificates</>
