@@ -15,7 +15,7 @@ export const PRESETS: Preset[] = [
   {
     id: 'basic-automation',
     name: 'Basic Automation',
-    description: 'Perfect for getting started with Ansible automation. Includes essential collections for system management.',
+    description: 'Essential collections for system management.',
     icon: '🚀',
     baseImage: 'registry.access.redhat.com/ubi9/python-311:latest',
     collections: [
@@ -33,7 +33,7 @@ export const PRESETS: Preset[] = [
   {
     id: 'network-automation',
     name: 'Network Automation',
-    description: 'Specialized for network device management with major vendor collections and networking tools.',
+    description: 'Network device management with major vendors',
     icon: '🌐',
     baseImage: 'registry.access.redhat.com/ubi9/python-311:latest',
     collections: [
@@ -56,7 +56,7 @@ export const PRESETS: Preset[] = [
   {
     id: 'cloud-management',
     name: 'Cloud Management',
-    description: 'Comprehensive setup for managing AWS, Azure, and GCP resources with cloud-specific tools.',
+    description: 'AWS, Azure, and GCP management.',
     icon: '☁️',
     baseImage: 'registry.access.redhat.com/ubi9/python-311:latest',
     collections: [
@@ -77,7 +77,7 @@ export const PRESETS: Preset[] = [
   {
     id: 'container-orchestration',
     name: 'Container Orchestration',
-    description: 'Built for Kubernetes and container management with Docker and OpenShift collections.',
+    description: 'Kubernetes and container management.',
     icon: '🐳',
     baseImage: 'registry.access.redhat.com/ubi9/python-311:latest',
     collections: [
@@ -98,7 +98,7 @@ export const PRESETS: Preset[] = [
   {
     id: 'security-compliance',
     name: 'Security & Compliance',
-    description: 'Security-focused setup with vulnerability scanning and compliance automation tools.',
+    description: 'Vulnerability scanning and compliance automation tools.',
     icon: '🔒',
     baseImage: 'registry.access.redhat.com/ubi9/python-311:latest',
     collections: [
