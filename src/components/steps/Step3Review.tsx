@@ -348,6 +348,19 @@ You can modify the build options by editing the variables at the top of the \`bu
             <Download className="h-5 w-5 mr-2" />
             {isExporting ? 'Preparing Download...' : 'Download Build Package'}
           </Button>
+
+          {/* Save Preset Button */}
+          {user ? (
+            <Button variant="outline" size="lg" onClick={handleSavePreset} className="w-full">
+              <Save className="h-5 w-5 mr-2" />
+              Save as Preset
+            </Button>
+          ) : (
+            <Button variant="outline" size="lg" onClick={() => navigate('/auth')} className="w-full">
+              <Save className="h-5 w-5 mr-2" />
+              Sign in to Save Preset
+            </Button>
+          )}
         </CardContent>
       </Card>
 
@@ -377,19 +390,6 @@ chmod +x build.sh && \\
           </div>
         </CardContent>
       </Card>
-
-      {/* Additional Actions */}
-      {user ? (
-        <Button variant="outline" size="lg" onClick={handleSavePreset} className="w-full">
-          <Save className="h-5 w-5 mr-2" />
-          Save as Preset
-        </Button>
-      ) : (
-        <Button variant="outline" size="lg" onClick={() => navigate('/auth')} className="w-full">
-          <Save className="h-5 w-5 mr-2" />
-          Sign in to Save Preset
-        </Button>
-      )}
 
       {/* Pay What You Want Section */}
       <PayWhatYouWant />
