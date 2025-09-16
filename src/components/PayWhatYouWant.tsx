@@ -27,7 +27,7 @@ export const PayWhatYouWant = () => {
     setLoading(true);
     try {
       // Create a one-time payment checkout session
-      const checkoutUrl = await subscriptionService.createCheckoutSession('pro');
+      const checkoutUrl = await subscriptionService.createAnonymousCheckoutSession(amount);
       window.location.href = checkoutUrl;
     } catch (error) {
       console.error('Error creating payment session:', error);
