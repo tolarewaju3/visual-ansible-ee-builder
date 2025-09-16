@@ -137,10 +137,10 @@ echo "Building execution environment with ansible-builder using $RUNTIME..."
 # Build with ansible-builder
 if [ "$PUSH_AFTER_BUILD" = "true" ]; then
   echo "Building and pushing image..."
-  ansible-builder build -t "$IMAGE_TAG" --container-runtime "$RUNTIME" --push .
+  ansible-builder build -v3 -t "$IMAGE_TAG" --container-runtime "$RUNTIME" --push
 else
   echo "Building image..."
-  ansible-builder build -t "$IMAGE_TAG" --container-runtime "$RUNTIME" .
+  ansible-builder build -v3 -t "$IMAGE_TAG" --container-runtime "$RUNTIME"
 fi
 
 if [ $? -eq 0 ]; then
