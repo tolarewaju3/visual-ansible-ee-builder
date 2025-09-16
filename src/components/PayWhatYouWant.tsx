@@ -20,8 +20,8 @@ export const PayWhatYouWant = () => {
   },
   {
     amount: 10,
-    label: 'Support',
-    icon: Zap
+    label: 'Love',
+    icon: Heart
   }];
   const handlePayment = async (amount: number) => {
     setLoading(true);
