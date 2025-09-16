@@ -159,6 +159,7 @@ const Builder = () => {
             selectedCollections={selectedCollections}
             requirements={requirements}
             selectedPackages={selectedPackages}
+            baseImage={selectedBaseImage}
             onCollectionsChange={setSelectedCollections}
             onRequirementsChange={setRequirements}
             onPackagesChange={setSelectedPackages}

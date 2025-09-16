@@ -7,8 +7,12 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Plus, X, Upload, Package, Layers, Search, FileText } from "lucide-react";
+import { Plus, X, Upload, Package, Layers, Search, FileText, Save } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
+import { SavePresetDialog } from "@/components/SavePresetDialog";
+import { useAuth } from "@/contexts/AuthContext";
+import { useNavigate } from "react-router-dom";
+import { toast } from "sonner";
 
 const systemPackages = [
   { name: "wget", description: "Download files from web", category: "network" },
@@ -39,6 +43,7 @@ interface Step2CollectionsRequirementsProps {
   selectedCollections: Collection[];
   requirements: string[];
   selectedPackages: string[];
+  baseImage: string;
   onCollectionsChange: (collections: Collection[]) => void;
   onRequirementsChange: (requirements: string[]) => void;
   onPackagesChange: (packages: string[]) => void;
@@ -49,6 +54,7 @@ export function Step2CollectionsRequirements({
   selectedCollections,
   requirements,
   selectedPackages,
+  baseImage,
   onCollectionsChange,
   onRequirementsChange,
   onPackagesChange,
@@ -61,7 +67,15 @@ export function Step2CollectionsRequirements({
   const [packageSearchQuery, setPackageSearchQuery] = useState("");
   const [customCollection, setCustomCollection] = useState("");
   const [customCollectionVersion, setCustomCollectionVersion] = useState("");
+  const [showSaveDialog, setShowSaveDialog] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  
+  const { user } = useAuth();
+  const navigate = useNavigate();
+
+  const handleSavePreset = () => {
+    setShowSaveDialog(true);
+  };
 
   const addPackage = (packageName: string) => {
     if (!selectedPackages.includes(packageName)) {
@@ -447,6 +461,37 @@ export function Step2CollectionsRequirements({
           </div>
         </CardContent>
       </Card>
+
+      {/* Save Preset Section */}
+      <Card>
+        <CardContent className="pt-6">
+          <div className="text-center">
+            {user ? (
+              <Button variant="outline" size="lg" onClick={handleSavePreset} className="w-full">
+                <Save className="h-5 w-5 mr-2" />
+                Save as Preset
+              </Button>
+            ) : (
+              <Button variant="outline" size="lg" onClick={() => navigate('/auth')} className="w-full">
+                <Save className="h-5 w-5 mr-2" />
+                Sign in to Save Preset
+              </Button>
+            )}
+          </div>
+        </CardContent>
+      </Card>
+
+      <SavePresetDialog
+        open={showSaveDialog}
+        onOpenChange={setShowSaveDialog}
+        baseImage={baseImage}
+        collections={selectedCollections}
+        requirements={requirements}
+        packages={selectedPackages}
+        onSuccess={() => {
+          toast.success('Preset saved successfully!');
+        }}
+      />
     </div>
   );
 }
