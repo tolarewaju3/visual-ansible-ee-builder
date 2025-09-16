@@ -28,7 +28,7 @@ export function StepNavigation({
 }: StepNavigationProps) {
   return (
     <div className="w-full bg-card border-b border-border">
-      <div className="container mx-auto px-4 py-2">
+      <div className="container mx-auto px-6 py-4">
         {/* Step indicators */}
         <div className="flex items-center justify-between mb-4">
           {steps.map((step, index) => {
