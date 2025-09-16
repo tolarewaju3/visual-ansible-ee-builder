@@ -16,12 +16,12 @@ export const PayWhatYouWant = () => {
   }, {
     amount: 5,
     label: 'Donut',
-    icon: Zap
+    icon: Donut
   },
   {
     amount: 10,
     label: 'Pizza',
-    icon: Heart
+    icon: Pizza
   }];
   const handlePayment = async (amount: number) => {
     setLoading(true);
