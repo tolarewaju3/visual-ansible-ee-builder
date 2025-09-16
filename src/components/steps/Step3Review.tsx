@@ -12,7 +12,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { SavePresetDialog } from "@/components/SavePresetDialog";
 import { UpgradeModal } from "@/components/UpgradeModal";
-import { UsageIndicator } from "@/components/UsageIndicator";
+
 import { useAuth } from "@/contexts/AuthContext";
 import { useSubscription } from "@/hooks/useSubscription";
 import { useUsageLimit } from "@/hooks/useUsageLimit";
@@ -34,7 +34,7 @@ export function Step3Review({
 }: Step3ReviewProps) {
   const { user } = useAuth();
   const { isPro } = useSubscription();
-  const { canExport, incrementExport, remainingExports } = useUsageLimit();
+  const { incrementExport } = useUsageLimit();
   const { toast } = useToast();
   const [showSaveDialog, setShowSaveDialog] = useState(false);
   const [showUpgradeModal, setShowUpgradeModal] = useState(false);
@@ -146,17 +146,10 @@ echo "Done!"
 `;
   };
   const handleExportBuildPackage = async () => {
-    // Check if user can export
-    if (!canExport) {
-      setUpgradeModalTrigger('export-limit');
-      setShowUpgradeModal(true);
-      return;
-    }
-
     setIsExporting(true);
     
     try {
-      // Increment export count for tracking
+      // Increment export count for analytics tracking
       await incrementExport();
 
       const zip = new JSZip();
@@ -234,9 +227,7 @@ You can modify the build options by editing the variables at the top of the \`bu
 
       toast({
         title: "Export successful!",
-        description: isPro 
-          ? "Your build package has been downloaded." 
-          : `Build package downloaded. ${remainingExports - 1} exports remaining today.`,
+        description: "Your build package has been downloaded.",
       });
 
     } catch (error) {
@@ -260,9 +251,6 @@ You can modify the build options by editing the variables at the top of the \`bu
     setShowSaveDialog(true);
   };
   return <div className="space-y-8">
-      {/* Usage Indicator for Free Users */}
-      <UsageIndicator />
-
       {/* Red Hat Subscription Warning */}
       {hasRedHatPackages && <Alert variant="destructive">
           <AlertTriangle className="h-4 w-4" />
@@ -362,17 +350,10 @@ You can modify the build options by editing the variables at the top of the \`bu
             </CollapsibleContent>
           </Collapsible>
 
-          <Button size="lg" onClick={handleExportBuildPackage} className="w-full" disabled={isExporting || (!isPro && !canExport)}>
+          <Button size="lg" onClick={handleExportBuildPackage} className="w-full" disabled={isExporting}>
             <Download className="h-5 w-5 mr-2" />
             {isExporting ? 'Preparing Download...' : 'Download Build Package'}
           </Button>
-          
-          {!isPro && !canExport && (
-            <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground mt-2">
-              <Crown className="w-4 h-4 text-amber-500" />
-              <span>Daily limit reached. Upgrade to Pro for unlimited exports.</span>
-            </div>
-          )}
         </CardContent>
       </Card>
 

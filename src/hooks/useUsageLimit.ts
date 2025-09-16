@@ -13,19 +13,15 @@ export const useUsageLimit = () => {
   const loadUsageData = async () => {
     if (!user) {
       setTodayExports(0);
-      setCanExport(false);
+      setCanExport(true); // Everyone can export now
       setLoading(false);
       return;
     }
 
     try {
-      const [exportCount, canUserExport] = await Promise.all([
-        subscriptionService.getTodayExportCount(),
-        subscriptionService.canUserExport()
-      ]);
-
+      const exportCount = await subscriptionService.getTodayExportCount();
       setTodayExports(exportCount);
-      setCanExport(canUserExport);
+      setCanExport(true); // Everyone can export now (unlimited)
     } catch (error) {
       console.error('Error loading usage data:', error);
     } finally {
@@ -38,19 +34,9 @@ export const useUsageLimit = () => {
   }, [user, isPro]);
 
   const incrementExport = async () => {
-    if (!canExport) {
-      throw new Error('Export limit reached');
-    }
-
     try {
       const newCount = await subscriptionService.incrementExportCount();
       setTodayExports(newCount);
-      
-      // Update canExport status for free users
-      if (isFree && newCount >= 3) {
-        setCanExport(false);
-      }
-      
       return newCount;
     } catch (error) {
       console.error('Error incrementing export count:', error);
@@ -58,7 +44,7 @@ export const useUsageLimit = () => {
     }
   };
 
-  const remainingExports = isPro ? Infinity : Math.max(0, 3 - todayExports);
+  const remainingExports = Infinity; // Unlimited exports for everyone
 
   return {
     todayExports,

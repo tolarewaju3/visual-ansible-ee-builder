@@ -95,16 +95,8 @@ export const subscriptionService = {
       return false;
     }
 
-    const { data, error } = await supabase.rpc('can_user_export', {
-      user_uuid: session.session.user.id
-    });
-
-    if (error) {
-      console.error('Error checking export permission:', error);
-      return false;
-    }
-
-    return data;
+    // Everyone can export now (unlimited)
+    return true;
   },
 
   async incrementExportCount(): Promise<number> {
