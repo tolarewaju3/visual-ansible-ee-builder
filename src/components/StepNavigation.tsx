@@ -25,7 +25,7 @@ export function StepNavigation({
   onNext,
   onPrev
 }: StepNavigationProps) {
-  return <div className="w-full bg-card border-b border-border">
+  return <div className="w-full border-b border-border bg-transparent">
       <div className="container mx-auto px-6 py-0">
         {/* Step indicators */}
         <div className="flex items-center justify-between mb-4">
