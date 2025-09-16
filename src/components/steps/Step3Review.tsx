@@ -50,6 +50,16 @@ export function Step3Review({
   const [imageTag, setImageTag] = useState('my-ee:latest');
   const [runtime, setRuntime] = useState('auto');
 
+  // Container image validation function
+  const isValidContainerImage = (image: string): boolean => {
+    // Regex to validate container image format: [registry[:port]/]namespace/name[:tag]
+    const imagePattern = /^(?:(?:[a-zA-Z0-9.-]+(?:\.[a-zA-Z]{2,})?(?::[0-9]+)?\/)?(?:[a-zA-Z0-9._-]+\/)*)?[a-zA-Z0-9._-]+(?::[a-zA-Z0-9._-]+)?$/;
+    return imagePattern.test(image.trim());
+  };
+
+  // Check if image tag is valid
+  const isImageTagValid = isValidContainerImage(imageTag);
+
   // Packages that require Red Hat subscription
   const redHatSubscriptionPackages = ['telnet', 'tcpdump'];
 
@@ -272,7 +282,21 @@ You can modify the build options by editing the variables at the top of the \`bu
           <div className="grid gap-4 md:grid-cols-2">
             <div className="space-y-2">
               <Label htmlFor="image-tag">Image Tag</Label>
-              <Input id="image-tag" placeholder="my-ee:latest" value={imageTag} onChange={e => setImageTag(e.target.value)} />
+              <Input 
+                id="image-tag" 
+                placeholder="my-ee:latest" 
+                value={imageTag} 
+                onChange={e => setImageTag(e.target.value)}
+                className={`${imageTag.trim() && !isImageTagValid ? 'border-destructive' : ''}`}
+              />
+              {imageTag.trim() && !isImageTagValid && (
+                <p className="text-xs text-destructive">
+                  Invalid format. Use: [registry[:port]/][namespace/]name[:tag]
+                </p>
+              )}
+              <p className="text-xs text-muted-foreground">
+                Examples: registry.com/namespace/image:tag, namespace/image:tag, image:tag
+              </p>
             </div>
             <div className="space-y-2">
               <Label htmlFor="runtime">Runtime</Label>
@@ -345,7 +369,12 @@ You can modify the build options by editing the variables at the top of the \`bu
             </CollapsibleContent>
           </Collapsible>
 
-          <Button size="lg" onClick={handleExportBuildPackage} className="w-full" disabled={isExporting}>
+          <Button 
+            size="lg" 
+            onClick={handleExportBuildPackage} 
+            className="w-full" 
+            disabled={isExporting || !isImageTagValid}
+          >
             <Download className="h-5 w-5 mr-2" />
             {isExporting ? 'Preparing Download...' : 'Download Build Package'}
           </Button>
