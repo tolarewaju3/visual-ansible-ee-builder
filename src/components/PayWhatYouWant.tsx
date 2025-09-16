@@ -13,16 +13,12 @@ export const PayWhatYouWant = () => {
     amount: 5,
     label: 'Coffee',
     icon: Coffee
-  }, {
-    amount: 25,
-    label: 'Support',
-    icon: Zap
   }];
   const handlePayment = async (amount: number) => {
     setLoading(true);
     try {
-      // Create an anonymous one-time payment checkout session
-      const checkoutUrl = await subscriptionService.createAnonymousCheckoutSession(amount);
+      // Create a one-time payment checkout session
+      const checkoutUrl = await subscriptionService.createCheckoutSession('pro');
       window.location.href = checkoutUrl;
     } catch (error) {
       console.error('Error creating payment session:', error);
