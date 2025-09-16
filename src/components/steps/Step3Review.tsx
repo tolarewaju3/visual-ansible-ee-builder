@@ -104,6 +104,13 @@ echo "Runtime: $RUNTIME"
 echo "Push after build: $PUSH_AFTER_BUILD"
 echo ""
 
+# Check if ansible-builder is installed
+if ! command -v ansible-builder &> /dev/null; then
+  echo "Error: ansible-builder is not installed"
+  echo "Please install ansible-builder: pip install ansible-builder"
+  exit 1
+fi
+
 # Auto-detect runtime if not specified
 if [ "$RUNTIME" = "auto" ]; then
   if command -v podman &> /dev/null; then
@@ -125,22 +132,21 @@ if ! command -v "$RUNTIME" &> /dev/null; then
   exit 1
 fi
 
-echo "Building execution environment with $RUNTIME..."
-$RUNTIME build -t "$IMAGE_TAG" .
+echo "Building execution environment with ansible-builder using $RUNTIME..."
+
+# Build with ansible-builder
+if [ "$PUSH_AFTER_BUILD" = "true" ]; then
+  echo "Building and pushing image..."
+  ansible-builder build -t "$IMAGE_TAG" --container-runtime "$RUNTIME" --push .
+else
+  echo "Building image..."
+  ansible-builder build -t "$IMAGE_TAG" --container-runtime "$RUNTIME" .
+fi
 
 if [ $? -eq 0 ]; then
   echo "Build completed successfully!"
-  
-  # Conditionally push if enabled
   if [ "$PUSH_AFTER_BUILD" = "true" ]; then
-    echo "Pushing image to registry..."
-    $RUNTIME push "$IMAGE_TAG"
-    if [ $? -eq 0 ]; then
-      echo "Image pushed successfully!"
-    else
-      echo "Error: Failed to push image"
-      exit 1
-    fi
+    echo "Image pushed successfully!"
   fi
 else
   echo "Error: Build failed"
