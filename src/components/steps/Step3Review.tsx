@@ -15,39 +15,34 @@ import { useAuth } from "@/contexts/AuthContext";
 import { Collection } from "@/lib/storage";
 import { useState } from "react";
 import JSZip from "jszip";
-
 interface Step3ReviewProps {
   selectedBaseImage: string;
   selectedCollections: Collection[];
   requirements: string[];
   selectedPackages: string[];
 }
-
 export function Step3Review({
   selectedBaseImage,
   selectedCollections,
   requirements,
   selectedPackages
 }: Step3ReviewProps) {
-  const { user } = useAuth();
+  const {
+    user
+  } = useAuth();
   const [showSaveDialog, setShowSaveDialog] = useState(false);
   const [isGeneratedFilesOpen, setIsGeneratedFilesOpen] = useState(false);
-  
+
   // Build options state
   const [imageTag, setImageTag] = useState('my-ee:latest');
   const [runtime, setRuntime] = useState('auto');
-  
+
   // Packages that require Red Hat subscription
   const redHatSubscriptionPackages = ['telnet', 'tcpdump'];
-  
+
   // Check if any selected packages require Red Hat subscription
-  const hasRedHatPackages = selectedPackages.some(pkg => 
-    redHatSubscriptionPackages.includes(pkg.toLowerCase())
-  );
-  
-  const redHatPackagesFound = selectedPackages.filter(pkg => 
-    redHatSubscriptionPackages.includes(pkg.toLowerCase())
-  );
+  const hasRedHatPackages = selectedPackages.some(pkg => redHatSubscriptionPackages.includes(pkg.toLowerCase()));
+  const redHatPackagesFound = selectedPackages.filter(pkg => redHatSubscriptionPackages.includes(pkg.toLowerCase()));
   const generateExecutionEnvironment = () => {
     const collections = selectedCollections.map(c => c.version ? `${c.name}:${c.version}` : c.name);
     const dependenciesLines = ['  ansible_core:', '    package_pip: ansible-core==2.14.4', '  ansible_runner:', '    package_pip: ansible-runner'];
@@ -70,21 +65,17 @@ images:
 dependencies:
 ${dependenciesLines.join('\n')}`;
   };
-
   const generateRequirementsTxt = () => {
     return requirements.join('\n');
   };
-
   const generateBindepsTxt = () => {
     return selectedPackages.join('\n');
   };
-
   const generateRequirementsYml = () => {
     return `---
 collections:
 ${selectedCollections.map(c => `  - name: ${c.name}${c.version ? `\n    version: "${c.version}"` : ''}`).join('\n')}`;
   };
-
   const generateBuildScript = () => {
     return `#!/bin/bash
 
@@ -145,7 +136,6 @@ fi
 echo "Done!"
 `;
   };
-
   const handleExportBuildPackage = async () => {
     const zip = new JSZip();
 
@@ -205,7 +195,6 @@ You can modify the build options by editing the variables at the top of the \`bu
 - \`IMAGE_TAG\`: Change the image name and tag
 - \`RUNTIME\`: Force a specific runtime (podman/docker)
 `;
-
     zip.file("README.md", readme);
 
     // Generate and download the zip file
@@ -221,7 +210,6 @@ You can modify the build options by editing the variables at the top of the \`bu
     document.body.removeChild(link);
     URL.revokeObjectURL(url);
   };
-
   const handleExportAll = async () => {
     const zip = new JSZip();
 
@@ -256,12 +244,9 @@ You can modify the build options by editing the variables at the top of the \`bu
     document.body.removeChild(link);
     URL.revokeObjectURL(url);
   };
-
-  return (
-    <div className="space-y-8">
+  return <div className="space-y-8">
       {/* Red Hat Subscription Warning */}
-      {hasRedHatPackages && (
-        <Alert variant="destructive">
+      {hasRedHatPackages && <Alert variant="destructive">
           <AlertTriangle className="h-4 w-4" />
           <AlertTitle>Red Hat Subscription Required</AlertTitle>
           <AlertDescription>
@@ -269,8 +254,7 @@ You can modify the build options by editing the variables at the top of the \`bu
             <br />
             Make sure you are building the execution environment on Red Hat Enterprise Linux with a valid subscription.
           </AlertDescription>
-        </Alert>
-      )}
+        </Alert>}
 
       {/* Step 1: Set Build Information */}
       <Card className="bg-card border-border">
@@ -288,12 +272,7 @@ You can modify the build options by editing the variables at the top of the \`bu
           <div className="grid gap-4 md:grid-cols-2">
             <div className="space-y-2">
               <Label htmlFor="image-tag">Image Tag</Label>
-              <Input
-                id="image-tag"
-                placeholder="my-ee:latest"
-                value={imageTag}
-                onChange={(e) => setImageTag(e.target.value)}
-              />
+              <Input id="image-tag" placeholder="my-ee:latest" value={imageTag} onChange={e => setImageTag(e.target.value)} />
             </div>
             <div className="space-y-2">
               <Label htmlFor="runtime">Runtime</Label>
@@ -341,61 +320,31 @@ You can modify the build options by editing the variables at the top of the \`bu
                 {/* execution-environment.yml */}
                 <div className="space-y-2">
                   <h4 className="text-sm font-medium text-foreground">execution-environment.yml</h4>
-                  <Textarea 
-                    value={generateExecutionEnvironment()} 
-                    readOnly 
-                    rows={Math.min(generateExecutionEnvironment().split('\n').length, 10)} 
-                    className="font-mono text-xs bg-background text-foreground border resize-none" 
-                  />
+                  <Textarea value={generateExecutionEnvironment()} readOnly rows={Math.min(generateExecutionEnvironment().split('\n').length, 10)} className="font-mono text-xs bg-background text-foreground border resize-none" />
                 </div>
 
                 {/* requirements.yml */}
-                {selectedCollections.length > 0 && (
-                  <div className="space-y-2">
+                {selectedCollections.length > 0 && <div className="space-y-2">
                     <h4 className="text-sm font-medium text-foreground">requirements.yml</h4>
-                    <Textarea 
-                      value={generateRequirementsYml()} 
-                      readOnly 
-                      rows={Math.min(generateRequirementsYml().split('\n').length, 8)} 
-                      className="font-mono text-xs bg-background text-foreground border resize-none" 
-                    />
-                  </div>
-                )}
+                    <Textarea value={generateRequirementsYml()} readOnly rows={Math.min(generateRequirementsYml().split('\n').length, 8)} className="font-mono text-xs bg-background text-foreground border resize-none" />
+                  </div>}
 
                 {/* requirements.txt */}
-                {requirements.length > 0 && (
-                  <div className="space-y-2">
+                {requirements.length > 0 && <div className="space-y-2">
                     <h4 className="text-sm font-medium text-foreground">requirements.txt</h4>
-                    <Textarea 
-                      value={generateRequirementsTxt()} 
-                      readOnly 
-                      rows={Math.min(generateRequirementsTxt().split('\n').length, 6)} 
-                      className="font-mono text-xs bg-background text-foreground border resize-none" 
-                    />
-                  </div>
-                )}
+                    <Textarea value={generateRequirementsTxt()} readOnly rows={Math.min(generateRequirementsTxt().split('\n').length, 6)} className="font-mono text-xs bg-background text-foreground border resize-none" />
+                  </div>}
 
                 {/* bindep.txt */}
-                {selectedPackages.length > 0 && (
-                  <div className="space-y-2">
+                {selectedPackages.length > 0 && <div className="space-y-2">
                     <h4 className="text-sm font-medium text-foreground">bindep.txt</h4>
-                    <Textarea 
-                      value={generateBindepsTxt()} 
-                      readOnly 
-                      rows={Math.min(generateBindepsTxt().split('\n').length, 6)} 
-                      className="font-mono text-xs bg-background text-foreground border resize-none" 
-                    />
-                  </div>
-                )}
+                    <Textarea value={generateBindepsTxt()} readOnly rows={Math.min(generateBindepsTxt().split('\n').length, 6)} className="font-mono text-xs bg-background text-foreground border resize-none" />
+                  </div>}
               </div>
             </CollapsibleContent>
           </Collapsible>
 
-          <Button 
-            size="lg" 
-            onClick={handleExportBuildPackage}
-            className="w-full"
-          >
+          <Button size="lg" onClick={handleExportBuildPackage} className="w-full">
             <Download className="h-5 w-5 mr-2" />
             Download Build Package
           </Button>
@@ -408,7 +357,8 @@ You can modify the build options by editing the variables at the top of the \`bu
           <CardTitle className="flex items-center space-x-2">
             <div className="flex items-center justify-center w-6 h-6 rounded-full bg-primary text-primary-foreground text-sm font-medium">3</div>
             <Play className="h-5 w-5 text-primary" />
-            <span>Run Build Commands</span>
+            <span>Run Build Command
+          </span>
           </CardTitle>
           <CardDescription>
             Execute these commands in your terminal to build the execution environment
@@ -418,7 +368,7 @@ You can modify the build options by editing the variables at the top of the \`bu
           <div className="space-y-3">
             <div className="p-4 bg-muted/50 rounded-lg border">
               <pre className="font-mono text-sm text-foreground whitespace-pre-wrap">
-{`unzip ee-build-package.zip -d ee-build-package && \\
+              {`unzip ee-build-package.zip -d ee-build-package && \\
 cd ee-build-package && \\
 chmod +x build.sh && \\
 ./build.sh`}
@@ -430,40 +380,19 @@ chmod +x build.sh && \\
 
       {/* Additional Actions */}
       <div className="flex gap-3">
-        {user && (
-          <Button 
-            variant="outline" 
-            size="lg" 
-            onClick={() => setShowSaveDialog(true)}
-            className="flex-1"
-          >
+        {user && <Button variant="outline" size="lg" onClick={() => setShowSaveDialog(true)} className="flex-1">
             <Save className="h-5 w-5 mr-2" />
             Save as Preset
-          </Button>
-        )}
-        <Button 
-          variant="outline" 
-          size="lg" 
-          onClick={handleExportAll}
-          className={user ? "flex-1" : "w-full"}
-        >
+          </Button>}
+        <Button variant="outline" size="lg" onClick={handleExportAll} className={user ? "flex-1" : "w-full"}>
           <FileText className="h-5 w-5 mr-2" />
           Export Files Only
         </Button>
       </div>
 
       {/* Save Preset Dialog */}
-      <SavePresetDialog
-        open={showSaveDialog}
-        onOpenChange={setShowSaveDialog}
-        baseImage={selectedBaseImage}
-        collections={selectedCollections}
-        requirements={requirements}
-        packages={selectedPackages}
-        onSuccess={() => {
-          // Optional: Add any additional success handling
-        }}
-      />
-    </div>
-  );
+      <SavePresetDialog open={showSaveDialog} onOpenChange={setShowSaveDialog} baseImage={selectedBaseImage} collections={selectedCollections} requirements={requirements} packages={selectedPackages} onSuccess={() => {
+      // Optional: Add any additional success handling
+    }} />
+    </div>;
 }
