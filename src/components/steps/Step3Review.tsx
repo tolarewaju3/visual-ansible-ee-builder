@@ -18,6 +18,7 @@ import { useUsageLimit } from "@/hooks/useUsageLimit";
 import { useToast } from "@/hooks/use-toast";
 import { Collection } from "@/lib/storage";
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import JSZip from "jszip";
 interface Step3ReviewProps {
   selectedBaseImage: string;
@@ -35,6 +36,7 @@ export function Step3Review({
   const { user } = useAuth();
   const { incrementExport } = useUsageLimit();
   const { toast } = useToast();
+  const navigate = useNavigate();
   const [showSaveDialog, setShowSaveDialog] = useState(false);
   const [isGeneratedFilesOpen, setIsGeneratedFilesOpen] = useState(false);
   const [isExporting, setIsExporting] = useState(false);
@@ -377,10 +379,15 @@ chmod +x build.sh && \\
       </Card>
 
       {/* Additional Actions */}
-      {user && (
+      {user ? (
         <Button variant="outline" size="lg" onClick={handleSavePreset} className="w-full">
           <Save className="h-5 w-5 mr-2" />
           Save as Preset
+        </Button>
+      ) : (
+        <Button variant="outline" size="lg" onClick={() => navigate('/auth')} className="w-full">
+          <Save className="h-5 w-5 mr-2" />
+          Sign in to Save Preset
         </Button>
       )}
 
