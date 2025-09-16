@@ -210,40 +210,6 @@ You can modify the build options by editing the variables at the top of the \`bu
     document.body.removeChild(link);
     URL.revokeObjectURL(url);
   };
-  const handleExportAll = async () => {
-    const zip = new JSZip();
-
-    // Add all generated files to the zip
-    zip.file("execution-environment.yml", generateExecutionEnvironment());
-
-    // Only include requirements.yml if there are collections
-    if (selectedCollections.length > 0) {
-      zip.file("requirements.yml", generateRequirementsYml());
-    }
-
-    // Only include requirements.txt if there are Python requirements
-    if (requirements.length > 0) {
-      zip.file("requirements.txt", generateRequirementsTxt());
-    }
-
-    // Only include bindep.txt if there are system packages
-    if (selectedPackages.length > 0) {
-      zip.file("bindep.txt", generateBindepsTxt());
-    }
-
-    // Generate and download the zip file
-    const content = await zip.generateAsync({
-      type: "blob"
-    });
-    const url = URL.createObjectURL(content);
-    const link = document.createElement("a");
-    link.href = url;
-    link.download = "ee.zip";
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    URL.revokeObjectURL(url);
-  };
   return <div className="space-y-8">
       {/* Red Hat Subscription Warning */}
       {hasRedHatPackages && <Alert variant="destructive">
@@ -379,16 +345,12 @@ chmod +x build.sh && \\
       </Card>
 
       {/* Additional Actions */}
-      <div className="flex gap-3">
-        {user && <Button variant="outline" size="lg" onClick={() => setShowSaveDialog(true)} className="flex-1">
-            <Save className="h-5 w-5 mr-2" />
-            Save as Preset
-          </Button>}
-        <Button variant="outline" size="lg" onClick={handleExportAll} className={user ? "flex-1" : "w-full"}>
-          <FileText className="h-5 w-5 mr-2" />
-          Export Files Only
+      {user && (
+        <Button variant="outline" size="lg" onClick={() => setShowSaveDialog(true)} className="w-full">
+          <Save className="h-5 w-5 mr-2" />
+          Save as Preset
         </Button>
-      </div>
+      )}
 
       {/* Save Preset Dialog */}
       <SavePresetDialog open={showSaveDialog} onOpenChange={setShowSaveDialog} baseImage={selectedBaseImage} collections={selectedCollections} requirements={requirements} packages={selectedPackages} onSuccess={() => {
