@@ -10,9 +10,18 @@ export const PayWhatYouWant = () => {
     toast
   } = useToast();
   const predefinedAmounts = [{
-    amount: 5,
+    amount: 3,
     label: 'Coffee',
     icon: Coffee
+  }, {
+    amount: 5,
+    label: 'Support',
+    icon: Zap
+  },
+  {
+    amount: 10,
+    label: 'Support',
+    icon: Zap
   }];
   const handlePayment = async (amount: number) => {
     setLoading(true);
