@@ -351,23 +351,6 @@ You can modify the build options by editing the variables at the top of the \`bu
         </CardContent>
       </Card>
 
-      {/* Save Preset Section */}
-      <Card className="bg-card border-border">
-        <CardContent className="pt-6">
-          {user ? (
-            <Button variant="outline" size="lg" onClick={handleSavePreset} className="w-full">
-              <Save className="h-5 w-5 mr-2" />
-              Save as Preset
-            </Button>
-          ) : (
-            <Button variant="outline" size="lg" onClick={() => navigate('/auth')} className="w-full">
-              <Save className="h-5 w-5 mr-2" />
-              Sign in to Save Preset
-            </Button>
-          )}
-        </CardContent>
-      </Card>
-
       {/* Step 3: Run Build Commands */}
       <Card className="bg-card border-border">
         <CardHeader>
@@ -390,6 +373,21 @@ cd ee-build-package && \\
 chmod +x build.sh && \\
 ./build.sh`}
               </pre>
+            </div>
+            
+            {/* Save Preset Button */}
+            <div className="pt-4 border-t border-border">
+              {user ? (
+                <Button variant="outline" size="lg" onClick={handleSavePreset} className="w-full">
+                  <Save className="h-5 w-5 mr-2" />
+                  Save as Preset
+                </Button>
+              ) : (
+                <Button variant="outline" size="lg" onClick={() => navigate('/auth')} className="w-full">
+                  <Save className="h-5 w-5 mr-2" />
+                  Sign in to Save Preset
+                </Button>
+              )}
             </div>
           </div>
         </CardContent>
