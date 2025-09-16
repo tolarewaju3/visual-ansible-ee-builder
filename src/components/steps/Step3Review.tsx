@@ -344,25 +344,27 @@ You can modify the build options by editing the variables at the top of the \`bu
             </CollapsibleContent>
           </Collapsible>
 
-          <div className="grid grid-cols-2 gap-4">
-            <Button size="lg" onClick={handleExportBuildPackage} className="w-full" disabled={isExporting}>
-              <Download className="h-5 w-5 mr-2" />
-              {isExporting ? 'Preparing Download...' : 'Download Build Package'}
-            </Button>
+          <Button size="lg" onClick={handleExportBuildPackage} className="w-full" disabled={isExporting}>
+            <Download className="h-5 w-5 mr-2" />
+            {isExporting ? 'Preparing Download...' : 'Download Build Package'}
+          </Button>
+        </CardContent>
+      </Card>
 
-            {/* Save Preset Button */}
-            {user ? (
-              <Button variant="outline" size="lg" onClick={handleSavePreset} className="w-full">
-                <Save className="h-5 w-5 mr-2" />
-                Save as Preset
-              </Button>
-            ) : (
-              <Button variant="outline" size="lg" onClick={() => navigate('/auth')} className="w-full">
-                <Save className="h-5 w-5 mr-2" />
-                Sign in to Save Preset
-              </Button>
-            )}
-          </div>
+      {/* Save Preset Section */}
+      <Card className="bg-card border-border">
+        <CardContent className="pt-6">
+          {user ? (
+            <Button variant="outline" size="lg" onClick={handleSavePreset} className="w-full">
+              <Save className="h-5 w-5 mr-2" />
+              Save as Preset
+            </Button>
+          ) : (
+            <Button variant="outline" size="lg" onClick={() => navigate('/auth')} className="w-full">
+              <Save className="h-5 w-5 mr-2" />
+              Sign in to Save Preset
+            </Button>
+          )}
         </CardContent>
       </Card>
 
