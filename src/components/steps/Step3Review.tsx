@@ -1,4 +1,4 @@
-import { FileText, Download, AlertTriangle, Save, Package, ChevronDown, Settings, Play, Archive, Crown } from "lucide-react";
+import { FileText, Download, AlertTriangle, Save, Package, ChevronDown, Settings, Play, Archive } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -31,6 +31,7 @@ export function Step3Review({
   requirements,
   selectedPackages
 }: Step3ReviewProps) {
+  // Component cleaned of all Pro gates - everything is now free
   const { user } = useAuth();
   const { incrementExport } = useUsageLimit();
   const { toast } = useToast();
