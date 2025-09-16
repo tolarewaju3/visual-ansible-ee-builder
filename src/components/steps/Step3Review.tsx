@@ -1,4 +1,4 @@
-import { FileText, Download, AlertTriangle, Save, Package, ChevronDown, Settings, Play, Archive } from "lucide-react";
+import { FileText, Download, AlertTriangle, Save, Package, ChevronDown, Settings, Play, Archive, Crown } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -11,7 +11,12 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Checkbox } from "@/components/ui/checkbox";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { SavePresetDialog } from "@/components/SavePresetDialog";
+import { UpgradeModal } from "@/components/UpgradeModal";
+import { UsageIndicator } from "@/components/UsageIndicator";
 import { useAuth } from "@/contexts/AuthContext";
+import { useSubscription } from "@/hooks/useSubscription";
+import { useUsageLimit } from "@/hooks/useUsageLimit";
+import { useToast } from "@/hooks/use-toast";
 import { Collection } from "@/lib/storage";
 import { useState } from "react";
 import JSZip from "jszip";
@@ -27,11 +32,15 @@ export function Step3Review({
   requirements,
   selectedPackages
 }: Step3ReviewProps) {
-  const {
-    user
-  } = useAuth();
+  const { user } = useAuth();
+  const { isPro } = useSubscription();
+  const { canExport, incrementExport, remainingExports } = useUsageLimit();
+  const { toast } = useToast();
   const [showSaveDialog, setShowSaveDialog] = useState(false);
+  const [showUpgradeModal, setShowUpgradeModal] = useState(false);
+  const [upgradeModalTrigger, setUpgradeModalTrigger] = useState<'export-limit' | 'preset-save' | 'manual'>('manual');
   const [isGeneratedFilesOpen, setIsGeneratedFilesOpen] = useState(false);
+  const [isExporting, setIsExporting] = useState(false);
 
   // Build options state
   const [imageTag, setImageTag] = useState('my-ee:latest');
@@ -137,31 +146,44 @@ echo "Done!"
 `;
   };
   const handleExportBuildPackage = async () => {
-    const zip = new JSZip();
-
-    // Add all generated files to the zip
-    zip.file("execution-environment.yml", generateExecutionEnvironment());
-
-    // Only include requirements.yml if there are collections
-    if (selectedCollections.length > 0) {
-      zip.file("requirements.yml", generateRequirementsYml());
+    // Check if user can export
+    if (!canExport) {
+      setUpgradeModalTrigger('export-limit');
+      setShowUpgradeModal(true);
+      return;
     }
 
-    // Only include requirements.txt if there are Python requirements
-    if (requirements.length > 0) {
-      zip.file("requirements.txt", generateRequirementsTxt());
-    }
+    setIsExporting(true);
+    
+    try {
+      // Increment export count for tracking
+      await incrementExport();
 
-    // Only include bindep.txt if there are system packages
-    if (selectedPackages.length > 0) {
-      zip.file("bindep.txt", generateBindepsTxt());
-    }
+      const zip = new JSZip();
 
-    // Add build script
-    zip.file("build.sh", generateBuildScript());
+      // Add all generated files to the zip
+      zip.file("execution-environment.yml", generateExecutionEnvironment());
 
-    // Add README
-    const readme = `# Ansible Execution Environment Build Package
+      // Only include requirements.yml if there are collections
+      if (selectedCollections.length > 0) {
+        zip.file("requirements.yml", generateRequirementsYml());
+      }
+
+      // Only include requirements.txt if there are Python requirements
+      if (requirements.length > 0) {
+        zip.file("requirements.txt", generateRequirementsTxt());
+      }
+
+      // Only include bindep.txt if there are system packages
+      if (selectedPackages.length > 0) {
+        zip.file("bindep.txt", generateBindepsTxt());
+      }
+
+      // Add build script
+      zip.file("build.sh", generateBuildScript());
+
+      // Add README
+      const readme = `# Ansible Execution Environment Build Package
 
 This package contains all the files needed to build your Ansible Execution Environment locally.
 
@@ -195,22 +217,52 @@ You can modify the build options by editing the variables at the top of the \`bu
 - \`IMAGE_TAG\`: Change the image name and tag
 - \`RUNTIME\`: Force a specific runtime (podman/docker)
 `;
-    zip.file("README.md", readme);
+      zip.file("README.md", readme);
 
-    // Generate and download the zip file
-    const content = await zip.generateAsync({
-      type: "blob"
-    });
-    const url = URL.createObjectURL(content);
-    const link = document.createElement("a");
-    link.href = url;
-    link.download = "ee-build-package.zip";
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    URL.revokeObjectURL(url);
+      // Generate and download the zip file
+      const content = await zip.generateAsync({
+        type: "blob"
+      });
+      const url = URL.createObjectURL(content);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = "ee-build-package.zip";
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+
+      toast({
+        title: "Export successful!",
+        description: isPro 
+          ? "Your build package has been downloaded." 
+          : `Build package downloaded. ${remainingExports - 1} exports remaining today.`,
+      });
+
+    } catch (error) {
+      console.error('Export failed:', error);
+      toast({
+        title: "Export failed",
+        description: "There was an error creating your build package. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsExporting(false);
+    }
+  };
+
+  const handleSavePreset = () => {
+    if (!isPro) {
+      setUpgradeModalTrigger('preset-save');
+      setShowUpgradeModal(true);
+      return;
+    }
+    setShowSaveDialog(true);
   };
   return <div className="space-y-8">
+      {/* Usage Indicator for Free Users */}
+      <UsageIndicator />
+
       {/* Red Hat Subscription Warning */}
       {hasRedHatPackages && <Alert variant="destructive">
           <AlertTriangle className="h-4 w-4" />
@@ -310,10 +362,17 @@ You can modify the build options by editing the variables at the top of the \`bu
             </CollapsibleContent>
           </Collapsible>
 
-          <Button size="lg" onClick={handleExportBuildPackage} className="w-full">
+          <Button size="lg" onClick={handleExportBuildPackage} className="w-full" disabled={isExporting || (!isPro && !canExport)}>
             <Download className="h-5 w-5 mr-2" />
-            Download Build Package
+            {isExporting ? 'Preparing Download...' : 'Download Build Package'}
           </Button>
+          
+          {!isPro && !canExport && (
+            <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground mt-2">
+              <Crown className="w-4 h-4 text-amber-500" />
+              <span>Daily limit reached. Upgrade to Pro for unlimited exports.</span>
+            </div>
+          )}
         </CardContent>
       </Card>
 
@@ -346,9 +405,14 @@ chmod +x build.sh && \\
 
       {/* Additional Actions */}
       {user && (
-        <Button variant="outline" size="lg" onClick={() => setShowSaveDialog(true)} className="w-full">
+        <Button variant="outline" size="lg" onClick={handleSavePreset} className="w-full" disabled={!isPro}>
           <Save className="h-5 w-5 mr-2" />
-          Save as Preset
+          {isPro ? 'Save as Preset' : (
+            <>
+              <Crown className="w-4 h-4 text-amber-500 mr-1" />
+              Save as Preset (Pro Only)
+            </>
+          )}
         </Button>
       )}
 
@@ -356,5 +420,12 @@ chmod +x build.sh && \\
       <SavePresetDialog open={showSaveDialog} onOpenChange={setShowSaveDialog} baseImage={selectedBaseImage} collections={selectedCollections} requirements={requirements} packages={selectedPackages} onSuccess={() => {
       // Optional: Add any additional success handling
     }} />
+
+      {/* Upgrade Modal */}
+      <UpgradeModal
+        open={showUpgradeModal}
+        onOpenChange={setShowUpgradeModal}
+        trigger={upgradeModalTrigger}
+      />
     </div>;
 }

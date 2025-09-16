@@ -14,12 +14,41 @@ export type Database = {
   }
   public: {
     Tables: {
+      daily_exports: {
+        Row: {
+          created_at: string
+          export_count: number
+          export_date: string
+          id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          export_count?: number
+          export_date?: string
+          id?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          export_count?: number
+          export_date?: string
+          id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           created_at: string
           display_name: string | null
           email: string | null
           id: string
+          stripe_customer_id: string | null
+          subscription_plan: Database["public"]["Enums"]["subscription_plan"]
           updated_at: string
           user_id: string
         }
@@ -28,6 +57,8 @@ export type Database = {
           display_name?: string | null
           email?: string | null
           id?: string
+          stripe_customer_id?: string | null
+          subscription_plan?: Database["public"]["Enums"]["subscription_plan"]
           updated_at?: string
           user_id: string
         }
@@ -36,6 +67,8 @@ export type Database = {
           display_name?: string | null
           email?: string | null
           id?: string
+          stripe_customer_id?: string | null
+          subscription_plan?: Database["public"]["Enums"]["subscription_plan"]
           updated_at?: string
           user_id?: string
         }
@@ -83,15 +116,72 @@ export type Database = {
         }
         Relationships: []
       }
+      user_subscriptions: {
+        Row: {
+          created_at: string
+          current_period_end: string
+          current_period_start: string
+          id: string
+          plan_name: string
+          status: string
+          stripe_customer_id: string
+          stripe_subscription_id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          current_period_end: string
+          current_period_start: string
+          id?: string
+          plan_name?: string
+          status: string
+          stripe_customer_id: string
+          stripe_subscription_id: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          current_period_end?: string
+          current_period_start?: string
+          id?: string
+          plan_name?: string
+          status?: string
+          stripe_customer_id?: string
+          stripe_subscription_id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      can_user_export: {
+        Args: { user_uuid: string }
+        Returns: boolean
+      }
+      get_or_create_daily_exports: {
+        Args: { user_uuid: string }
+        Returns: {
+          created_at: string
+          export_count: number
+          export_date: string
+          id: string
+          updated_at: string
+          user_id: string
+        }
+      }
+      increment_export_count: {
+        Args: { user_uuid: string }
+        Returns: number
+      }
     }
     Enums: {
-      [_ in never]: never
+      subscription_plan: "free" | "pro"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -218,6 +308,8 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      subscription_plan: ["free", "pro"],
+    },
   },
 } as const
