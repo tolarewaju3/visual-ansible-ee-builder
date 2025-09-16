@@ -11,10 +11,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Checkbox } from "@/components/ui/checkbox";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { SavePresetDialog } from "@/components/SavePresetDialog";
-import { UpgradeModal } from "@/components/UpgradeModal";
+import { PayWhatYouWant } from "@/components/PayWhatYouWant";
 
 import { useAuth } from "@/contexts/AuthContext";
-import { useSubscription } from "@/hooks/useSubscription";
 import { useUsageLimit } from "@/hooks/useUsageLimit";
 import { useToast } from "@/hooks/use-toast";
 import { Collection } from "@/lib/storage";
@@ -33,12 +32,9 @@ export function Step3Review({
   selectedPackages
 }: Step3ReviewProps) {
   const { user } = useAuth();
-  const { isPro } = useSubscription();
   const { incrementExport } = useUsageLimit();
   const { toast } = useToast();
   const [showSaveDialog, setShowSaveDialog] = useState(false);
-  const [showUpgradeModal, setShowUpgradeModal] = useState(false);
-  const [upgradeModalTrigger, setUpgradeModalTrigger] = useState<'export-limit' | 'preset-save' | 'manual'>('manual');
   const [isGeneratedFilesOpen, setIsGeneratedFilesOpen] = useState(false);
   const [isExporting, setIsExporting] = useState(false);
 
@@ -243,11 +239,6 @@ You can modify the build options by editing the variables at the top of the \`bu
   };
 
   const handleSavePreset = () => {
-    if (!isPro) {
-      setUpgradeModalTrigger('preset-save');
-      setShowUpgradeModal(true);
-      return;
-    }
     setShowSaveDialog(true);
   };
   return <div className="space-y-8">
@@ -386,27 +377,18 @@ chmod +x build.sh && \\
 
       {/* Additional Actions */}
       {user && (
-        <Button variant="outline" size="lg" onClick={handleSavePreset} className="w-full" disabled={!isPro}>
+        <Button variant="outline" size="lg" onClick={handleSavePreset} className="w-full">
           <Save className="h-5 w-5 mr-2" />
-          {isPro ? 'Save as Preset' : (
-            <>
-              <Crown className="w-4 h-4 text-amber-500 mr-1" />
-              Save as Preset (Pro Only)
-            </>
-          )}
+          Save as Preset
         </Button>
       )}
+
+      {/* Pay What You Want Section */}
+      <PayWhatYouWant />
 
       {/* Save Preset Dialog */}
       <SavePresetDialog open={showSaveDialog} onOpenChange={setShowSaveDialog} baseImage={selectedBaseImage} collections={selectedCollections} requirements={requirements} packages={selectedPackages} onSuccess={() => {
       // Optional: Add any additional success handling
     }} />
-
-      {/* Upgrade Modal */}
-      <UpgradeModal
-        open={showUpgradeModal}
-        onOpenChange={setShowUpgradeModal}
-        trigger={upgradeModalTrigger}
-      />
     </div>;
 }
