@@ -15,22 +15,26 @@ import { PayWhatYouWant } from "@/components/PayWhatYouWant";
 import { useAuth } from "@/contexts/AuthContext";
 import { useUsageLimit } from "@/hooks/useUsageLimit";
 import { useToast } from "@/hooks/use-toast";
-import { Collection } from "@/lib/storage";
+import { Collection, AdditionalBuildStep } from "@/lib/storage";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import JSZip from "jszip";
-interface Step3ReviewProps {
+
+interface Step4ReviewProps {
   selectedBaseImage: string;
   selectedCollections: Collection[];
   requirements: string[];
   selectedPackages: string[];
+  additionalBuildSteps: AdditionalBuildStep[];
 }
-export function Step3Review({
+
+export function Step4Review({
   selectedBaseImage,
   selectedCollections,
   requirements,
-  selectedPackages
-}: Step3ReviewProps) {
+  selectedPackages,
+  additionalBuildSteps
+}: Step4ReviewProps) {
   // Component cleaned of all Pro gates - everything is now free
   const {
     user
@@ -66,6 +70,7 @@ export function Step3Review({
   // Check if any selected packages require Red Hat subscription
   const hasRedHatPackages = selectedPackages.some(pkg => redHatSubscriptionPackages.includes(pkg.toLowerCase()));
   const redHatPackagesFound = selectedPackages.filter(pkg => redHatSubscriptionPackages.includes(pkg.toLowerCase()));
+
   const generateExecutionEnvironment = () => {
     const collections = selectedCollections.map(c => c.version ? `${c.name}:${c.version}` : c.name);
     const dependenciesLines = ['  ansible_core:', '    package_pip: ansible-core==2.14.4', '  ansible_runner:', '    package_pip: ansible-runner'];
@@ -78,7 +83,8 @@ export function Step3Review({
     if (selectedPackages.length > 0) {
       dependenciesLines.push('  system: bindep.txt');
     }
-    return `---
+
+    let content = `---
 version: 3
 
 images:
@@ -87,18 +93,44 @@ images:
 
 dependencies:
 ${dependenciesLines.join('\n')}`;
+
+    // Add additional_build_steps if any are defined
+    if (additionalBuildSteps.length > 0) {
+      const buildStepsGroups: Record<string, string[]> = {};
+      
+      additionalBuildSteps.forEach(step => {
+        if (!buildStepsGroups[step.stepType]) {
+          buildStepsGroups[step.stepType] = [];
+        }
+        buildStepsGroups[step.stepType].push(...step.commands);
+      });
+
+      content += '\n\nadditional_build_steps:';
+      Object.entries(buildStepsGroups).forEach(([stepType, commands]) => {
+        content += `\n  ${stepType}:`;
+        commands.forEach(command => {
+          content += `\n    - ${command}`;
+        });
+      });
+    }
+
+    return content;
   };
+
   const generateRequirementsTxt = () => {
     return requirements.join('\n');
   };
+
   const generateBindepsTxt = () => {
     return selectedPackages.join('\n');
   };
+
   const generateRequirementsYml = () => {
     return `---
 collections:
 ${selectedCollections.map(c => `  - name: ${c.name}${c.version ? `\n    version: "${c.version}"` : ''}`).join('\n')}`;
   };
+
   const generateBuildScript = () => {
     return `#!/bin/bash
 
@@ -159,6 +191,7 @@ fi
 echo "Done!"
 `;
   };
+
   const handleExportBuildPackage = async () => {
     setIsExporting(true);
     try {
@@ -251,9 +284,11 @@ You can modify the build options by editing the variables at the top of the \`bu
       setIsExporting(false);
     }
   };
+
   const handleSavePreset = () => {
     setShowSaveDialog(true);
   };
+
   return <div className="space-y-8">
       {/* Red Hat Subscription Warning */}
       {hasRedHatPackages && <Alert variant="destructive">
@@ -412,8 +447,17 @@ chmod +x build.sh && \\
       <PayWhatYouWant />
 
       {/* Save Preset Dialog */}
-      <SavePresetDialog open={showSaveDialog} onOpenChange={setShowSaveDialog} baseImage={selectedBaseImage} collections={selectedCollections} requirements={requirements} packages={selectedPackages} onSuccess={() => {
-      // Optional: Add any additional success handling
-    }} />
+      <SavePresetDialog 
+        open={showSaveDialog} 
+        onOpenChange={setShowSaveDialog} 
+        baseImage={selectedBaseImage} 
+        collections={selectedCollections} 
+        requirements={requirements} 
+        packages={selectedPackages} 
+        additionalBuildSteps={additionalBuildSteps}
+        onSuccess={() => {
+          // Optional: Add any additional success handling
+        }} 
+      />
     </div>;
 }

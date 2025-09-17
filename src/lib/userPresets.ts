@@ -1,5 +1,5 @@
 import { supabase } from '@/integrations/supabase/client';
-import { Collection } from './storage';
+import { Collection, AdditionalBuildStep } from './storage';
 
 export interface UserPreset {
   id: string;
@@ -11,6 +11,7 @@ export interface UserPreset {
   collections: Collection[];
   requirements: string[];
   packages: string[];
+  additional_build_steps?: AdditionalBuildStep[];
   created_at: string;
   updated_at: string;
 }
@@ -23,6 +24,7 @@ export interface CreateUserPresetData {
   collections: Collection[];
   requirements: string[];
   packages: string[];
+  additional_build_steps?: AdditionalBuildStep[];
 }
 
 export const userPresetsService = {
@@ -47,6 +49,7 @@ export const userPresetsService = {
       collections: preset.collections as unknown as Collection[],
       requirements: preset.requirements as unknown as string[],
       packages: preset.packages as unknown as string[],
+      additional_build_steps: ((preset as any).additional_build_steps as AdditionalBuildStep[]) || [],
     }));
   },
 
@@ -67,6 +70,7 @@ export const userPresetsService = {
         collections: presetData.collections as any,
         requirements: presetData.requirements as any,
         packages: presetData.packages as any,
+        additional_build_steps: presetData.additional_build_steps as any,
       })
       .select()
       .single();
@@ -81,6 +85,7 @@ export const userPresetsService = {
       collections: data.collections as unknown as Collection[],
       requirements: data.requirements as unknown as string[],
       packages: data.packages as unknown as string[],
+      additional_build_steps: ((data as any).additional_build_steps as AdditionalBuildStep[]) || [],
     } : null;
   },
 
@@ -89,6 +94,7 @@ export const userPresetsService = {
     if (updates.collections) updateData.collections = updates.collections as any;
     if (updates.requirements) updateData.requirements = updates.requirements as any;
     if (updates.packages) updateData.packages = updates.packages as any;
+    if (updates.additional_build_steps) updateData.additional_build_steps = updates.additional_build_steps as any;
 
     const { data, error } = await supabase
       .from('user_presets')
@@ -107,6 +113,7 @@ export const userPresetsService = {
       collections: data.collections as unknown as Collection[],
       requirements: data.requirements as unknown as string[],
       packages: data.packages as unknown as string[],
+      additional_build_steps: ((data as any).additional_build_steps as AdditionalBuildStep[]) || [],
     } : null;
   },
 

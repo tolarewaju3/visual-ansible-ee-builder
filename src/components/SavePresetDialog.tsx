@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { Collection } from '@/lib/storage';
+import { Collection, AdditionalBuildStep } from '@/lib/storage';
 import { userPresetsService } from '@/lib/userPresets';
 import { toast } from '@/hooks/use-toast';
 import { Loader2 } from 'lucide-react';
@@ -16,6 +16,7 @@ interface SavePresetDialogProps {
   collections: Collection[];
   requirements: string[];
   packages: string[];
+  additionalBuildSteps?: AdditionalBuildStep[];
   onSuccess?: () => void;
 }
 
@@ -28,6 +29,7 @@ export const SavePresetDialog: React.FC<SavePresetDialogProps> = ({
   collections,
   requirements,
   packages,
+  additionalBuildSteps,
   onSuccess,
 }) => {
   const [name, setName] = useState('');
@@ -56,6 +58,7 @@ export const SavePresetDialog: React.FC<SavePresetDialogProps> = ({
         collections,
         requirements,
         packages,
+        additional_build_steps: additionalBuildSteps || [],
       });
 
       toast({

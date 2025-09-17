@@ -1,4 +1,4 @@
-import { Collection } from './storage';
+import { Collection, AdditionalBuildStep } from './storage';
 
 export interface Preset {
   id: string;
@@ -9,6 +9,7 @@ export interface Preset {
   collections: Collection[];
   requirements: string[];
   packages: string[];
+  additionalBuildSteps?: AdditionalBuildStep[];
 }
 
 export const PRESETS: Preset[] = [

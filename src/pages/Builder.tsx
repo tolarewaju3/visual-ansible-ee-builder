@@ -2,16 +2,17 @@
 import { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
-import { Container, Layers, Package, Play, ChevronLeft, ChevronRight, RotateCcw, Sparkles, Save } from "lucide-react";
+import { Container, Layers, Package, Play, ChevronLeft, ChevronRight, RotateCcw, Sparkles, Save, Settings } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { StepNavigation } from "@/components/StepNavigation";
 import { Step0Presets } from "@/components/steps/Step0Presets";
 import { Step1BaseImage } from "@/components/steps/Step1BaseImage";
 import { Step2CollectionsRequirements } from "@/components/steps/Step2CollectionsRequirements";
-import { Step3Review } from "@/components/steps/Step3Review";
+import { Step3Customize } from "@/components/steps/Step3Customize";
+import { Step4Review } from "@/components/steps/Step4Review";
 import { SavePresetDialog } from "@/components/SavePresetDialog";
 import { useLocalStorage } from "@/hooks/useLocalStorage";
-import { Collection, STORAGE_KEY, DEFAULT_STATE, clearStoredState } from "@/lib/storage";
+import { Collection, AdditionalBuildStep, STORAGE_KEY, DEFAULT_STATE, clearStoredState } from "@/lib/storage";
 import { getPresetById } from "@/lib/presets";
 
 const steps = [
@@ -32,6 +33,11 @@ const steps = [
   },
   {
     id: 3,
+    title: "Customize",
+    icon: Settings,
+  },
+  {
+    id: 4,
     title: "Build EE",
     icon: Play,
   },
@@ -49,6 +55,7 @@ const Builder = () => {
   const [selectedCollections, setSelectedCollections] = useLocalStorage<Collection[]>(`${STORAGE_KEY}-selectedCollections`, DEFAULT_STATE.selectedCollections);
   const [requirements, setRequirements] = useLocalStorage<string[]>(`${STORAGE_KEY}-requirements`, DEFAULT_STATE.requirements);
   const [selectedPackages, setSelectedPackages] = useLocalStorage<string[]>(`${STORAGE_KEY}-selectedPackages`, DEFAULT_STATE.selectedPackages);
+  const [additionalBuildSteps, setAdditionalBuildSteps] = useLocalStorage<AdditionalBuildStep[]>(`${STORAGE_KEY}-additionalBuildSteps`, DEFAULT_STATE.additionalBuildSteps);
 
   // Handle preset from Templates page
   useEffect(() => {
@@ -60,6 +67,7 @@ const Builder = () => {
       setSelectedCollections(preset.collections);
       setRequirements(preset.requirements);
       setSelectedPackages(preset.packages);
+      setAdditionalBuildSteps(preset.additionalBuildSteps || []);
       
       // Clear the state to prevent reapplying on refresh
       window.history.replaceState({}, document.title);
@@ -73,6 +81,7 @@ const Builder = () => {
       setSelectedCollections(DEFAULT_STATE.selectedCollections);
       setRequirements(DEFAULT_STATE.requirements);
       setSelectedPackages(DEFAULT_STATE.selectedPackages);
+      setAdditionalBuildSteps(DEFAULT_STATE.additionalBuildSteps);
     } else if (presetId.startsWith('user_')) {
       // Handle user preset - data should already be loaded from useEffect
       // No need to do anything here as the data is already set
@@ -84,6 +93,7 @@ const Builder = () => {
         setSelectedCollections(preset.collections);
         setRequirements(preset.requirements);
         setSelectedPackages(preset.packages);
+        setAdditionalBuildSteps(preset.additionalBuildSteps || []);
       }
     }
   };
@@ -105,6 +115,9 @@ const Builder = () => {
         // Can always proceed from step 2, even with empty selections
         return true;
       case 3:
+        // Can always proceed from step 3, even with no additional build steps
+        return true;
+      case 4:
         // Final step, show save preset button
         return true;
       default:
@@ -117,7 +130,7 @@ const Builder = () => {
   };
 
   const handleNext = () => {
-    if (currentStep === 3) {
+    if (currentStep === 4) {
       // On final step, check auth before saving preset
       if (!user) {
         navigate('/auth');
@@ -152,6 +165,7 @@ const Builder = () => {
     setSelectedCollections(DEFAULT_STATE.selectedCollections);
     setRequirements(DEFAULT_STATE.requirements);
     setSelectedPackages(DEFAULT_STATE.selectedPackages);
+    setAdditionalBuildSteps(DEFAULT_STATE.additionalBuildSteps);
   };
 
   const renderStep = () => {
@@ -184,11 +198,19 @@ const Builder = () => {
         );
       case 3:
         return (
-          <Step3Review
+          <Step3Customize
+            additionalBuildSteps={additionalBuildSteps}
+            onAdditionalBuildStepsChange={setAdditionalBuildSteps}
+          />
+        );
+      case 4:
+        return (
+          <Step4Review
             selectedBaseImage={selectedBaseImage}
             selectedCollections={selectedCollections}
             requirements={requirements}
             selectedPackages={selectedPackages}
+            additionalBuildSteps={additionalBuildSteps}
           />
         );
       default:
@@ -242,7 +264,7 @@ const Builder = () => {
                   disabled={!canGoNext()}
                   className="flex items-center space-x-2"
                 >
-                  {currentStep === 3 ? (
+                  {currentStep === 4 ? (
                     <>
                       <Save className="w-4 h-4" />
                       <span>{user ? "Save as Preset" : "Sign in to save preset"}</span>
@@ -267,6 +289,7 @@ const Builder = () => {
           collections={selectedCollections}
           requirements={requirements}
           packages={selectedPackages}
+          additionalBuildSteps={additionalBuildSteps}
           onSuccess={() => {
             // Optional: Add any additional success handling
           }}
