@@ -2,8 +2,6 @@
 
 Visual builder for Ansible Execution Environments. Create an EE freaky fast — without fighting YAML, dependencies, or base-image gotchas.
 
----
-
 ## 🚀 What it does
 - Start from **EE presets** (Basic, Network, Cloud, Security) or from scratch.
 - Pick a **base image**, add **collections / Python packages / RPMs**.
@@ -14,8 +12,6 @@ Visual builder for Ansible Execution Environments. Create an EE freaky fast — 
 - Run `ansible-builder` for you.
 - Push images to registries.
 - Manage Red Hat entitlements or credentials.
-
----
 
 ## 🧩 Presets
 Presets give you a **known working** execution environment & dependencies. You can use them as-is or tweak them.
@@ -37,8 +33,6 @@ Presets give you a **known working** execution environment & dependencies. You c
 3. **Custom** — any `<registry>/<namespace>/<name>:<tag>`  
    *If not RHEL/UBI-like, RPM installs may fail due to missing package managers.*  
 
----
-
 ## ⏱️ Quick Start
 1. Pick a base image (or preset).  
 2. Add collections / Python deps / RPMs.  
@@ -51,8 +45,6 @@ ansible-builder build -t quay.io/<org>/<name>:<tag> -f execution-environment.yml
 podman push quay.io/<org>/<name>:<tag>
 ```
 
----
-
 ## 📦 Files you’ll get
 ```
 execution-environment.yml
@@ -62,15 +54,11 @@ bindep.txt    # only if you added RPMs
 build.sh      # build script to run
 ```
 
----
-
 ## ✅ Guardrails
 - Empty lists are **OK** → files still valid.  
 - Image ref sanity check (format like `quay.io/org/name:tag`).
 - Clear warnings for subscription-only RPMs.
 - RPMs **off by default**; enabled only when you add them (and when base supports it).
-
----
 
 ## 🧪 Troubleshooting
 - **`registry.redhat.io` pull fails** → run `podman login registry.redhat.io`.  
@@ -78,14 +66,10 @@ build.sh      # build script to run
 - **`dnf` vs `microdnf`** → UBI minimal uses `microdnf`; standard UBI/AAP use `dnf`.  
 - **Custom base quirks** → non‑RHEL bases may not support RPM installs.
 
----
-
 ## 🗺️ Roadmap (post‑MVP)
 - Optional backend to run `ansible-builder` + stream logs.  
 - Preflight checks (auth, base pullability, pkg‑mgr detection).  
 - Team templates, org RBAC, audit history.
-
----
 
 ## 🔐 Security & Privacy
 - No credential collection.  
