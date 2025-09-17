@@ -18,12 +18,12 @@ import { getPresetById } from "@/lib/presets";
 const steps = [
   {
     id: 0,
-    title: "Choose Preset",
+    title: "Presests",
     icon: Sparkles,
   },
   {
     id: 1,
-    title: "Base Image",
+    title: "Build Image",
     icon: Container,
   },
   {
@@ -33,7 +33,7 @@ const steps = [
   },
   {
     id: 3,
-    title: "Customize",
+    title: "Customization",
     icon: Settings,
   },
   {
