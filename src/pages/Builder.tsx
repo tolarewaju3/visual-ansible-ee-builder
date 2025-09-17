@@ -32,7 +32,7 @@ const steps = [
   },
   {
     id: 3,
-    title: "Build Execution Environment",
+    title: "Build EE",
     icon: Play,
   },
 ];
