@@ -2,6 +2,9 @@
 
 Visual builder for Ansible Execution Environments. Create an EE freaky fast — without fighting YAML, dependencies, or base-image gotchas.
 
+![Visusl EE Builder](img/dashboard.png "Screenshow of EE builder")
+
+
 ## 🚀 What it does
 - Start from **EE presets** (Basic, Network, Cloud, Security) or from scratch.
 - Pick a **base image**, add **collections / Python packages / RPMs**.
