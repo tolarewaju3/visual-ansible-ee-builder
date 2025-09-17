@@ -105,9 +105,9 @@ export function Step2CollectionsRequirements({
   const [customCollection, setCustomCollection] = useState("");
   const [customCollectionVersion, setCustomCollectionVersion] = useState("");
   const [showSaveDialog, setShowSaveDialog] = useState(false);
-  const [collectionsOpen, setCollectionsOpen] = useState(true);
-  const [requirementsOpen, setRequirementsOpen] = useState(true);
-  const [packagesOpen, setPackagesOpen] = useState(true);
+  const [collectionsOpen, setCollectionsOpen] = useState(false);
+  const [requirementsOpen, setRequirementsOpen] = useState(false);
+  const [packagesOpen, setPackagesOpen] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const {
     user
