@@ -1,0 +1,54 @@
+name: Hosted EE Build
+
+on:
+  workflow_dispatch:
+    inputs:
+      image:
+        description: "Target image (e.g., quay.io/org/ee:tag)"
+        required: true
+      ee_zip_b64:
+        description: "Base64-encoded ZIP of EE files"
+        required: true
+      push:
+        description: "Push after build"
+        type: boolean
+        default: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Prepare workspace
+        run: |
+          mkdir -p ee
+          echo "${{ inputs.ee_zip_b64 }}" | base64 -d > ee/ee.zip
+          unzip ee/ee.zip -d ee
+          ls -la ee
+
+      - name: Install ansible-builder
+        run: |
+          python3 -m pip install --upgrade pip
+          pip install "ansible-builder>=3.1"
+
+      - name: Docker login
+        if: ${{ inputs.push == true }}
+        env:
+          REGISTRY_USERNAME: ${{ secrets.REGISTRY_USERNAME }}
+          REGISTRY_PASSWORD: ${{ secrets.REGISTRY_PASSWORD }}
+        run: |
+          REG="$(echo "${{ inputs.image }}" | awk -F/ '{print $1}')"
+          echo "$REGISTRY_PASSWORD" | docker login --username "$REGISTRY_USERNAME" --password-stdin "$REG"
+
+      - name: Build EE
+        working-directory: ee
+        run: |
+          test -f execution-environment.yml || { echo "missing execution-environment.yml"; exit 2; }
+          ansible-builder build \
+            -t "${{ inputs.image }}" \
+            -f execution-environment.yml \
+            --container-runtime docker
+
+      - name: Push EE
+        if: ${{ inputs.push == true }}
+        run: docker push "${{ inputs.image }}"
