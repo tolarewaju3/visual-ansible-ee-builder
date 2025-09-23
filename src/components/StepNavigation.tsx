@@ -43,7 +43,7 @@ export function StepNavigation({
                   onClick={() => isClickable && onStepChange(stepNumber)}
                   disabled={!isClickable}
                   className={cn(
-                    "flex items-center space-x-3 p-2 rounded-lg transition-all",
+                    "flex flex-col items-center space-y-2 p-2 rounded-lg transition-all",
                     isClickable ? "hover:bg-muted/50 cursor-pointer" : "cursor-not-allowed opacity-50"
                   )}
                 >
@@ -63,7 +63,7 @@ export function StepNavigation({
                       <step.icon className="w-5 h-5" />
                     )}
                   </div>
-                  <div className="text-left">
+                  <div className="text-center">
                     <p
                       className={cn(
                         "text-sm font-medium",
