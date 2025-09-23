@@ -23,7 +23,7 @@ const steps = [
   },
   {
     id: 1,
-    title: "Build Image",
+    title: "Base Image",
     icon: Container,
   },
   {
