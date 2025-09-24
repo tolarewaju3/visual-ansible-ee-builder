@@ -8,15 +8,11 @@ on:
         required: true
       ee_yaml_path:
         description: "Path to execution-environment.yml (ignored if ee_zip_b64 used)"
-        default: "execution-environment.yml"
+        default: "test/execution-environment.yml"
         required: true
       ee_zip_b64:
         description: "Base64-encoded ZIP of EE files (optional)"
         required: false
-      push:
-        description: "Push after build"
-        type: boolean
-        default: false
 
 jobs:
   build:
