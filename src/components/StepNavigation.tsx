@@ -1,3 +1,4 @@
+import React from "react";
 import { Check } from "lucide-react";
 import { cn } from "@/lib/utils";
 interface Step {
@@ -34,19 +35,21 @@ export function StepNavigation({
           const isActive = stepNumber === currentStep;
           const isCompleted = stepNumber < currentStep;
           const isClickable = stepNumber <= currentStep;
-          return <div key={step.id} className="flex items-center flex-1">
-                <button onClick={() => isClickable && onStepChange(stepNumber)} disabled={!isClickable} className={cn("flex flex-col items-center space-y-2 p-2 rounded-lg transition-all", isClickable ? "hover:bg-muted/50 cursor-pointer" : "cursor-not-allowed opacity-50")}>
-                  <div className={cn("flex items-center justify-center w-10 h-10 rounded-full border-2 transition-all", isCompleted ? "bg-primary border-primary text-primary-foreground" : isActive ? "bg-primary/10 border-primary text-primary" : "bg-muted border-muted-foreground/30 text-muted-foreground")}>
-                    {isCompleted ? <Check className="w-5 h-5" /> : <step.icon className="w-5 h-5" />}
-                  </div>
-                  <div className="text-center">
-                    <p className={cn("text-sm font-medium", isActive ? "text-primary" : "text-foreground")}>
-                      {step.title}
-                    </p>
-                  </div>
-                </button>
+          return <React.Fragment key={step.id}>
+                <div className="flex-1 flex justify-center">
+                  <button onClick={() => isClickable && onStepChange(stepNumber)} disabled={!isClickable} className={cn("flex flex-col items-center space-y-2 p-2 rounded-lg transition-all", isClickable ? "hover:bg-muted/50 cursor-pointer" : "cursor-not-allowed opacity-50")}>
+                    <div className={cn("flex items-center justify-center w-10 h-10 rounded-full border-2 transition-all", isCompleted ? "bg-primary border-primary text-primary-foreground" : isActive ? "bg-primary/10 border-primary text-primary" : "bg-muted border-muted-foreground/30 text-muted-foreground")}>
+                      {isCompleted ? <Check className="w-5 h-5" /> : <step.icon className="w-5 h-5" />}
+                    </div>
+                    <div className="text-center">
+                      <p className={cn("text-sm font-medium", isActive ? "text-primary" : "text-foreground")}>
+                        {step.title}
+                      </p>
+                    </div>
+                  </button>
+                </div>
                 {index < steps.length - 1 && <div className={cn("flex-1 h-0.5 mx-4 transition-colors", stepNumber < currentStep ? "bg-primary" : "bg-border")} />}
-              </div>;
+              </React.Fragment>;
         })}
         </div>
 
