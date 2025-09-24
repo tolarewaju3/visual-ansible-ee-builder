@@ -39,34 +39,5 @@ export const PayWhatYouWant = () => {
       setLoading(false);
     }
   };
-  return (
-    <div className="space-y-4">
-      <div className="text-center space-y-2">
-        <h3 className="text-lg font-semibold">Support the Project</h3>
-        <p className="text-muted-foreground">Help us keep building amazing tools for you</p>
-      </div>
-      
-      <div className="grid grid-cols-3 gap-4">
-        {predefinedAmounts.map((item) => (
-          <Card key={item.amount} className="cursor-pointer hover:bg-muted/50 transition-colors">
-            <CardContent className="p-4 text-center space-y-2">
-              <item.icon className="w-8 h-8 mx-auto text-primary" />
-              <div>
-                <p className="font-medium">{item.label}</p>
-                <p className="text-lg font-bold">${item.amount}</p>
-              </div>
-              <Button 
-                onClick={() => handlePayment(item.amount)}
-                disabled={loading}
-                className="w-full"
-                size="sm"
-              >
-                {loading ? "Processing..." : "Pay"}
-              </Button>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
-    </div>
-  );
+  return;
 };
