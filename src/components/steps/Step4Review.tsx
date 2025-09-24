@@ -11,7 +11,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Checkbox } from "@/components/ui/checkbox";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { SavePresetDialog } from "@/components/SavePresetDialog";
-import { PayWhatYouWant } from "@/components/PayWhatYouWant";
+
 import { useAuth } from "@/contexts/AuthContext";
 import { useUsageLimit } from "@/hooks/useUsageLimit";
 import { useToast } from "@/hooks/use-toast";
@@ -443,8 +443,6 @@ chmod +x build.sh && \\
         </CardContent>
       </Card>
 
-      {/* Pay What You Want Section */}
-      <PayWhatYouWant />
 
       {/* Save Preset Dialog */}
       <SavePresetDialog 
