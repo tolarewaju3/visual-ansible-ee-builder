@@ -405,19 +405,7 @@ export function Step2CollectionsRequirements({
       </Collapsible>
 
       {/* Save Preset Section */}
-      <Card>
-        <CardContent className="pt-6">
-          <div className="text-center">
-            {user ? <Button variant="outline" size="lg" onClick={handleSavePreset} className="w-full">
-                <Save className="h-5 w-5 mr-2" />
-                Save as Preset
-              </Button> : <Button variant="outline" size="lg" onClick={() => navigate('/auth')} className="w-full">
-                <Save className="h-5 w-5 mr-2" />
-                Sign in to Save Preset
-              </Button>}
-          </div>
-        </CardContent>
-      </Card>
+      
 
       <SavePresetDialog open={showSaveDialog} onOpenChange={setShowSaveDialog} baseImage={baseImage} collections={selectedCollections} requirements={requirements} packages={selectedPackages} onSuccess={() => {
       toast.success('Preset saved successfully!');
