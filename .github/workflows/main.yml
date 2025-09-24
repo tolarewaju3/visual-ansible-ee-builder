@@ -62,7 +62,6 @@ jobs:
           pip install "ansible-builder>=3.1"
 
       - name: Docker login
-        if: ${{ inputs.push == 'true' }}
         env:
           REGISTRY_USERNAME: ${{ secrets.REGISTRY_USERNAME }}
           REGISTRY_PASSWORD: ${{ secrets.REGISTRY_PASSWORD }}
@@ -80,5 +79,4 @@ jobs:
             --container-runtime docker
 
       - name: Push EE
-        if: ${{ inputs.push == 'true' }}
         run: docker push "${{ inputs.image }}"
