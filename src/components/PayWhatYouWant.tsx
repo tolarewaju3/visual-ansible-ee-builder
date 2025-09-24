@@ -39,5 +39,40 @@ export const PayWhatYouWant = () => {
       setLoading(false);
     }
   };
-  return;
+  return (
+    <Card className="w-full max-w-md mx-auto">
+      <CardContent className="p-6">
+        <div className="text-center mb-6">
+          <Heart className="w-8 h-8 text-primary mx-auto mb-2" />
+          <h3 className="text-lg font-semibold mb-2">Support the Project</h3>
+          <p className="text-sm text-muted-foreground">
+            Choose an amount to support this open-source project
+          </p>
+        </div>
+        
+        <div className="grid gap-3 mb-4">
+          {predefinedAmounts.map((item) => (
+            <Button
+              key={item.amount}
+              variant="outline"
+              className="flex items-center justify-between p-4 h-auto"
+              onClick={() => handlePayment(item.amount)}
+              disabled={loading}
+            >
+              <div className="flex items-center gap-3">
+                <item.icon className="w-5 h-5" />
+                <span>{item.label}</span>
+              </div>
+              <span className="font-semibold">${item.amount}</span>
+            </Button>
+          ))}
+        </div>
+        
+        <div className="flex items-center gap-2 text-xs text-muted-foreground">
+          <Zap className="w-3 h-3" />
+          <span>Secure payment powered by Stripe</span>
+        </div>
+      </CardContent>
+    </Card>
+  );
 };
