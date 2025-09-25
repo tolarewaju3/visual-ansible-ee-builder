@@ -11,7 +11,6 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Checkbox } from "@/components/ui/checkbox";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { SavePresetDialog } from "@/components/SavePresetDialog";
-
 import { useAuth } from "@/contexts/AuthContext";
 import { useUsageLimit } from "@/hooks/useUsageLimit";
 import { useToast } from "@/hooks/use-toast";
@@ -20,7 +19,6 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import JSZip from "jszip";
 import { supabase } from "@/integrations/supabase/client";
-
 interface Step4ReviewProps {
   selectedBaseImage: string;
   selectedCollections: Collection[];
@@ -28,7 +26,6 @@ interface Step4ReviewProps {
   selectedPackages: string[];
   additionalBuildSteps: AdditionalBuildStep[];
 }
-
 export function Step4Review({
   selectedBaseImage,
   selectedCollections,
@@ -54,7 +51,7 @@ export function Step4Review({
   // Build options state
   const [imageTag, setImageTag] = useState('my-ee:latest');
   const [runtime, setRuntime] = useState('auto');
-  
+
   // Registry credentials state
   const [registryUsername, setRegistryUsername] = useState('');
   const [registryPassword, setRegistryPassword] = useState('');
@@ -75,7 +72,6 @@ export function Step4Review({
   // Check if any selected packages require Red Hat subscription
   const hasRedHatPackages = selectedPackages.some(pkg => redHatSubscriptionPackages.includes(pkg.toLowerCase()));
   const redHatPackagesFound = selectedPackages.filter(pkg => redHatSubscriptionPackages.includes(pkg.toLowerCase()));
-
   const generateExecutionEnvironment = () => {
     const collections = selectedCollections.map(c => c.version ? `${c.name}:${c.version}` : c.name);
     const dependenciesLines = ['  ansible_core:', '    package_pip: ansible-core==2.14.4', '  ansible_runner:', '    package_pip: ansible-runner'];
@@ -88,7 +84,6 @@ export function Step4Review({
     if (selectedPackages.length > 0) {
       dependenciesLines.push('  system: bindep.txt');
     }
-
     let content = `---
 version: 3
 
@@ -102,14 +97,12 @@ ${dependenciesLines.join('\n')}`;
     // Add additional_build_steps if any are defined
     if (additionalBuildSteps.length > 0) {
       const buildStepsGroups: Record<string, string[]> = {};
-      
       additionalBuildSteps.forEach(step => {
         if (!buildStepsGroups[step.stepType]) {
           buildStepsGroups[step.stepType] = [];
         }
         buildStepsGroups[step.stepType].push(...step.commands);
       });
-
       content += '\n\nadditional_build_steps:';
       Object.entries(buildStepsGroups).forEach(([stepType, commands]) => {
         content += `\n  ${stepType}:`;
@@ -118,24 +111,19 @@ ${dependenciesLines.join('\n')}`;
         });
       });
     }
-
     return content;
   };
-
   const generateRequirementsTxt = () => {
     return requirements.join('\n');
   };
-
   const generateBindepsTxt = () => {
     return selectedPackages.join('\n');
   };
-
   const generateRequirementsYml = () => {
     return `---
 collections:
 ${selectedCollections.map(c => `  - name: ${c.name}${c.version ? `\n    version: "${c.version}"` : ''}`).join('\n')}`;
   };
-
   const generateBuildScript = () => {
     return `#!/bin/bash
 
@@ -196,7 +184,6 @@ fi
 echo "Done!"
 `;
   };
-
   const handleExportBuildPackage = async () => {
     setIsExporting(true);
     try {
@@ -289,7 +276,6 @@ You can modify the build options by editing the variables at the top of the \`bu
       setIsExporting(false);
     }
   };
-
   const handleCloudBuild = async () => {
     if (!imageTag || !isImageTagValid) {
       toast({
@@ -299,7 +285,6 @@ You can modify the build options by editing the variables at the top of the \`bu
       });
       return;
     }
-
     if (!registryUsername || !registryPassword) {
       toast({
         title: "Registry credentials required",
@@ -308,7 +293,6 @@ You can modify the build options by editing the variables at the top of the \`bu
       });
       return;
     }
-
     setIsExporting(true);
     try {
       // Increment export count for analytics tracking  
@@ -316,27 +300,29 @@ You can modify the build options by editing the variables at the top of the \`bu
 
       // Create ZIP with EE files
       const zip = new JSZip();
-      
+
       // Add execution environment files
       zip.file("execution-environment.yml", generateExecutionEnvironment());
-      
       if (selectedCollections.length > 0) {
         zip.file("requirements.yml", generateRequirementsYml());
       }
-      
       if (requirements.length > 0) {
         zip.file("requirements.txt", generateRequirementsTxt());
       }
-      
       if (selectedPackages.length > 0) {
         zip.file("bindep.txt", generateBindepsTxt());
       }
 
       // Generate base64 encoded zip
-      const zipBlob = await zip.generateAsync({ type: "base64" });
+      const zipBlob = await zip.generateAsync({
+        type: "base64"
+      });
 
       // Call Supabase function to trigger GitHub workflow
-      const { data, error } = await supabase.functions.invoke('trigger-github-workflow', {
+      const {
+        data,
+        error
+      } = await supabase.functions.invoke('trigger-github-workflow', {
         body: {
           image: imageTag,
           eeZipB64: zipBlob,
@@ -344,23 +330,14 @@ You can modify the build options by editing the variables at the top of the \`bu
           registryPassword: registryPassword
         }
       });
-
       if (error) throw error;
-
       toast({
         title: "Build triggered successfully!",
         description: `Your Execution Environment build has started. Check the progress on GitHub Actions.`,
-        action: data.runUrl ? (
-          <Button 
-            variant="outline" 
-            size="sm"
-            onClick={() => window.open(data.runUrl, '_blank')}
-          >
+        action: data.runUrl ? <Button variant="outline" size="sm" onClick={() => window.open(data.runUrl, '_blank')}>
             View Build
-          </Button>
-        ) : undefined
+          </Button> : undefined
       });
-
     } catch (error) {
       console.error('Cloud build failed:', error);
       toast({
@@ -372,11 +349,9 @@ You can modify the build options by editing the variables at the top of the \`bu
       setIsExporting(false);
     }
   };
-
   const handleSavePreset = () => {
     setShowSaveDialog(true);
   };
-
   return <div className="space-y-8">
       {/* Red Hat Subscription Warning */}
       {hasRedHatPackages && <Alert variant="destructive">
@@ -405,49 +380,18 @@ You can modify the build options by editing the variables at the top of the \`bu
           <div className="grid gap-4 md:grid-cols-2">
             <div className="space-y-2">
               <Label htmlFor="image-tag">Image Tag</Label>
-              <Input 
-                id="image-tag" 
-                placeholder="my-ee:latest" 
-                value={imageTag} 
-                onChange={e => setImageTag(e.target.value)}
-                className={`${imageTag.trim() && !isImageTagValid ? 'border-destructive' : ''}`}
-              />
-              {imageTag.trim() && !isImageTagValid && (
-                <p className="text-xs text-destructive">
+              <Input id="image-tag" placeholder="my-ee:latest" value={imageTag} onChange={e => setImageTag(e.target.value)} className={`${imageTag.trim() && !isImageTagValid ? 'border-destructive' : ''}`} />
+              {imageTag.trim() && !isImageTagValid && <p className="text-xs text-destructive">
                   Invalid format. Use: [registry[:port]/][namespace/]name[:tag]
-                </p>
-              )}
+                </p>}
               <p className="text-xs text-muted-foreground">
                 Examples: registry.com/namespace/image:tag, namespace/image:tag, image:tag
               </p>
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="registry-username">Registry Username</Label>
-              <Input
-                id="registry-username"
-                type="text"
-                placeholder="e.g., your-username"
-                value={registryUsername}
-                onChange={(e) => setRegistryUsername(e.target.value)}
-                className="font-mono text-sm"
-              />
-            </div>
+            
           </div>
           
-          <div className="space-y-2">
-            <Label htmlFor="registry-password">Registry Password/Token</Label>
-            <Input
-              id="registry-password"
-              type="password"
-              placeholder="Enter your registry password or token"
-              value={registryPassword}
-              onChange={(e) => setRegistryPassword(e.target.value)}
-              className="font-mono text-sm"
-            />
-            <p className="text-xs text-muted-foreground">
-              Use a personal access token or app password for better security
-            </p>
-          </div>
+          
         </CardContent>
       </Card>
 
@@ -471,12 +415,7 @@ You can modify the build options by editing the variables at the top of the \`bu
                 <h3 className="font-semibold text-foreground">Option A – Download Build Package</h3>
                 <p className="text-sm text-muted-foreground">Run locally in your own environment.</p>
               </div>
-              <Button
-                onClick={handleExportBuildPackage}
-                disabled={isExporting}
-                variant="outline"
-                size="lg"
-              >
+              <Button onClick={handleExportBuildPackage} disabled={isExporting} variant="outline" size="lg">
                 <Archive className="h-4 w-4 mr-2" />
                 {isExporting ? 'Exporting...' : 'Download Build Files'}
               </Button>
@@ -531,12 +470,7 @@ You can modify the build options by editing the variables at the top of the \`bu
                 <h3 className="font-semibold text-foreground">Option B – Build in Cloud</h3>
                 <p className="text-sm text-muted-foreground">We'll build & push the image for you.</p>
               </div>
-              <Button
-                onClick={handleCloudBuild}
-                disabled={isExporting || !isImageTagValid || !registryUsername || !registryPassword}
-                className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
-                size="lg"
-              >
+              <Button onClick={handleCloudBuild} disabled={isExporting || !isImageTagValid || !registryUsername || !registryPassword} className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700" size="lg">
                 <Play className="h-4 w-4 mr-2" />
                 {isExporting ? 'Starting Build...' : 'Build in Cloud'}
               </Button>
@@ -545,60 +479,35 @@ You can modify the build options by editing the variables at the top of the \`bu
             <div className="grid gap-4 md:grid-cols-2">
               <div className="space-y-2">
                 <Label htmlFor="registry-username-cloud">Registry Username</Label>
-                <Input
-                  id="registry-username-cloud"
-                  type="text"
-                  placeholder="e.g., your-username"
-                  value={registryUsername}
-                  onChange={(e) => setRegistryUsername(e.target.value)}
-                  className="font-mono text-sm"
-                />
+                <Input id="registry-username-cloud" type="text" placeholder="e.g., your-username" value={registryUsername} onChange={e => setRegistryUsername(e.target.value)} className="font-mono text-sm" />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="registry-password-cloud">Registry Password/Token</Label>
-                <Input
-                  id="registry-password-cloud"
-                  type="password"
-                  placeholder="Enter your registry password or token"
-                  value={registryPassword}
-                  onChange={(e) => setRegistryPassword(e.target.value)}
-                  className="font-mono text-sm"
-                />
+                <Input id="registry-password-cloud" type="password" placeholder="Enter your registry password or token" value={registryPassword} onChange={e => setRegistryPassword(e.target.value)} className="font-mono text-sm" />
               </div>
             </div>
             <p className="text-xs text-muted-foreground">
               Use a personal access token or app password for better security
             </p>
 
-            {!isImageTagValid && (
-              <Alert className="border-amber-200 bg-amber-50">
+            {!isImageTagValid && <Alert className="border-amber-200 bg-amber-50">
                 <AlertTriangle className="h-4 w-4" />
                 <AlertDescription>
                   Please enter a valid container image tag to enable cloud builds.
                 </AlertDescription>
-              </Alert>
-            )}
+              </Alert>}
 
-            {isImageTagValid && (!registryUsername || !registryPassword) && (
-              <Alert className="border-amber-200 bg-amber-50">
-                <AlertTriangle className="h-4 w-4" />
-                <AlertDescription>
-                  Please enter your registry username and password to enable cloud builds.
-                </AlertDescription>
-              </Alert>
-            )}
+            {isImageTagValid && (!registryUsername || !registryPassword)}
           </div>
 
-          {hasRedHatPackages && (
-            <Alert variant="destructive">
+          {hasRedHatPackages && <Alert variant="destructive">
               <AlertTriangle className="h-4 w-4" />
               <AlertTitle>Red Hat Subscription Required</AlertTitle>
               <AlertDescription>
                 Your EE includes packages ({redHatPackagesFound.join(', ')}) that require a Red Hat subscription. 
                 Make sure your build environment has the necessary entitlements configured.
               </AlertDescription>
-            </Alert>
-          )}
+            </Alert>}
         </CardContent>
       </Card>
 
@@ -631,17 +540,8 @@ chmod +x build.sh && \\
 
 
       {/* Save Preset Dialog */}
-      <SavePresetDialog 
-        open={showSaveDialog} 
-        onOpenChange={setShowSaveDialog} 
-        baseImage={selectedBaseImage} 
-        collections={selectedCollections} 
-        requirements={requirements} 
-        packages={selectedPackages} 
-        additionalBuildSteps={additionalBuildSteps}
-        onSuccess={() => {
-          // Optional: Add any additional success handling
-        }} 
-      />
+      <SavePresetDialog open={showSaveDialog} onOpenChange={setShowSaveDialog} baseImage={selectedBaseImage} collections={selectedCollections} requirements={requirements} packages={selectedPackages} additionalBuildSteps={additionalBuildSteps} onSuccess={() => {
+      // Optional: Add any additional success handling
+    }} />
     </div>;
 }
