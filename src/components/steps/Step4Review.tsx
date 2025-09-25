@@ -468,22 +468,7 @@ You can modify the build options by editing the variables at the top of the \`bu
           {selectedBuildMethod === 'local' ? (
             <div className="space-y-4">
               <div className="p-4 bg-muted/50 rounded-lg border">
-                <pre className="font-mono text-sm text-foreground whitespace-pre-wrap">
-                {`unzip ee-build-package.zip -d ee-build-package && \\
-cd ee-build-package && \\
-chmod +x build.sh && \\
-./build.sh`}
-                </pre>
-              </div>
-              
-              <div className="flex justify-center">
-                <Button onClick={handleExportBuildPackage} disabled={isExporting} size="lg">
-                  <Archive className="h-4 w-4 mr-2" />
-                  {isExporting ? 'Preparing Files...' : 'Download Build Files'}
-                </Button>
-              </div>
-
-              {/* Generated Files Dropdown */}
+                {/* Generated Files Dropdown */}
               <Collapsible open={isGeneratedFilesOpen} onOpenChange={setIsGeneratedFilesOpen}>
                 <CollapsibleTrigger asChild>
                   <Button variant="ghost" className="w-full justify-between text-sm">
@@ -522,6 +507,22 @@ chmod +x build.sh && \\
                   </div>
                 </CollapsibleContent>
               </Collapsible>
+                <pre className="font-mono text-sm text-foreground whitespace-pre-wrap">
+                {`unzip ee-build-package.zip -d ee-build-package && \\
+cd ee-build-package && \\
+chmod +x build.sh && \\
+./build.sh`}
+                </pre>
+              </div>
+              
+              <div className="flex justify-center">
+                <Button onClick={handleExportBuildPackage} disabled={isExporting} size="lg">
+                  <Archive className="h-4 w-4 mr-2" />
+                  {isExporting ? 'Preparing Files...' : 'Download Build Files'}
+                </Button>
+              </div>
+
+              
             </div>
           ) : (
             <div className="space-y-4">
