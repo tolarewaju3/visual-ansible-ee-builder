@@ -94,6 +94,7 @@ temp/
 
 # Supabase
 .supabase/
+supabase/.temp/
 
 # Vite
 vite.config.js.timestamp-*
