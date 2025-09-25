@@ -23,8 +23,16 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 20
     steps:
+      - name: Docker login
+        env:
+          REGISTRY_USERNAME: ${{ github.event.inputs.registry_username }}
+          REGISTRY_PASSWORD: ${{ github.event.inputs.registry_password }}
+        run: |
+          REG="$(echo "${{ inputs.image }}" | awk -F/ '{print $1}')"
+          echo "$REGISTRY_PASSWORD" | docker login --username "$REGISTRY_USERNAME" --password-stdin "$REG"
+          
       - name: Prepare workspace
         run: mkdir -p ee
 
@@ -62,14 +70,6 @@ jobs:
         run: |
           python3 -m pip install --upgrade pip
           pip install "ansible-builder>=3.1"
-
-      - name: Docker login
-        env:
-          REGISTRY_USERNAME: ${{ github.event.inputs.registry_username }}
-          REGISTRY_PASSWORD: ${{ github.event.inputs.registry_password }}
-        run: |
-          REG="$(echo "${{ inputs.image }}" | awk -F/ '{print $1}')"
-          echo "$REGISTRY_PASSWORD" | docker login --username "$REGISTRY_USERNAME" --password-stdin "$REG"
 
       - name: Build EE
         working-directory: ee
