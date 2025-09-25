@@ -10,6 +10,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { SavePresetDialog } from "@/components/SavePresetDialog";
 import { BuildModal } from "@/components/BuildModal";
 import { useAuth } from "@/contexts/AuthContext";
@@ -64,15 +65,22 @@ export function Step4Review({
   const [currentRunId, setCurrentRunId] = useState<string | null>(null);
   const [currentRunUrl, setCurrentRunUrl] = useState<string | undefined>(undefined);
 
-  // Container image validation function
+  // Container image validation function for local builds
   const isValidContainerImage = (image: string): boolean => {
     // Regex to validate container image format: [registry[:port]/]namespace/name[:tag]
     const imagePattern = /^(?:(?:[a-zA-Z0-9.-]+(?:\.[a-zA-Z]{2,})?(?::[0-9]+)?\/)?(?:[a-zA-Z0-9._-]+\/)*)?[a-zA-Z0-9._-]+(?::[a-zA-Z0-9._-]+)?$/;
     return imagePattern.test(image.trim());
   };
 
-  // Check if image tag is valid
-  const isImageTagValid = isValidContainerImage(imageTag);
+  // Cloud build validation - requires registry.com/namespace/image:tag format
+  const isValidCloudImage = (image: string): boolean => {
+    // Must have registry.domain/namespace/image format, tag is optional
+    const cloudPattern = /^[a-zA-Z0-9.-]+(?:\.[a-zA-Z]{2,})?(?::[0-9]+)?\/[a-zA-Z0-9._-]+\/[a-zA-Z0-9._-]+(?::[a-zA-Z0-9._-]+)?$/;
+    return cloudPattern.test(image.trim());
+  };
+
+  // Check if image tag is valid for current build method
+  const isImageTagValid = selectedBuildMethod === 'cloud' ? isValidCloudImage(imageTag) : isValidContainerImage(imageTag);
 
   // Packages that require Red Hat subscription
   const redHatSubscriptionPackages = ['telnet', 'tcpdump'];
@@ -410,12 +418,20 @@ You can modify the build options by editing the variables at the top of the \`bu
         <CardContent className="space-y-4">
           <div className="space-y-2">
             <Label htmlFor="image-tag">Image Tag</Label>
-            <Input id="image-tag" placeholder="my-ee:latest" value={imageTag} onChange={e => setImageTag(e.target.value)} className={`${imageTag.trim() && !isImageTagValid ? 'border-destructive' : ''}`} />
-            {imageTag.trim() && !isImageTagValid && <p className="text-xs text-destructive">
-                Invalid format. Use: [registry[:port]/][namespace/]name[:tag]
-              </p>}
+            <Input id="image-tag" placeholder={selectedBuildMethod === 'cloud' ? 'registry.com/namespace/image:tag' : 'my-ee:latest'} value={imageTag} onChange={e => setImageTag(e.target.value)} className={`${imageTag.trim() && !isImageTagValid ? 'border-destructive' : ''}`} />
+            {imageTag.trim() && !isImageTagValid && (
+              <p className="text-xs text-destructive">
+                {selectedBuildMethod === 'cloud' 
+                  ? 'Cloud builds require: registry.com/namespace/image:tag (tag optional)'
+                  : 'Invalid format. Use: [registry[:port]/][namespace/]name[:tag]'
+                }
+              </p>
+            )}
             <p className="text-xs text-muted-foreground">
-              Examples: registry.com/namespace/image:tag, namespace/image:tag, image:tag
+              {selectedBuildMethod === 'cloud' 
+                ? 'Examples: quay.io/myorg/ee:latest, registry.com/namespace/image'
+                : 'Examples: registry.com/namespace/image:tag, namespace/image:tag, image:tag'
+              }
             </p>
           </div>
           
@@ -556,29 +572,24 @@ chmod +x build.sh && \\
             <div className="space-y-4">
               <div className="grid gap-4 md:grid-cols-2">
                 <div className="space-y-2">
-                  <Label htmlFor="registry-username-cloud">Registry Username</Label>
-                  <Input id="registry-username-cloud" type="text" placeholder="e.g., your-username" value={registryUsername} onChange={e => setRegistryUsername(e.target.value)} className="font-mono text-sm" />
+                  <Label htmlFor="registry-username-cloud">Username</Label>
+                  <Input id="registry-username-cloud" type="text" placeholder="Your username" value={registryUsername} onChange={e => setRegistryUsername(e.target.value)} className="font-mono text-sm" />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="registry-password-cloud">Registry Password/Token</Label>
-                  <Input id="registry-password-cloud" type="password" placeholder="Enter your registry password or token" value={registryPassword} onChange={e => setRegistryPassword(e.target.value)} className="font-mono text-sm" />
+                  <Label htmlFor="registry-password-cloud">Password (Access Token Recommended)</Label>
+                  <Input id="registry-password-cloud" type="password" placeholder="Your password/token" value={registryPassword} onChange={e => setRegistryPassword(e.target.value)} className="font-mono text-sm" />
                 </div>
               </div>
-              <p className="text-xs text-muted-foreground">
-                Use a personal access token or app password for better security
-              </p>
 
-              {!isImageTagValid && <Alert className="border-amber-200 bg-amber-50">
-                  <AlertTriangle className="h-4 w-4" />
-                  <AlertDescription>
-                    Please enter a valid container image tag to enable cloud builds.
-                  </AlertDescription>
-                </Alert>}
 
               <Button onClick={handleCloudBuild} disabled={isExporting || !isImageTagValid || !registryUsername || !registryPassword} className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700" size="lg">
                 <Play className="h-4 w-4 mr-2" />
                 {isExporting ? 'Starting Build...' : 'Build in Cloud'}
               </Button>
+              
+              <p className="text-xs text-muted-foreground/60 text-center mt-3">
+              Your registry credentials are never stored. They're deleted after each build.
+              </p>
             </div>
           )}
         </CardContent>
