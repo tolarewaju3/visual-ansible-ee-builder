@@ -408,17 +408,18 @@ You can modify the build options by editing the variables at the top of the \`bu
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
+          <div className="space-y-2">
+            <Label htmlFor="image-tag">Image Tag</Label>
+            <Input id="image-tag" placeholder="my-ee:latest" value={imageTag} onChange={e => setImageTag(e.target.value)} className={`${imageTag.trim() && !isImageTagValid ? 'border-destructive' : ''}`} />
+            {imageTag.trim() && !isImageTagValid && <p className="text-xs text-destructive">
+                Invalid format. Use: [registry[:port]/][namespace/]name[:tag]
+              </p>}
+            <p className="text-xs text-muted-foreground">
+              Examples: registry.com/namespace/image:tag, namespace/image:tag, image:tag
+            </p>
+          </div>
+          
           <div className="grid gap-4 md:grid-cols-2">
-            <div className="space-y-2">
-              <Label htmlFor="image-tag">Image Tag</Label>
-              <Input id="image-tag" placeholder="my-ee:latest" value={imageTag} onChange={e => setImageTag(e.target.value)} className={`${imageTag.trim() && !isImageTagValid ? 'border-destructive' : ''}`} />
-              {imageTag.trim() && !isImageTagValid && <p className="text-xs text-destructive">
-                  Invalid format. Use: [registry[:port]/][namespace/]name[:tag]
-                </p>}
-              <p className="text-xs text-muted-foreground">
-                Examples: registry.com/namespace/image:tag, namespace/image:tag, image:tag
-              </p>
-            </div>
             
           </div>
           
@@ -506,13 +507,6 @@ chmod +x build.sh && \\
                 </pre>
               </div>
               
-              <div className="flex justify-center">
-                <Button onClick={handleExportBuildPackage} disabled={isExporting} size="lg">
-                  <Archive className="h-4 w-4 mr-2" />
-                  {isExporting ? 'Preparing Files...' : 'Download Build Files'}
-                </Button>
-              </div>
-
               {/* Generated Files Dropdown */}
               <Collapsible open={isGeneratedFilesOpen} onOpenChange={setIsGeneratedFilesOpen}>
                 <CollapsibleTrigger asChild>
@@ -552,6 +546,11 @@ chmod +x build.sh && \\
                   </div>
                 </CollapsibleContent>
               </Collapsible>
+
+              <Button onClick={handleExportBuildPackage} disabled={isExporting} className="w-full" size="lg">
+                <Archive className="h-4 w-4 mr-2" />
+                {isExporting ? 'Preparing Files...' : 'Download Build Files'}
+              </Button>
             </div>
           ) : (
             <div className="space-y-4">
@@ -576,12 +575,10 @@ chmod +x build.sh && \\
                   </AlertDescription>
                 </Alert>}
 
-              <div className="flex justify-center">
-                <Button onClick={handleCloudBuild} disabled={isExporting || !isImageTagValid || !registryUsername || !registryPassword} className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700" size="lg">
-                  <Play className="h-4 w-4 mr-2" />
-                  {isExporting ? 'Starting Build...' : 'Build in Cloud'}
-                </Button>
-              </div>
+              <Button onClick={handleCloudBuild} disabled={isExporting || !isImageTagValid || !registryUsername || !registryPassword} className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700" size="lg">
+                <Play className="h-4 w-4 mr-2" />
+                {isExporting ? 'Starting Build...' : 'Build in Cloud'}
+              </Button>
             </div>
           )}
         </CardContent>
