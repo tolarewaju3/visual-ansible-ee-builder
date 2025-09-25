@@ -25,14 +25,24 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:
+      - name: Mask sensitive inputs
+        run: |
+          echo "::add-mask::${{ github.event.inputs.registry_password }}"
+          echo "::add-mask::${{ github.event.inputs.registry_username }}"
+          if [ -n "${{ github.event.inputs.ee_zip_b64 }}" ]; then
+            echo "::add-mask::${{ github.event.inputs.ee_zip_b64 }}"
+          fi
+      
       - name: Prepare workspace
         run: mkdir -p ee
 
       - name: Use repo files or reconstruct ZIP
         run: |
           if [ -n "${{ github.event.inputs.ee_zip_b64 }}" ]; then
+            echo "Processing provided ZIP file..."
             echo "${{ github.event.inputs.ee_zip_b64 }}" | base64 -d > ee/ee.zip
             unzip ee/ee.zip -d ee
+            echo "ZIP file extracted successfully"
           else
             echo "No ee_zip_b64 provided; using repo files at ${{ github.event.inputs.ee_yaml_path }}"
           fi
@@ -45,17 +55,21 @@ jobs:
       - name: Locate EE files
         run: |
           if [ -f ee/execution-environment.yml ]; then
-            echo "Using EE files from ZIP"
-            ls -la ee
+            echo "Using EE files from provided ZIP"
+            echo "Found execution-environment.yml in ZIP"
+            ls -la ee/execution-environment.yml ee/*.yml ee/*.txt 2>/dev/null || echo "Additional files: $(ls ee/ | tr '\n' ' ')"
           else
-            echo "Using EE files from repo"
+            echo "Using EE files from repository"
             mkdir -p ee
             cp "repo/${{ github.event.inputs.ee_yaml_path }}" ee/execution-environment.yml
             # Copy neighbors if present
             for f in requirements.yml requirements.txt bindep.txt ; do
-              [ -f "repo/$f" ] && cp "repo/$f" "ee/$f"
+              if [ -f "repo/$f" ]; then
+                cp "repo/$f" "ee/$f"
+                echo "Copied $f"
+              fi
             done
-            ls -la ee
+            echo "EE files prepared from repository"
           fi
 
       - name: Install ansible-builder
@@ -69,7 +83,9 @@ jobs:
           REGISTRY_PASSWORD: ${{ github.event.inputs.registry_password }}
         run: |
           REG="$(echo "${{ inputs.image }}" | awk -F/ '{print $1}')"
-          echo "$REGISTRY_PASSWORD" | docker login --username "$REGISTRY_USERNAME" --password-stdin "$REG"
+          echo "Logging into registry: $REG"
+          echo "$REGISTRY_PASSWORD" | docker login --username "$REGISTRY_USERNAME" --password-stdin "$REG" > /dev/null 2>&1
+          echo "Docker login successful"
 
       - name: Build EE
         working-directory: ee
@@ -81,4 +97,17 @@ jobs:
             --container-runtime docker
 
       - name: Push EE
-        run: docker push "${{ inputs.image }}"
+        run: |
+          echo "Pushing image to registry..."
+          docker push "${{ inputs.image }}"
+          echo "Image pushed successfully"
+          
+      - name: Cleanup sensitive files
+        if: always()
+        run: |
+          # Remove any potentially sensitive files
+          rm -rf ee/ee.zip
+          rm -rf ee/
+          # Clear Docker credentials
+          docker logout > /dev/null 2>&1 || true
+          echo "Cleanup completed"

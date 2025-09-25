@@ -1,35 +1,41 @@
 import { Download, CheckCircle, XCircle, X } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Progress } from "@/components/ui/progress";
-import { Textarea } from "@/components/ui/textarea";
-import { Label } from "@/components/ui/label";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { PollingLogs } from "./PollingLogs";
 
 interface BuildModalProps {
   isOpen: boolean;
   onClose: () => void;
-  buildProgress: number;
+  runId: string | null;
+  runUrl?: string;
   buildStatus: 'idle' | 'building' | 'success' | 'error';
-  buildLogs: string;
   isBuilding: boolean;
+  onBuildComplete?: (success: boolean) => void;
 }
 
 export function BuildModal({
   isOpen,
   onClose,
-  buildProgress,
+  runId,
+  runUrl,
   buildStatus,
-  buildLogs,
   isBuilding,
+  onBuildComplete,
 }: BuildModalProps) {
+  const handleBuildComplete = (success: boolean) => {
+    if (onBuildComplete) {
+      onBuildComplete(success);
+    }
+  };
+
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
+      <DialogContent className="max-w-6xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="flex items-center justify-between">
-            <span>Build & Deploy</span>
+            <span>Build & Deploy - Live Logs</span>
             <Button variant="ghost" size="sm" onClick={onClose}>
               <X className="h-4 w-4" />
             </Button>
@@ -37,71 +43,49 @@ export function BuildModal({
         </DialogHeader>
 
         <div className="space-y-6">
-          {/* Build Progress and Logs */}
-          <Card className="bg-card border-border">
-            <CardHeader>
-              <CardTitle>Build Progress</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              {buildStatus !== 'idle' && (
-                <div className="space-y-2">
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm font-medium">Progress</span>
-                    <span className="text-sm text-muted-foreground">{Math.round(buildProgress)}%</span>
-                  </div>
-                  <Progress value={buildProgress} className="w-full" />
-                </div>
-              )}
+          {/* Status Alerts */}
+          {buildStatus === 'success' && (
+            <Alert className="border-green-500/50 bg-green-500/10">
+              <CheckCircle className="h-4 w-4 text-green-500" />
+              <AlertDescription className="text-green-700 dark:text-green-300">
+                Build completed successfully! Your execution environment is ready.
+              </AlertDescription>
+            </Alert>
+          )}
 
-              {buildStatus === 'success' && (
-                <Alert className="border-success/50 bg-success/10">
-                  <CheckCircle className="h-4 w-4 text-success" />
-                  <AlertDescription className="text-success-foreground">
-                    Build completed successfully! Your execution environment is ready.
-                  </AlertDescription>
-                </Alert>
-              )}
+          {buildStatus === 'error' && (
+            <Alert className="border-red-500/50 bg-red-500/10">
+              <XCircle className="h-4 w-4 text-red-500" />
+              <AlertDescription className="text-red-700 dark:text-red-300">
+                Build failed. Check the logs below for more details.
+              </AlertDescription>
+            </Alert>
+          )}
 
-              {buildStatus === 'error' && (
-                <Alert className="border-destructive/50 bg-destructive/10">
-                  <XCircle className="h-4 w-4 text-destructive" />
-                  <AlertDescription className="text-destructive-foreground">
-                    Build failed. Check the logs for more details.
-                  </AlertDescription>
-                </Alert>
-              )}
-
-              {buildLogs && (
-                <div className="space-y-2">
-                  <Label className="text-sm font-medium">Build Logs</Label>
-                  <Textarea
-                    value={buildLogs}
-                    readOnly
-                    className="font-mono text-xs bg-code text-terminal-green border resize-none"
-                    rows={Math.min(buildLogs.split('\n').length, 15)}
-                  />
-                </div>
-              )}
-            </CardContent>
-          </Card>
+          {/* Polling Logs */}
+          <PollingLogs 
+            runId={runId} 
+            runUrl={runUrl}
+            onComplete={handleBuildComplete}
+            className="w-full"
+          />
 
           {/* Download Options */}
           {buildStatus === 'success' && (
             <Card className="bg-card border-border">
               <CardHeader>
-                <CardTitle>Download Results</CardTitle>
+                <CardTitle>Next Steps</CardTitle>
               </CardHeader>
               <CardContent className="space-y-3">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                  <Button variant="outline" className="w-full">
-                    <Download className="h-4 w-4 mr-2" />
-                    Download Image
+                <p className="text-sm text-muted-foreground">
+                  Your Execution Environment has been built and pushed to the registry successfully. 
+                  You can now use it in your Ansible Automation Platform.
+                </p>
+                {runUrl && (
+                  <Button variant="outline" onClick={() => window.open(runUrl, '_blank')}>
+                    View on GitHub Actions
                   </Button>
-                  <Button variant="outline" className="w-full">
-                    <Download className="h-4 w-4 mr-2" />
-                    Download Build Files
-                  </Button>
-                </div>
+                )}
               </CardContent>
             </Card>
           )}

@@ -11,6 +11,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Checkbox } from "@/components/ui/checkbox";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { SavePresetDialog } from "@/components/SavePresetDialog";
+import { BuildModal } from "@/components/BuildModal";
 import { useAuth } from "@/contexts/AuthContext";
 import { useUsageLimit } from "@/hooks/useUsageLimit";
 import { useToast } from "@/hooks/use-toast";
@@ -56,6 +57,12 @@ export function Step4Review({
   // Registry credentials state
   const [registryUsername, setRegistryUsername] = useState('');
   const [registryPassword, setRegistryPassword] = useState('');
+
+  // Build modal state
+  const [showBuildModal, setShowBuildModal] = useState(false);
+  const [buildStatus, setBuildStatus] = useState<'idle' | 'building' | 'success' | 'error'>('idle');
+  const [currentRunId, setCurrentRunId] = useState<string | null>(null);
+  const [currentRunUrl, setCurrentRunUrl] = useState<string | undefined>(undefined);
 
   // Container image validation function
   const isValidContainerImage = (image: string): boolean => {
@@ -294,7 +301,10 @@ You can modify the build options by editing the variables at the top of the \`bu
       });
       return;
     }
+    
     setIsExporting(true);
+    setBuildStatus('building');
+    
     try {
       // Increment export count for analytics tracking  
       await incrementExport();
@@ -332,15 +342,31 @@ You can modify the build options by editing the variables at the top of the \`bu
         }
       });
       if (error) throw error;
+      
+      console.log('Build triggered successfully, response:', data);
+      
+      // Open build modal immediately (even if runId is not ready yet)
+      setShowBuildModal(true);
+      
+      // Set run information
+      if (data.runId) {
+        setCurrentRunId(data.runId);
+        setCurrentRunUrl(data.runUrl);
+        console.log('Got runId immediately:', data.runId);
+      } else {
+        console.log('No runId yet, will show waiting state');
+        // Set a placeholder that will trigger the waiting state
+        setCurrentRunId(null);
+        setCurrentRunUrl(data.runUrl);
+      }
+      
       toast({
-        title: "Build triggered successfully!",
-        description: `Your Execution Environment build has started. Check the progress on GitHub Actions.`,
-        action: data.runUrl ? <Button variant="outline" size="sm" onClick={() => window.open(data.runUrl, '_blank')}>
-            View Build
-          </Button> : undefined
+        title: "Build started!",
+        description: "Your Execution Environment build has been triggered. View live progress below.",
       });
     } catch (error) {
       console.error('Cloud build failed:', error);
+      setBuildStatus('error');
       toast({
         title: "Build trigger failed",
         description: error.message || "Failed to trigger cloud build. Please try again.",
@@ -350,6 +376,11 @@ You can modify the build options by editing the variables at the top of the \`bu
       setIsExporting(false);
     }
   };
+  
+  const handleBuildComplete = (success: boolean) => {
+    setBuildStatus(success ? 'success' : 'error');
+  };
+  
   const handleSavePreset = () => {
     setShowSaveDialog(true);
   };
@@ -562,5 +593,16 @@ chmod +x build.sh && \\
       <SavePresetDialog open={showSaveDialog} onOpenChange={setShowSaveDialog} baseImage={selectedBaseImage} collections={selectedCollections} requirements={requirements} packages={selectedPackages} additionalBuildSteps={additionalBuildSteps} onSuccess={() => {
       // Optional: Add any additional success handling
     }} />
+
+      {/* Build Modal with Polling Logs */}
+      <BuildModal
+        isOpen={showBuildModal}
+        onClose={() => setShowBuildModal(false)}
+        runId={currentRunId}
+        runUrl={currentRunUrl}
+        buildStatus={buildStatus}
+        isBuilding={isExporting}
+        onBuildComplete={handleBuildComplete}
+      />
     </div>;
 }

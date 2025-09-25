@@ -89,23 +89,93 @@ serve(async (req) => {
       throw new Error(`GitHub API error: ${workflowResponse.status} ${workflowResponse.statusText}`);
     }
 
-    // Get the workflow run URL for tracking
-    const workflowRunsResponse = await fetch(
-      'https://api.github.com/repos/tolarewaju3/visual-ansible-ee-builder/actions/runs?per_page=1',
-      {
-        headers: {
-          'Accept': 'application/vnd.github.v3+json',
-          'Authorization': `token ${githubToken}`,
-          'User-Agent': 'visual-ansible-ee-builder',
-        },
-      }
-    );
-
+    // Wait for the workflow run to be created and get its ID
+    const triggerTime = new Date();
     let runUrl = 'https://github.com/tolarewaju3/visual-ansible-ee-builder/actions';
-    if (workflowRunsResponse.ok) {
-      const runsData = await workflowRunsResponse.json();
-      if (runsData.workflow_runs && runsData.workflow_runs.length > 0) {
-        runUrl = runsData.workflow_runs[0].html_url;
+    let runId = null;
+    
+    console.log('Looking for newly triggered workflow run...');
+    
+    // Retry logic to find the newly created workflow run
+    for (let attempt = 0; attempt < 10; attempt++) {
+      // Wait before checking (starts with 1 second, increases each attempt)
+      if (attempt > 0) {
+        console.log(`Attempt ${attempt + 1}: Waiting ${1000 + (attempt * 500)}ms before checking...`);
+        await new Promise(resolve => setTimeout(resolve, 1000 + (attempt * 500)));
+      }
+      
+      try {
+        const workflowRunsResponse = await fetch(
+          'https://api.github.com/repos/tolarewaju3/visual-ansible-ee-builder/actions/runs?per_page=10&event=workflow_dispatch',
+          {
+            headers: {
+              'Accept': 'application/vnd.github.v3+json',
+              'Authorization': `token ${githubToken}`,
+              'User-Agent': 'visual-ansible-ee-builder',
+            },
+          }
+        );
+
+        if (workflowRunsResponse.ok) {
+          const runsData = await workflowRunsResponse.json();
+          
+          if (runsData.workflow_runs && runsData.workflow_runs.length > 0) {
+            // Find the most recent workflow_dispatch run that was created after we triggered
+            for (const run of runsData.workflow_runs) {
+              const runCreatedAt = new Date(run.created_at);
+              const timeDiff = runCreatedAt.getTime() - triggerTime.getTime();
+              
+              console.log(`Checking run ${run.id}: created at ${run.created_at}, time diff: ${timeDiff}ms`);
+              
+              // Look for runs created within 2 minutes after our trigger (allowing for some clock skew)
+              if (timeDiff >= -5000 && timeDiff <= 120000) {
+                runUrl = run.html_url;
+                runId = run.id;
+                console.log(`✓ Found matching workflow run: ${runId} created at ${run.created_at}`);
+                break;
+              }
+            }
+          }
+        }
+        
+        // If we found a run, break out of retry loop
+        if (runId) {
+          break;
+        }
+        
+        console.log(`Attempt ${attempt + 1}: No matching workflow run found yet`);
+        
+      } catch (fetchError) {
+        console.log(`Attempt ${attempt + 1} failed to fetch runs:`, fetchError);
+      }
+    }
+    
+    if (!runId) {
+      console.warn('Could not find the specific workflow run within timeout period - using fallback');
+      // Fallback: get the most recent workflow_dispatch run
+      try {
+        const fallbackResponse = await fetch(
+          'https://api.github.com/repos/tolarewaju3/visual-ansible-ee-builder/actions/runs?per_page=1&event=workflow_dispatch',
+          {
+            headers: {
+              'Accept': 'application/vnd.github.v3+json',
+              'Authorization': `token ${githubToken}`,
+              'User-Agent': 'visual-ansible-ee-builder',
+            },
+          }
+        );
+        
+        if (fallbackResponse.ok) {
+          const fallbackData = await fallbackResponse.json();
+          if (fallbackData.workflow_runs && fallbackData.workflow_runs.length > 0) {
+            const latestRun = fallbackData.workflow_runs[0];
+            runUrl = latestRun.html_url;
+            runId = latestRun.id;
+            console.log(`Using fallback run: ${runId}`);
+          }
+        }
+      } catch (fallbackError) {
+        console.error('Fallback also failed:', fallbackError);
       }
     }
 
@@ -113,7 +183,8 @@ serve(async (req) => {
       JSON.stringify({ 
         success: true, 
         message: 'Workflow triggered successfully',
-        runUrl: runUrl
+        runUrl: runUrl,
+        runId: runId
       }),
       { 
         headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
