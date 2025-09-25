@@ -93,38 +93,6 @@ export const subscriptionService = {
   },
 
 
-  async createAnonymousCheckoutSession(amount: number): Promise<string> {
-    const { data, error } = await supabase.functions.invoke('create-anonymous-checkout', {
-      body: { amount }
-    });
-
-    if (error) {
-      console.error('Error creating anonymous checkout session:', error);
-      throw error;
-    }
-
-    return data.url;
-  },
-
-  async createPortalSession(): Promise<string> {
-    const { data: session } = await supabase.auth.getSession();
-    if (!session?.session?.user) {
-      throw new Error('User not authenticated');
-    }
-
-    const { data, error } = await supabase.functions.invoke('create-portal-session', {
-      body: {
-        userId: session.session.user.id,
-      }
-    });
-
-    if (error) {
-      console.error('Error creating portal session:', error);
-      throw error;
-    }
-
-    return data.url;
-  },
 
   async getCloudBuildUsage(): Promise<CloudBuildUsage> {
     const { data: session } = await supabase.auth.getSession();
