@@ -19,6 +19,7 @@ import { Collection, AdditionalBuildStep } from "@/lib/storage";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import JSZip from "jszip";
+import { supabase } from "@/integrations/supabase/client";
 
 interface Step4ReviewProps {
   selectedBaseImage: string;
@@ -53,6 +54,10 @@ export function Step4Review({
   // Build options state
   const [imageTag, setImageTag] = useState('my-ee:latest');
   const [runtime, setRuntime] = useState('auto');
+  
+  // Registry credentials state
+  const [registryUsername, setRegistryUsername] = useState('');
+  const [registryPassword, setRegistryPassword] = useState('');
 
   // Container image validation function
   const isValidContainerImage = (image: string): boolean => {
@@ -285,6 +290,89 @@ You can modify the build options by editing the variables at the top of the \`bu
     }
   };
 
+  const handleCloudBuild = async () => {
+    if (!imageTag || !isImageTagValid) {
+      toast({
+        title: "Invalid image tag",
+        description: "Please enter a valid container image tag.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    if (!registryUsername || !registryPassword) {
+      toast({
+        title: "Registry credentials required",
+        description: "Please enter your registry username and password.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    setIsExporting(true);
+    try {
+      // Increment export count for analytics tracking  
+      await incrementExport();
+
+      // Create ZIP with EE files
+      const zip = new JSZip();
+      
+      // Add execution environment files
+      zip.file("execution-environment.yml", generateExecutionEnvironment());
+      
+      if (selectedCollections.length > 0) {
+        zip.file("requirements.yml", generateRequirementsYml());
+      }
+      
+      if (requirements.length > 0) {
+        zip.file("requirements.txt", generateRequirementsTxt());
+      }
+      
+      if (selectedPackages.length > 0) {
+        zip.file("bindep.txt", generateBindepsTxt());
+      }
+
+      // Generate base64 encoded zip
+      const zipBlob = await zip.generateAsync({ type: "base64" });
+
+      // Call Supabase function to trigger GitHub workflow
+      const { data, error } = await supabase.functions.invoke('trigger-github-workflow', {
+        body: {
+          image: imageTag,
+          eeZipB64: zipBlob,
+          registryUsername: registryUsername,
+          registryPassword: registryPassword
+        }
+      });
+
+      if (error) throw error;
+
+      toast({
+        title: "Build triggered successfully!",
+        description: `Your Execution Environment build has started. Check the progress on GitHub Actions.`,
+        action: data.runUrl ? (
+          <Button 
+            variant="outline" 
+            size="sm"
+            onClick={() => window.open(data.runUrl, '_blank')}
+          >
+            View Build
+          </Button>
+        ) : undefined
+      });
+
+    } catch (error) {
+      console.error('Cloud build failed:', error);
+      toast({
+        title: "Build trigger failed",
+        description: error.message || "Failed to trigger cloud build. Please try again.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsExporting(false);
+    }
+  };
+
   const handleSavePreset = () => {
     setShowSaveDialog(true);
   };
@@ -334,18 +422,31 @@ You can modify the build options by editing the variables at the top of the \`bu
               </p>
             </div>
             <div className="space-y-2">
-              <Label htmlFor="runtime">Runtime</Label>
-              <Select value={runtime} onValueChange={setRuntime}>
-                <SelectTrigger id="runtime" className="bg-background border-border">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent className="bg-background border-border shadow-lg z-50">
-                  <SelectItem value="auto">Auto</SelectItem>
-                  <SelectItem value="podman">Podman</SelectItem>
-                  <SelectItem value="docker">Docker</SelectItem>
-                </SelectContent>
-              </Select>
+              <Label htmlFor="registry-username">Registry Username</Label>
+              <Input
+                id="registry-username"
+                type="text"
+                placeholder="e.g., your-username"
+                value={registryUsername}
+                onChange={(e) => setRegistryUsername(e.target.value)}
+                className="font-mono text-sm"
+              />
             </div>
+          </div>
+          
+          <div className="space-y-2">
+            <Label htmlFor="registry-password">Registry Password/Token</Label>
+            <Input
+              id="registry-password"
+              type="password"
+              placeholder="Enter your registry password or token"
+              value={registryPassword}
+              onChange={(e) => setRegistryPassword(e.target.value)}
+              className="font-mono text-sm"
+            />
+            <p className="text-xs text-muted-foreground">
+              Use a personal access token or app password for better security
+            </p>
           </div>
         </CardContent>
       </Card>
@@ -404,15 +505,59 @@ You can modify the build options by editing the variables at the top of the \`bu
             </CollapsibleContent>
           </Collapsible>
 
-          <Button 
-            size="lg" 
-            onClick={handleExportBuildPackage} 
-            className="w-full" 
-            disabled={isExporting || !isImageTagValid}
-          >
-            <Download className="h-5 w-5 mr-2" />
-            {isExporting ? 'Preparing Download...' : 'Download Build Package'}
-          </Button>
+          {/* Build Actions */}
+          <div className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <Button
+                onClick={handleExportBuildPackage}
+                disabled={isExporting}
+                className="w-full"
+                size="lg"
+              >
+                <Archive className="h-4 w-4 mr-2" />
+                {isExporting ? 'Exporting...' : 'Download Build Package'}
+              </Button>
+
+              <Button
+                onClick={handleCloudBuild}
+                disabled={isExporting || !isImageTagValid || !registryUsername || !registryPassword}
+                className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
+                size="lg"
+              >
+                <Play className="h-4 w-4 mr-2" />
+                {isExporting ? 'Starting Build...' : 'Build in Cloud'}
+              </Button>
+            </div>
+
+            {!isImageTagValid && (
+              <Alert className="border-amber-200 bg-amber-50">
+                <AlertTriangle className="h-4 w-4" />
+                <AlertDescription>
+                  Please enter a valid container image tag to enable cloud builds.
+                </AlertDescription>
+              </Alert>
+            )}
+
+            {isImageTagValid && (!registryUsername || !registryPassword) && (
+              <Alert className="border-amber-200 bg-amber-50">
+                <AlertTriangle className="h-4 w-4" />
+                <AlertDescription>
+                  Please enter your registry username and password to enable cloud builds.
+                </AlertDescription>
+              </Alert>
+            )}
+
+            {hasRedHatPackages && (
+              <Alert className="border-amber-200 bg-amber-50">
+                <AlertTriangle className="h-4 w-4" />
+                <AlertTitle>Red Hat Subscription Required</AlertTitle>
+                <AlertDescription>
+                  Your EE includes packages ({redHatPackagesFound.join(', ')}) that require a Red Hat subscription. 
+                  Make sure your build environment has the necessary entitlements configured.
+                </AlertDescription>
+              </Alert>
+            )}
+          </div>
         </CardContent>
       </Card>
 

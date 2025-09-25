@@ -13,6 +13,12 @@ on:
       ee_zip_b64:
         description: "Base64-encoded ZIP of EE files (optional)"
         required: false
+      registry_username:
+        description: "Registry username for pushing the image"
+        required: true
+      registry_password:
+        description: "Registry password/token for pushing the image"
+        required: true
 
 jobs:
   build:
@@ -59,8 +65,8 @@ jobs:
 
       - name: Docker login
         env:
-          REGISTRY_USERNAME: ${{ secrets.REGISTRY_USERNAME }}
-          REGISTRY_PASSWORD: ${{ secrets.REGISTRY_PASSWORD }}
+          REGISTRY_USERNAME: ${{ github.event.inputs.registry_username }}
+          REGISTRY_PASSWORD: ${{ github.event.inputs.registry_password }}
         run: |
           REG="$(echo "${{ inputs.image }}" | awk -F/ '{print $1}')"
           echo "$REGISTRY_PASSWORD" | docker login --username "$REGISTRY_USERNAME" --password-stdin "$REG"
