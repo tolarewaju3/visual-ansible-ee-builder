@@ -1,4 +1,4 @@
-import { FileText, Download, AlertTriangle, Save, Package, ChevronDown, Settings, Play, Archive } from "lucide-react";
+import { FileText, Download, AlertTriangle, Save, Package, ChevronDown, Settings, Play, Archive, Monitor, Cloud } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -47,6 +47,7 @@ export function Step4Review({
   const [showSaveDialog, setShowSaveDialog] = useState(false);
   const [isGeneratedFilesOpen, setIsGeneratedFilesOpen] = useState(false);
   const [isExporting, setIsExporting] = useState(false);
+  const [selectedBuildMethod, setSelectedBuildMethod] = useState<'local' | 'cloud'>('local');
 
   // Build options state
   const [imageTag, setImageTag] = useState('my-ee:latest');
@@ -408,96 +409,33 @@ You can modify the build options by editing the variables at the top of the \`bu
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
-          {/* Option A - Download Build Package */}
-          <div className="border border-border rounded-lg p-6 space-y-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <h3 className="font-semibold text-foreground">Option A – Download Build Package</h3>
+          {/* Build Method Selection Tiles */}
+          <div className="grid gap-4 md:grid-cols-2">
+            <div 
+              className={`border rounded-lg p-6 cursor-pointer transition-all hover:border-primary ${
+                selectedBuildMethod === 'local' ? 'border-primary bg-primary/5' : 'border-border'
+              }`}
+              onClick={() => setSelectedBuildMethod('local')}
+            >
+              <div className="flex flex-col items-center text-center space-y-3">
+                <Monitor className="h-8 w-8 text-foreground" />
+                <h3 className="font-semibold text-foreground">Local Build</h3>
                 <p className="text-sm text-muted-foreground">Run locally in your own environment.</p>
               </div>
-              <Button onClick={handleExportBuildPackage} disabled={isExporting} variant="outline" size="lg">
-                <Archive className="h-4 w-4 mr-2" />
-                {isExporting ? 'Exporting...' : 'Download Build Files'}
-              </Button>
             </div>
             
-            {/* Generated Files Dropdown */}
-            <Collapsible open={isGeneratedFilesOpen} onOpenChange={setIsGeneratedFilesOpen}>
-              <CollapsibleTrigger asChild>
-                <Button variant="ghost" className="w-full justify-between text-sm">
-                  <div className="flex items-center space-x-2">
-                    <FileText className="h-4 w-4" />
-                    <span>View Generated Files</span>
-                  </div>
-                  <ChevronDown className={`h-4 w-4 transition-transform duration-200 ${isGeneratedFilesOpen ? 'rotate-180' : ''}`} />
-                </Button>
-              </CollapsibleTrigger>
-              <CollapsibleContent className="mt-2">
-                <div className="space-y-4 p-4 border border-border rounded-lg bg-muted/30">
-                  {/* execution-environment.yml */}
-                  <div className="space-y-2">
-                    <h4 className="text-sm font-medium text-foreground">execution-environment.yml</h4>
-                    <Textarea value={generateExecutionEnvironment()} readOnly rows={Math.min(generateExecutionEnvironment().split('\n').length, 10)} className="font-mono text-xs bg-background text-foreground border resize-none" />
-                  </div>
-
-                  {/* requirements.yml */}
-                  {selectedCollections.length > 0 && <div className="space-y-2">
-                      <h4 className="text-sm font-medium text-foreground">requirements.yml</h4>
-                      <Textarea value={generateRequirementsYml()} readOnly rows={Math.min(generateRequirementsYml().split('\n').length, 8)} className="font-mono text-xs bg-background text-foreground border resize-none" />
-                    </div>}
-
-                  {/* requirements.txt */}
-                  {requirements.length > 0 && <div className="space-y-2">
-                      <h4 className="text-sm font-medium text-foreground">requirements.txt</h4>
-                      <Textarea value={generateRequirementsTxt()} readOnly rows={Math.min(generateRequirementsTxt().split('\n').length, 6)} className="font-mono text-xs bg-background text-foreground border resize-none" />
-                    </div>}
-
-                  {/* bindep.txt */}
-                  {selectedPackages.length > 0 && <div className="space-y-2">
-                      <h4 className="text-sm font-medium text-foreground">bindep.txt</h4>
-                      <Textarea value={generateBindepsTxt()} readOnly rows={Math.min(generateBindepsTxt().split('\n').length, 6)} className="font-mono text-xs bg-background text-foreground border resize-none" />
-                    </div>}
-                  
-                </div>
-              </CollapsibleContent>
-            </Collapsible>
-          </div>
-
-          {/* Option B - Build in Cloud */}
-          <div className="border border-border rounded-lg p-6 space-y-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <h3 className="font-semibold text-foreground">Option B – Build in Cloud</h3>
+            <div 
+              className={`border rounded-lg p-6 cursor-pointer transition-all hover:border-primary ${
+                selectedBuildMethod === 'cloud' ? 'border-primary bg-primary/5' : 'border-border'
+              }`}
+              onClick={() => setSelectedBuildMethod('cloud')}
+            >
+              <div className="flex flex-col items-center text-center space-y-3">
+                <Cloud className="h-8 w-8 text-foreground" />
+                <h3 className="font-semibold text-foreground">Build in Cloud</h3>
                 <p className="text-sm text-muted-foreground">We'll build & push the image for you.</p>
               </div>
-              <Button onClick={handleCloudBuild} disabled={isExporting || !isImageTagValid || !registryUsername || !registryPassword} className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700" size="lg">
-                <Play className="h-4 w-4 mr-2" />
-                {isExporting ? 'Starting Build...' : 'Build in Cloud'}
-              </Button>
             </div>
-            
-            <div className="grid gap-4 md:grid-cols-2">
-              <div className="space-y-2">
-                <Label htmlFor="registry-username-cloud">Registry Username</Label>
-                <Input id="registry-username-cloud" type="text" placeholder="e.g., your-username" value={registryUsername} onChange={e => setRegistryUsername(e.target.value)} className="font-mono text-sm" />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="registry-password-cloud">Registry Password/Token</Label>
-                <Input id="registry-password-cloud" type="password" placeholder="Enter your registry password or token" value={registryPassword} onChange={e => setRegistryPassword(e.target.value)} className="font-mono text-sm" />
-              </div>
-            </div>
-            <p className="text-xs text-muted-foreground">
-              Use a personal access token or app password for better security
-            </p>
-
-            {!isImageTagValid && <Alert className="border-amber-200 bg-amber-50">
-                <AlertTriangle className="h-4 w-4" />
-                <AlertDescription>
-                  Please enter a valid container image tag to enable cloud builds.
-                </AlertDescription>
-              </Alert>}
-
-            {isImageTagValid && (!registryUsername || !registryPassword)}
           </div>
 
           {hasRedHatPackages && <Alert variant="destructive">
@@ -511,30 +449,111 @@ You can modify the build options by editing the variables at the top of the \`bu
         </CardContent>
       </Card>
 
-      {/* Step 3: Run Build Commands */}
+      {/* Step 3: Build Execution Environment */}
       <Card className="bg-card border-border">
         <CardHeader>
           <CardTitle className="flex items-center space-x-2">
             <div className="flex items-center justify-center w-6 h-6 rounded-full bg-primary text-primary-foreground text-sm font-medium">3</div>
             
-            <span>Build Execution Environment
-          </span>
+            <span>Build Execution Environment</span>
           </CardTitle>
           <CardDescription>
-            Execute these commands in your terminal to build the execution environment
+            {selectedBuildMethod === 'local' 
+              ? 'Execute these commands in your terminal to build the execution environment'
+              : 'Enter your registry credentials to build and push your image'
+            }
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="space-y-3">
-            <div className="p-4 bg-muted/50 rounded-lg border">
-              <pre className="font-mono text-sm text-foreground whitespace-pre-wrap">
-              {`unzip ee-build-package.zip -d ee-build-package && \\
+          {selectedBuildMethod === 'local' ? (
+            <div className="space-y-4">
+              <div className="p-4 bg-muted/50 rounded-lg border">
+                <pre className="font-mono text-sm text-foreground whitespace-pre-wrap">
+                {`unzip ee-build-package.zip -d ee-build-package && \\
 cd ee-build-package && \\
 chmod +x build.sh && \\
 ./build.sh`}
-              </pre>
+                </pre>
+              </div>
+              
+              <div className="flex justify-center">
+                <Button onClick={handleExportBuildPackage} disabled={isExporting} size="lg">
+                  <Archive className="h-4 w-4 mr-2" />
+                  {isExporting ? 'Preparing Files...' : 'Download Build Files'}
+                </Button>
+              </div>
+
+              {/* Generated Files Dropdown */}
+              <Collapsible open={isGeneratedFilesOpen} onOpenChange={setIsGeneratedFilesOpen}>
+                <CollapsibleTrigger asChild>
+                  <Button variant="ghost" className="w-full justify-between text-sm">
+                    <div className="flex items-center space-x-2">
+                      <FileText className="h-4 w-4" />
+                      <span>View Generated Files</span>
+                    </div>
+                    <ChevronDown className={`h-4 w-4 transition-transform duration-200 ${isGeneratedFilesOpen ? 'rotate-180' : ''}`} />
+                  </Button>
+                </CollapsibleTrigger>
+                <CollapsibleContent className="mt-2">
+                  <div className="space-y-4 p-4 border border-border rounded-lg bg-muted/30">
+                    {/* execution-environment.yml */}
+                    <div className="space-y-2">
+                      <h4 className="text-sm font-medium text-foreground">execution-environment.yml</h4>
+                      <Textarea value={generateExecutionEnvironment()} readOnly rows={Math.min(generateExecutionEnvironment().split('\n').length, 10)} className="font-mono text-xs bg-background text-foreground border resize-none" />
+                    </div>
+
+                    {/* requirements.yml */}
+                    {selectedCollections.length > 0 && <div className="space-y-2">
+                        <h4 className="text-sm font-medium text-foreground">requirements.yml</h4>
+                        <Textarea value={generateRequirementsYml()} readOnly rows={Math.min(generateRequirementsYml().split('\n').length, 8)} className="font-mono text-xs bg-background text-foreground border resize-none" />
+                      </div>}
+
+                    {/* requirements.txt */}
+                    {requirements.length > 0 && <div className="space-y-2">
+                        <h4 className="text-sm font-medium text-foreground">requirements.txt</h4>
+                        <Textarea value={generateRequirementsTxt()} readOnly rows={Math.min(generateRequirementsTxt().split('\n').length, 6)} className="font-mono text-xs bg-background text-foreground border resize-none" />
+                      </div>}
+
+                    {/* bindep.txt */}
+                    {selectedPackages.length > 0 && <div className="space-y-2">
+                        <h4 className="text-sm font-medium text-foreground">bindep.txt</h4>
+                        <Textarea value={generateBindepsTxt()} readOnly rows={Math.min(generateBindepsTxt().split('\n').length, 6)} className="font-mono text-xs bg-background text-foreground border resize-none" />
+                      </div>}
+                  </div>
+                </CollapsibleContent>
+              </Collapsible>
             </div>
-          </div>
+          ) : (
+            <div className="space-y-4">
+              <div className="grid gap-4 md:grid-cols-2">
+                <div className="space-y-2">
+                  <Label htmlFor="registry-username-cloud">Registry Username</Label>
+                  <Input id="registry-username-cloud" type="text" placeholder="e.g., your-username" value={registryUsername} onChange={e => setRegistryUsername(e.target.value)} className="font-mono text-sm" />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="registry-password-cloud">Registry Password/Token</Label>
+                  <Input id="registry-password-cloud" type="password" placeholder="Enter your registry password or token" value={registryPassword} onChange={e => setRegistryPassword(e.target.value)} className="font-mono text-sm" />
+                </div>
+              </div>
+              <p className="text-xs text-muted-foreground">
+                Use a personal access token or app password for better security
+              </p>
+
+              {!isImageTagValid && <Alert className="border-amber-200 bg-amber-50">
+                  <AlertTriangle className="h-4 w-4" />
+                  <AlertDescription>
+                    Please enter a valid container image tag to enable cloud builds.
+                  </AlertDescription>
+                </Alert>}
+
+              <div className="flex justify-center">
+                <Button onClick={handleCloudBuild} disabled={isExporting || !isImageTagValid || !registryUsername || !registryPassword} className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700" size="lg">
+                  <Play className="h-4 w-4 mr-2" />
+                  {isExporting ? 'Starting Build...' : 'Build in Cloud'}
+                </Button>
+              </div>
+            </div>
+          )}
         </CardContent>
       </Card>
 
