@@ -68,119 +68,24 @@ serve(async (req) => {
       case 'checkout.session.completed': {
         const session = event.data.object;
         const userId = session.metadata?.user_id;
+        const planType = session.metadata?.plan_type;
         
         if (!userId) {
           console.error('No user_id in checkout session metadata');
           break;
         }
 
-        // Update user's subscription plan to pro
-        await supabase
-          .from('profiles')
-          .update({ 
-            subscription_plan: 'pro',
-            stripe_customer_id: session.customer 
-          })
-          .eq('user_id', userId);
-
-        console.log(`Updated user ${userId} to pro plan`);
+        // Add 10 cloud builds to user's account
+        await supabase.rpc('add_purchased_builds', {
+          user_uuid: userId,
+          builds_to_add: 10
+        });
+        console.log(`Added 10 cloud builds to user ${userId}`);
         break;
       }
 
-      case 'customer.subscription.created':
-      case 'customer.subscription.updated': {
-        const subscription = event.data.object;
-        const customerId = subscription.customer;
 
-        // Get user from customer ID
-        const { data: profile } = await supabase
-          .from('profiles')
-          .select('user_id')
-          .eq('stripe_customer_id', customerId)
-          .single();
 
-        if (!profile) {
-          console.error('No user found for customer:', customerId);
-          break;
-        }
-
-        // Upsert subscription record
-        await supabase
-          .from('user_subscriptions')
-          .upsert({
-            user_id: profile.user_id,
-            stripe_customer_id: customerId,
-            stripe_subscription_id: subscription.id,
-            status: subscription.status,
-            plan_name: 'pro',
-            current_period_start: new Date(subscription.current_period_start * 1000).toISOString(),
-            current_period_end: new Date(subscription.current_period_end * 1000).toISOString(),
-          });
-
-        // Update profile subscription plan based on status
-        const isActive = ['active', 'trialing'].includes(subscription.status);
-        await supabase
-          .from('profiles')
-          .update({ 
-            subscription_plan: isActive ? 'pro' : 'free'
-          })
-          .eq('user_id', profile.user_id);
-
-        console.log(`Updated subscription for user ${profile.user_id}:`, subscription.status);
-        break;
-      }
-
-      case 'customer.subscription.deleted': {
-        const subscription = event.data.object;
-        const customerId = subscription.customer;
-
-        // Get user from customer ID
-        const { data: profile } = await supabase
-          .from('profiles')
-          .select('user_id')
-          .eq('stripe_customer_id', customerId)
-          .single();
-
-        if (!profile) {
-          console.error('No user found for customer:', customerId);
-          break;
-        }
-
-        // Update subscription status
-        await supabase
-          .from('user_subscriptions')
-          .update({
-            status: 'canceled',
-          })
-          .eq('stripe_subscription_id', subscription.id);
-
-        // Downgrade user to free plan
-        await supabase
-          .from('profiles')
-          .update({ subscription_plan: 'free' })
-          .eq('user_id', profile.user_id);
-
-        console.log(`Downgraded user ${profile.user_id} to free plan`);
-        break;
-      }
-
-      case 'invoice.payment_failed': {
-        const invoice = event.data.object;
-        const customerId = invoice.customer;
-
-        // Get user from customer ID
-        const { data: profile } = await supabase
-          .from('profiles')
-          .select('user_id')
-          .eq('stripe_customer_id', customerId)
-          .single();
-
-        if (profile) {
-          console.log(`Payment failed for user ${profile.user_id}`);
-          // You might want to send an email notification here
-        }
-        break;
-      }
 
       default:
         console.log(`Unhandled webhook event type: ${event.type}`);

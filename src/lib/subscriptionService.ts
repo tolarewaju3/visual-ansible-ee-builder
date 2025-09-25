@@ -1,17 +1,5 @@
 import { supabase } from '@/integrations/supabase/client';
 
-export interface UserSubscription {
-  id: string;
-  user_id: string;
-  stripe_subscription_id: string;
-  stripe_customer_id: string;
-  status: string;
-  current_period_start: string;
-  current_period_end: string;
-  plan_name: string;
-  created_at: string;
-  updated_at: string;
-}
 
 export interface DailyExport {
   id: string;
@@ -23,6 +11,12 @@ export interface DailyExport {
 }
 
 export type SubscriptionPlan = 'free' | 'pro';
+
+export interface CloudBuildUsage {
+  used: number;
+  remaining: number;
+  total: number;
+}
 
 export const subscriptionService = {
   async getUserProfile() {
@@ -45,26 +39,6 @@ export const subscriptionService = {
     return data;
   },
 
-  async getUserSubscription(): Promise<UserSubscription | null> {
-    const { data: session } = await supabase.auth.getSession();
-    if (!session?.session?.user) {
-      return null;
-    }
-
-    const { data, error } = await supabase
-      .from('user_subscriptions')
-      .select('*')
-      .eq('user_id', session.session.user.id)
-      .eq('status', 'active')
-      .single();
-
-    if (error && error.code !== 'PGRST116') {
-      console.error('Error fetching user subscription:', error);
-      return null;
-    }
-
-    return data;
-  },
 
   async getTodayExportCount(): Promise<number> {
     const { data: session } = await supabase.auth.getSession();
@@ -118,27 +92,6 @@ export const subscriptionService = {
     return data;
   },
 
-  async createCheckoutSession(planType: 'pro'): Promise<string> {
-    const { data: session } = await supabase.auth.getSession();
-    if (!session?.session?.user) {
-      throw new Error('User not authenticated');
-    }
-
-    const { data, error } = await supabase.functions.invoke('create-checkout-session', {
-      body: {
-        planType,
-        userId: session.session.user.id,
-        userEmail: session.session.user.email,
-      }
-    });
-
-    if (error) {
-      console.error('Error creating checkout session:', error);
-      throw error;
-    }
-
-    return data.url;
-  },
 
   async createAnonymousCheckoutSession(amount: number): Promise<string> {
     const { data, error } = await supabase.functions.invoke('create-anonymous-checkout', {
@@ -167,6 +120,68 @@ export const subscriptionService = {
 
     if (error) {
       console.error('Error creating portal session:', error);
+      throw error;
+    }
+
+    return data.url;
+  },
+
+  async getCloudBuildUsage(): Promise<CloudBuildUsage> {
+    const { data: session } = await supabase.auth.getSession();
+    if (!session?.session?.user) {
+      return { used: 0, remaining: 3, total: 3 };
+    }
+
+    const { data, error } = await supabase
+      .from('user_cloud_builds')
+      .select('builds_used, builds_purchased')
+      .eq('user_id', session.session.user.id)
+      .single();
+
+    if (error && error.code !== 'PGRST116') {
+      console.error('Error fetching cloud build usage:', error);
+      // New user - return default 3 free builds
+      return { used: 0, remaining: 3, total: 3 };
+    }
+
+    const used = data?.builds_used || 0;
+    const purchased = data?.builds_purchased || 0;
+    const total = 3 + purchased; // 3 free + purchased packs (10 each)
+    const remaining = Math.max(0, total - used);
+
+    return { used, remaining, total };
+  },
+
+  async incrementCloudBuildCount(): Promise<CloudBuildUsage> {
+    const { data: session } = await supabase.auth.getSession();
+    if (!session?.session?.user) {
+      throw new Error('User not authenticated');
+    }
+
+    const { data, error } = await supabase.rpc('increment_cloud_build_count', {
+      user_uuid: session.session.user.id
+    });
+
+    if (error) {
+      console.error('Error incrementing cloud build count:', error);
+      throw error;
+    }
+
+    return await this.getCloudBuildUsage();
+  },
+
+  async createCloudBuildCheckout(): Promise<string> {
+    const { data: session } = await supabase.auth.getSession();
+    if (!session?.session?.user) {
+      throw new Error('User not authenticated');
+    }
+
+    const { data, error } = await supabase.functions.invoke('create-checkout-session', {
+      body: {}
+    });
+
+    if (error) {
+      console.error('Error creating cloud build checkout session:', error);
       throw error;
     }
 

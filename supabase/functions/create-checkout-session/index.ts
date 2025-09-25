@@ -35,11 +35,8 @@ serve(async (req) => {
       throw new Error('Invalid or expired token');
     }
 
-    const { planType } = await req.json();
-
-    if (planType !== 'pro') {
-      throw new Error('Invalid plan type');
-    }
+    // This function only handles cloud build packs
+    const planType = 'cloud-builds';
 
     // Get user profile to check for existing Stripe customer
     const { data: profile } = await supabase
@@ -77,16 +74,17 @@ serve(async (req) => {
         .eq('user_id', user.id);
     }
 
-    // Create checkout session
+    // Create checkout session for cloud build packs
     const checkoutData = new URLSearchParams({
       'success_url': `${req.headers.get('origin')}/templates?session_id={CHECKOUT_SESSION_ID}`,
       'cancel_url': `${req.headers.get('origin')}/templates`,
       'payment_method_types[0]': 'card',
-      'mode': 'subscription',
+      'mode': 'payment',
       'customer': customerId,
-      'line_items[0][price]': 'price_1234567890abcdef', // You'll need to replace this with your actual price ID
+      'line_items[0][price]': 'price_1SBLH17mbN0biK7otdMonZrj', // Cloud builds: $5 for 10 builds
       'line_items[0][quantity]': '1',
       'metadata[user_id]': user.id,
+      'metadata[plan_type]': 'cloud-builds',
     });
 
     const sessionResponse = await fetch('https://api.stripe.com/v1/checkout/sessions', {

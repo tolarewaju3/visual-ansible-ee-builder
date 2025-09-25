@@ -1,4 +1,4 @@
-import { FileText, Download, AlertTriangle, Save, Package, ChevronDown, Settings, Play, Archive, Monitor, Cloud } from "lucide-react";
+import { FileText, Download, AlertTriangle, Save, Package, ChevronDown, Settings, Play, Archive, Monitor, Cloud, CreditCard } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -15,6 +15,7 @@ import { SavePresetDialog } from "@/components/SavePresetDialog";
 import { BuildModal } from "@/components/BuildModal";
 import { useAuth } from "@/contexts/AuthContext";
 import { useUsageLimit } from "@/hooks/useUsageLimit";
+import { useCloudBuilds } from "@/hooks/useCloudBuilds";
 import { useToast } from "@/hooks/use-toast";
 import { Collection, AdditionalBuildStep } from "@/lib/storage";
 import { useState } from "react";
@@ -46,6 +47,15 @@ export function Step4Review({
     toast
   } = useToast();
   const navigate = useNavigate();
+  const { 
+    cloudBuildsUsed, 
+    cloudBuildsRemaining, 
+    cloudBuildsTotal,
+    canBuild: canCloudBuild, 
+    loading: cloudBuildsLoading,
+    incrementCloudBuild,
+    purchaseBuildPack 
+  } = useCloudBuilds();
   const [showSaveDialog, setShowSaveDialog] = useState(false);
   const [isGeneratedFilesOpen, setIsGeneratedFilesOpen] = useState(false);
   const [isExporting, setIsExporting] = useState(false);
@@ -293,6 +303,15 @@ You can modify the build options by editing the variables at the top of the \`bu
     }
   };
   const handleCloudBuild = async () => {
+    if (!canCloudBuild) {
+      toast({
+        title: "No builds remaining",
+        description: "Purchase more cloud builds to continue.",
+        variant: "destructive"
+      });
+      return;
+    }
+
     if (!imageTag || !isImageTagValid) {
       toast({
         title: "Invalid image tag",
@@ -316,6 +335,9 @@ You can modify the build options by editing the variables at the top of the \`bu
     setBuildStatus('building');
     
     try {
+      // Increment cloud build count first
+      await incrementCloudBuild();
+      
       // Increment export count for analytics tracking  
       await incrementExport();
 
@@ -570,22 +592,76 @@ chmod +x build.sh && \\
             </div>
           ) : (
             <div className="space-y-4">
+              {/* Registry Credentials */}
               <div className="grid gap-4 md:grid-cols-2">
                 <div className="space-y-2">
                   <Label htmlFor="registry-username-cloud">Username</Label>
-                  <Input id="registry-username-cloud" type="text" placeholder="Your username" value={registryUsername} onChange={e => setRegistryUsername(e.target.value)} className="font-mono text-sm" />
+                  <Input 
+                    id="registry-username-cloud" 
+                    type="text" 
+                    placeholder="Your username" 
+                    value={registryUsername} 
+                    onChange={e => setRegistryUsername(e.target.value)} 
+                    className="font-mono text-sm" 
+                  />
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="registry-password-cloud">Password (Access Token Recommended)</Label>
-                  <Input id="registry-password-cloud" type="password" placeholder="Your password/token" value={registryPassword} onChange={e => setRegistryPassword(e.target.value)} className="font-mono text-sm" />
+                  <Input 
+                    id="registry-password-cloud" 
+                    type="password" 
+                    placeholder="Your password/token" 
+                    value={registryPassword} 
+                    onChange={e => setRegistryPassword(e.target.value)} 
+                    className="font-mono text-sm" 
+                  />
                 </div>
               </div>
 
+              {/* Cloud Build Usage Display */}
+              <div className="bg-muted/20 rounded-lg p-4 border">
+                <div className="flex items-center justify-between mb-2">
+                  <h4 className="font-medium text-sm">Cloud Builds</h4>
+                  <Badge variant="secondary">
+                    {cloudBuildsRemaining} / {cloudBuildsTotal} remaining
+                  </Badge>
+                </div>
+                <div className="w-full bg-muted rounded-full h-2">
+                  <div 
+                    className="bg-primary h-2 rounded-full transition-all duration-300" 
+                    style={{ width: `${(cloudBuildsUsed / cloudBuildsTotal) * 100}%` }}
+                  />
+                </div>
+                <p className="text-xs text-muted-foreground mt-2">
+                  {cloudBuildsRemaining === 0 
+                    ? "No builds remaining. Purchase more to continue." 
+                    : `You have ${cloudBuildsRemaining} cloud build${cloudBuildsRemaining === 1 ? '' : 's'} remaining.`}
+                </p>
+              </div>
 
-              {currentRunId && buildStatus !== 'idle' ? (
+              {/* Build Actions */}
+              {cloudBuildsRemaining === 0 ? (
                 <div className="space-y-3">
-                  <Button onClick={() => setShowBuildModal(true)} className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700" size="lg">
-                    <Play className="h-4 w-4 mr-2" />
+                  <Button 
+                    onClick={purchaseBuildPack}
+                    className="w-full bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700" 
+                    size="lg"
+                  >
+                    <CreditCard className="h-4 w-4 mr-2" />
+                    Buy 10 More Builds - $5
+                  </Button>
+                  <p className="text-xs text-muted-foreground/60 text-center">
+                    Get 10 additional cloud builds for just $5
+                  </p>
+                </div>
+              ) : currentRunId && buildStatus !== 'idle' ? (
+                <div className="space-y-3">
+                  <Button 
+                    onClick={() => setShowBuildModal(true)} 
+                    className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700" 
+                    size="lg"
+                  >
+                    <Monitor className="h-4 w-4 mr-2" />
                     {buildStatus === 'building' ? 'View Build Progress' : 'View Build Results'}
                   </Button>
                   <p className="text-xs text-muted-foreground/60 text-center">
@@ -596,19 +672,16 @@ chmod +x build.sh && \\
                 <div className="space-y-3">
                   <Button 
                     onClick={user ? handleCloudBuild : () => navigate('/auth')} 
-                    disabled={user && (isExporting || !isImageTagValid || !registryUsername || !registryPassword)} 
+                    disabled={user && (isExporting || !isImageTagValid || !registryUsername || !registryPassword || !canCloudBuild)} 
                     className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700" 
                     size="lg"
                   >
                     <Play className="h-4 w-4 mr-2" />
-                    {!user ? 'Sign in to Build in Cloud' : isExporting ? 'Starting Build...' : 'Build in Cloud'}
+                    {user ? (isExporting ? 'Starting Build...' : 'Build in Cloud') : 'Sign in to Build in Cloud'}
                   </Button>
                   
-                  <p className="text-xs text-muted-foreground/60 text-center">
-                  {user 
-                    ? "Your registry credentials are never stored. They're deleted after each build."
-                    : "Sign in to access cloud builds"
-                  }
+                  <p className="text-xs text-muted-foreground/60 text-center mt-3">
+                    {user ? "Your registry credentials are never stored. They're deleted after each build." : "Sign in to access cloud builds"}
                   </p>
                 </div>
               )}
