@@ -216,12 +216,6 @@ export function PollingLogs({ runId, runUrl, onComplete, className }: PollingLog
                 {workflowConclusion && `: ${workflowConclusion}`}
               </Badge>
             </div>
-            {runUrl && (
-              <Button variant="outline" size="sm" onClick={() => window.open(runUrl, '_blank')}>
-                <ExternalLink className="h-4 w-4 mr-1" />
-                GitHub
-              </Button>
-            )}
           </div>
         </div>
         

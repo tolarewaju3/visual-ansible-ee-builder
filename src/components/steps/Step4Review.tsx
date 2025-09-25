@@ -582,14 +582,28 @@ chmod +x build.sh && \\
               </div>
 
 
-              <Button onClick={handleCloudBuild} disabled={isExporting || !isImageTagValid || !registryUsername || !registryPassword} className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700" size="lg">
-                <Play className="h-4 w-4 mr-2" />
-                {isExporting ? 'Starting Build...' : 'Build in Cloud'}
-              </Button>
-              
-              <p className="text-xs text-muted-foreground/60 text-center mt-3">
-              Your registry credentials are never stored. They're deleted after each build.
-              </p>
+              {currentRunId && buildStatus !== 'idle' ? (
+                <div className="space-y-3">
+                  <Button onClick={() => setShowBuildModal(true)} className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700" size="lg">
+                    <Play className="h-4 w-4 mr-2" />
+                    {buildStatus === 'building' ? 'View Build Progress' : 'View Build Results'}
+                  </Button>
+                  <p className="text-xs text-muted-foreground/60 text-center">
+                    Build {buildStatus === 'building' ? 'in progress' : buildStatus === 'success' ? 'completed successfully' : 'failed'}
+                  </p>
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  <Button onClick={handleCloudBuild} disabled={isExporting || !isImageTagValid || !registryUsername || !registryPassword} className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700" size="lg">
+                    <Play className="h-4 w-4 mr-2" />
+                    {isExporting ? 'Starting Build...' : 'Build in Cloud'}
+                  </Button>
+                  
+                  <p className="text-xs text-muted-foreground/60 text-center">
+                  Your registry credentials are never stored. They're deleted after each build.
+                  </p>
+                </div>
+              )}
             </div>
           )}
         </CardContent>
