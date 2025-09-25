@@ -302,6 +302,8 @@ You can modify the build options by editing the variables at the top of the \`bu
       return;
     }
     
+    // Open build modal immediately when button is clicked
+    setShowBuildModal(true);
     setIsExporting(true);
     setBuildStatus('building');
     
@@ -344,9 +346,6 @@ You can modify the build options by editing the variables at the top of the \`bu
       if (error) throw error;
       
       console.log('Build triggered successfully, response:', data);
-      
-      // Open build modal immediately (even if runId is not ready yet)
-      setShowBuildModal(true);
       
       // Set run information
       if (data.runId) {

@@ -69,26 +69,6 @@ export function BuildModal({
             onComplete={handleBuildComplete}
             className="w-full"
           />
-
-          {/* Download Options */}
-          {buildStatus === 'success' && (
-            <Card className="bg-card border-border">
-              <CardHeader>
-                <CardTitle>Next Steps</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                <p className="text-sm text-muted-foreground">
-                  Your Execution Environment has been built and pushed to the registry successfully. 
-                  You can now use it in your Ansible Automation Platform.
-                </p>
-                {runUrl && (
-                  <Button variant="outline" onClick={() => window.open(runUrl, '_blank')}>
-                    View on GitHub Actions
-                  </Button>
-                )}
-              </CardContent>
-            </Card>
-          )}
         </div>
       </DialogContent>
     </Dialog>
