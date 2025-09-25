@@ -594,13 +594,21 @@ chmod +x build.sh && \\
                 </div>
               ) : (
                 <div className="space-y-3">
-                  <Button onClick={handleCloudBuild} disabled={isExporting || !isImageTagValid || !registryUsername || !registryPassword} className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700" size="lg">
+                  <Button 
+                    onClick={user ? handleCloudBuild : () => navigate('/auth')} 
+                    disabled={user && (isExporting || !isImageTagValid || !registryUsername || !registryPassword)} 
+                    className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700" 
+                    size="lg"
+                  >
                     <Play className="h-4 w-4 mr-2" />
-                    {isExporting ? 'Starting Build...' : 'Build in Cloud'}
+                    {!user ? 'Sign in to Build in Cloud' : isExporting ? 'Starting Build...' : 'Build in Cloud'}
                   </Button>
                   
                   <p className="text-xs text-muted-foreground/60 text-center">
-                  Your registry credentials are never stored. They're deleted after each build.
+                  {user 
+                    ? "Your registry credentials are never stored. They're deleted after each build."
+                    : "Sign in to access cloud builds"
+                  }
                   </p>
                 </div>
               )}

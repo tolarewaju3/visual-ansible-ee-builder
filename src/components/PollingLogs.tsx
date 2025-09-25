@@ -194,8 +194,8 @@ export function PollingLogs({ runId, runUrl, onComplete, className }: PollingLog
           <div className="flex flex-col items-center justify-center gap-3 text-muted-foreground py-8">
             <Loader2 className="h-8 w-8 animate-spin" />
             <div className="text-center">
-              <div className="font-medium">Finding your build...</div>
-              <div className="text-sm mt-1">Looking for the newly triggered workflow run</div>
+              <div className="font-medium">Starting your build...</div>
+              <div className="text-sm mt-1">This may take a moment to start</div>
             </div>
           </div>
         </CardContent>
