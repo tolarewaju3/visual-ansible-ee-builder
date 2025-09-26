@@ -4,8 +4,9 @@ import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
-import { User, LogOut, Settings, FileText } from 'lucide-react';
+import { User, LogOut, Settings, FileText, Bug } from 'lucide-react';
 import { SubscriptionBadge } from '@/components/SubscriptionBadge';
+import { ReportProblemDialog } from '@/components/ReportProblemDialog';
 
 export const Navigation = () => {
   const { user, signOut } = useAuth();
@@ -83,6 +84,13 @@ export const Navigation = () => {
                     My Templates
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
+                  <ReportProblemDialog>
+                    <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
+                      <Bug className="mr-2 h-4 w-4" />
+                      Report a Problem
+                    </DropdownMenuItem>
+                  </ReportProblemDialog>
+                  <DropdownMenuSeparator />
                   <DropdownMenuItem onClick={handleSignOut}>
                     <LogOut className="mr-2 h-4 w-4" />
                     Sign Out
@@ -90,9 +98,17 @@ export const Navigation = () => {
                 </DropdownMenuContent>
               </DropdownMenu>
             ) : (
-              <Button onClick={() => navigate('/auth')} variant="outline">
-                Sign In
-              </Button>
+              <div className="flex items-center gap-2">
+                <ReportProblemDialog>
+                  <Button variant="ghost" size="sm">
+                    <Bug className="h-4 w-4 mr-2" />
+                    Report Problem
+                  </Button>
+                </ReportProblemDialog>
+                <Button onClick={() => navigate('/auth')} variant="outline">
+                  Sign In
+                </Button>
+              </div>
             )}
           </div>
         </div>

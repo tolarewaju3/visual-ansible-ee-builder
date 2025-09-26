@@ -1,9 +1,10 @@
-import { Download, CheckCircle, XCircle, X } from "lucide-react";
+import { Download, CheckCircle, XCircle, X, Bug } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { PollingLogs } from "./PollingLogs";
+import { ReportProblemDialog } from "./ReportProblemDialog";
 
 interface BuildModalProps {
   isOpen: boolean;
@@ -56,8 +57,21 @@ export function BuildModal({
           {buildStatus === 'error' && (
             <Alert className="border-red-500/50 bg-red-500/10">
               <XCircle className="h-4 w-4 text-red-500" />
-              <AlertDescription className="text-red-700 dark:text-red-300">
-                Build failed. Check the logs below for more details.
+              <AlertDescription className="text-red-700 dark:text-red-300 flex items-center justify-between">
+                <span>Build failed. Check the logs below for more details.</span>
+                <ReportProblemDialog
+                  errorDetails={{
+                    error: "Build failed",
+                    context: "Cloud build execution",
+                    runId: runId || undefined,
+                    runUrl: runUrl
+                  }}
+                >
+                  <Button variant="outline" size="sm" className="ml-4">
+                    <Bug className="h-4 w-4 mr-2" />
+                    Report Problem
+                  </Button>
+                </ReportProblemDialog>
               </AlertDescription>
             </Alert>
           )}

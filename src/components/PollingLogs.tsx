@@ -4,8 +4,9 @@ import { Badge } from './ui/badge';
 import { Button } from './ui/button';
 import { ScrollArea } from './ui/scroll-area';
 import { Separator } from './ui/separator';
-import { CheckCircle, AlertCircle, XCircle, Loader2, ExternalLink } from 'lucide-react';
+import { CheckCircle, AlertCircle, XCircle, Loader2, ExternalLink, Bug } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
+import { ReportProblemDialog } from './ReportProblemDialog';
 
 interface LogEntry {
   timestamp: string;
@@ -227,10 +228,26 @@ export function PollingLogs({ runId, runUrl, onComplete, className }: PollingLog
               Polling for updates every second
             </span>
           ) : error ? (
-            <span className="flex items-center gap-1 text-red-500">
-              <div className="h-2 w-2 bg-red-500 rounded-full" />
-              {error}
-            </span>
+            <div className="flex items-center justify-between">
+              <span className="flex items-center gap-1 text-red-500">
+                <div className="h-2 w-2 bg-red-500 rounded-full" />
+                {error}
+              </span>
+              <ReportProblemDialog
+                errorDetails={{
+                  error: error,
+                  context: "Build log polling",
+                  runId: runId || undefined,
+                  runUrl: runUrl,
+                  logs: logs.map(log => `[${log.timestamp}] ${log.step ? `[${log.step}] ` : ''}${log.message}`).join('\n')
+                }}
+              >
+                <Button variant="outline" size="sm">
+                  <Bug className="h-4 w-4 mr-2" />
+                  Report Problem
+                </Button>
+              </ReportProblemDialog>
+            </div>
           ) : (
             <span className="flex items-center gap-1">
               <div className="h-2 w-2 bg-yellow-500 rounded-full" />

@@ -1,4 +1,4 @@
-import { FileText, Download, AlertTriangle, Save, Package, ChevronDown, Settings, Play, Archive, Monitor, Cloud, CreditCard } from "lucide-react";
+import { FileText, Download, AlertTriangle, Save, Package, ChevronDown, Settings, Play, Archive, Monitor, Cloud, CreditCard, Bug } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -13,6 +13,7 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/component
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { SavePresetDialog } from "@/components/SavePresetDialog";
 import { BuildModal } from "@/components/BuildModal";
+import { ReportProblemDialog } from "@/components/ReportProblemDialog";
 import { useAuth } from "@/contexts/AuthContext";
 import { useUsageLimit } from "@/hooks/useUsageLimit";
 import { useCloudBuilds } from "@/hooks/useCloudBuilds";
@@ -74,6 +75,7 @@ export function Step4Review({
   const [buildStatus, setBuildStatus] = useState<'idle' | 'building' | 'success' | 'error'>('idle');
   const [currentRunId, setCurrentRunId] = useState<string | null>(null);
   const [currentRunUrl, setCurrentRunUrl] = useState<string | undefined>(undefined);
+  const [buildError, setBuildError] = useState<string | null>(null);
 
   // Container image validation function for local builds
   const isValidContainerImage = (image: string): boolean => {
@@ -395,10 +397,12 @@ You can modify the build options by editing the variables at the top of the \`bu
       });
     } catch (error) {
       console.error('Cloud build failed:', error);
+      const errorMessage = error.message || "Failed to trigger cloud build. Please try again.";
+      setBuildError(errorMessage);
       setBuildStatus('error');
       toast({
         title: "Build trigger failed",
-        description: error.message || "Failed to trigger cloud build. Please try again.",
+        description: errorMessage,
         variant: "destructive"
       });
     } finally {
@@ -683,6 +687,25 @@ chmod +x build.sh && \\
                   <p className="text-xs text-muted-foreground/60 text-center mt-3">
                     {user ? "Your registry credentials are never stored. They're deleted after each build." : "Sign in to access cloud builds"}
                   </p>
+                  
+                  {/* Report Problem Button - Show when build fails */}
+                  {buildStatus === 'error' && buildError && (
+                    <div className="pt-3 border-t">
+                      <ReportProblemDialog
+                        errorDetails={{
+                          error: buildError,
+                          context: "Cloud build trigger",
+                          runId: currentRunId || undefined,
+                          runUrl: currentRunUrl
+                        }}
+                      >
+                        <Button variant="outline" size="sm" className="w-full">
+                          <Bug className="h-4 w-4 mr-2" />
+                          Report Problem
+                        </Button>
+                      </ReportProblemDialog>
+                    </div>
+                  )}
                 </div>
               )}
             </div>
