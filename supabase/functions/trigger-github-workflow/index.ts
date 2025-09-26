@@ -61,17 +61,17 @@ serve(async (req) => {
 
     // Trigger GitHub Actions workflow
     const workflowResponse = await fetch(
-      'https://api.github.com/repos/tolarewaju3/visual-ansible-ee-builder/actions/workflows/main.yml/dispatches',
+      'https://api.github.com/repos/tolarewaju3/hosted-ee-build-infra/actions/workflows/main.yml/dispatches',
       {
         method: 'POST',
         headers: {
           'Accept': 'application/vnd.github.v3+json',
           'Authorization': `token ${githubToken}`,
           'Content-Type': 'application/json',
-          'User-Agent': 'visual-ansible-ee-builder',
+          'User-Agent': 'hosted-ee-build-infra',
         },
         body: JSON.stringify({
-          ref: 'main',
+          ref: 'master',
           inputs: {
             image: image,
             ee_yaml_path: 'test/execution-environment.yml',
@@ -91,7 +91,7 @@ serve(async (req) => {
 
     // Wait for the workflow run to be created and get its ID
     const triggerTime = new Date();
-    let runUrl = 'https://github.com/tolarewaju3/visual-ansible-ee-builder/actions';
+    let runUrl = 'https://github.com/tolarewaju3/hosted-ee-build-infra/actions';
     let runId = null;
     
     console.log('Looking for newly triggered workflow run...');
@@ -106,12 +106,12 @@ serve(async (req) => {
       
       try {
         const workflowRunsResponse = await fetch(
-          'https://api.github.com/repos/tolarewaju3/visual-ansible-ee-builder/actions/runs?per_page=10&event=workflow_dispatch',
+          'https://api.github.com/repos/tolarewaju3/hosted-ee-build-infra/actions/runs?per_page=10&event=workflow_dispatch',
           {
             headers: {
               'Accept': 'application/vnd.github.v3+json',
               'Authorization': `token ${githubToken}`,
-              'User-Agent': 'visual-ansible-ee-builder',
+              'User-Agent': 'hosted-ee-build-infra',
             },
           }
         );
@@ -155,12 +155,12 @@ serve(async (req) => {
       // Fallback: get the most recent workflow_dispatch run
       try {
         const fallbackResponse = await fetch(
-          'https://api.github.com/repos/tolarewaju3/visual-ansible-ee-builder/actions/runs?per_page=1&event=workflow_dispatch',
+          'https://api.github.com/repos/tolarewaju3/hosted-ee-build-infra/actions/runs?per_page=1&event=workflow_dispatch',
           {
             headers: {
               'Accept': 'application/vnd.github.v3+json',
               'Authorization': `token ${githubToken}`,
-              'User-Agent': 'visual-ansible-ee-builder',
+              'User-Agent': 'hosted-ee-build-infra',
             },
           }
         );

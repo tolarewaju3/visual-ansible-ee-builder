@@ -28,12 +28,12 @@ interface JobStatus {
 
 async function getWorkflowRun(runId: string): Promise<any> {
   const response = await fetch(
-    `https://api.github.com/repos/tolarewaju3/visual-ansible-ee-builder/actions/runs/${runId}`,
+    `https://api.github.com/repos/tolarewaju3/hosted-ee-build-infra/actions/runs/${runId}`,
     {
       headers: {
         'Accept': 'application/vnd.github.v3+json',
         'Authorization': `token ${githubToken}`,
-        'User-Agent': 'visual-ansible-ee-builder',
+        'User-Agent': 'hosted-ee-build-infra',
       },
     }
   );
@@ -47,12 +47,12 @@ async function getWorkflowRun(runId: string): Promise<any> {
 
 async function getWorkflowJobs(runId: string): Promise<JobStatus[]> {
   const response = await fetch(
-    `https://api.github.com/repos/tolarewaju3/visual-ansible-ee-builder/actions/runs/${runId}/jobs`,
+    `https://api.github.com/repos/tolarewaju3/hosted-ee-build-infra/actions/runs/${runId}/jobs`,
     {
       headers: {
         'Accept': 'application/vnd.github.v3+json',
         'Authorization': `token ${githubToken}`,
-        'User-Agent': 'visual-ansible-ee-builder',
+        'User-Agent': 'hosted-ee-build-infra',
       },
     }
   );
@@ -67,12 +67,12 @@ async function getWorkflowJobs(runId: string): Promise<JobStatus[]> {
 
 async function getJobLogs(jobId: number): Promise<string> {
   const response = await fetch(
-    `https://api.github.com/repos/tolarewaju3/visual-ansible-ee-builder/actions/jobs/${jobId}/logs`,
+    `https://api.github.com/repos/tolarewaju3/hosted-ee-build-infra/actions/jobs/${jobId}/logs`,
     {
       headers: {
         'Accept': 'application/vnd.github.v3+json',
         'Authorization': `token ${githubToken}`,
-        'User-Agent': 'visual-ansible-ee-builder',
+        'User-Agent': 'hosted-ee-build-infra',
       },
     }
   );
@@ -90,12 +90,12 @@ async function getJobLogs(jobId: number): Promise<string> {
 // Get detailed job with steps
 async function getJobWithSteps(runId: string): Promise<any[]> {
   const response = await fetch(
-    `https://api.github.com/repos/tolarewaju3/visual-ansible-ee-builder/actions/runs/${runId}/jobs`,
+    `https://api.github.com/repos/tolarewaju3/hosted-ee-build-infra/actions/runs/${runId}/jobs`,
     {
       headers: {
         'Accept': 'application/vnd.github.v3+json',
         'Authorization': `token ${githubToken}`,
-        'User-Agent': 'visual-ansible-ee-builder',
+        'User-Agent': 'hosted-ee-build-infra',
       },
     }
   );
