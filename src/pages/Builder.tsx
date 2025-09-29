@@ -113,8 +113,12 @@ const Builder = () => {
         // Can proceed if a preset is selected
         return selectedPreset.trim() !== "";
       case 1:
-        // Can proceed if base image is selected
-        return selectedBaseImage.trim() !== "";
+        // Can proceed if base image is selected and Red Hat credentials if needed
+        if (selectedBaseImage.trim() === "") return false;
+        if (selectedBaseImage.includes('registry.redhat.io/ansible-automation-platform-25/ee-minimal-rhel9')) {
+          return Boolean(redhatCredentials?.username && redhatCredentials?.password);
+        }
+        return true;
       case 2:
         // Check if Red Hat credentials are needed and provided
         const needsRedHatCreds = 
