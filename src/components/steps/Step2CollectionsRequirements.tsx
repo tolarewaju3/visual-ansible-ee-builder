@@ -8,7 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
-import { Plus, X, Upload, Package, Layers, Search, FileText, Save, ChevronDown } from "lucide-react";
+import { Plus, X, Upload, Package, Layers, Search, FileText, Save, ChevronDown, Lock } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import { SavePresetDialog } from "@/components/SavePresetDialog";
 import { useAuth } from "@/contexts/AuthContext";
@@ -81,9 +81,11 @@ interface Step2CollectionsRequirementsProps {
   requirements: string[];
   selectedPackages: string[];
   baseImage: string;
+  redhatCredentials?: { username: string; password: string };
   onCollectionsChange: (collections: Collection[]) => void;
   onRequirementsChange: (requirements: string[]) => void;
   onPackagesChange: (packages: string[]) => void;
+  onRedhatCredentialsChange?: (credentials: { username: string; password: string } | undefined) => void;
 }
 
 // Step 2: Collections & Requirements Component
@@ -92,9 +94,11 @@ export function Step2CollectionsRequirements({
   requirements,
   selectedPackages,
   baseImage,
+  redhatCredentials,
   onCollectionsChange,
   onRequirementsChange,
-  onPackagesChange
+  onPackagesChange,
+  onRedhatCredentialsChange
 }: Step2CollectionsRequirementsProps) {
   const [searchQuery, setSearchQuery] = useState("");
   const [newRequirement, setNewRequirement] = useState("");
@@ -187,6 +191,13 @@ export function Step2CollectionsRequirements({
     acc[pkg.category].push(pkg);
     return acc;
   }, {} as Record<string, typeof systemPackages>);
+  
+  // Check if Red Hat credentials are needed
+  const needsRedHatCredentials = 
+    baseImage.includes('registry.redhat.io/ansible-automation-platform-25/ee-minimal-rhel9') ||
+    selectedPackages.some(pkg => ['telnet', 'tcpdump', 'openshift'].includes(pkg.toLowerCase())) ||
+    requirements.some(req => req.toLowerCase().includes('openshift'));
+
   return <div className="space-y-6">
       {/* Ansible Collections */}
       <Collapsible open={collectionsOpen} onOpenChange={setCollectionsOpen}>
@@ -403,6 +414,53 @@ export function Step2CollectionsRequirements({
           </CollapsibleContent>
         </Card>
       </Collapsible>
+
+      {/* Red Hat Credentials - shown when needed */}
+      {needsRedHatCredentials && (
+        <Card className="bg-card border-border border-orange-500/50">
+          <CardHeader>
+            <CardTitle className="flex items-center space-x-2">
+              <Lock className="h-5 w-5 text-orange-500" />
+              <span>Red Hat Subscription Required</span>
+            </CardTitle>
+            <CardDescription>
+              Enter your Red Hat Customer Portal credentials to access subscription-required packages
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div>
+              <Label htmlFor="redhat-username">Username</Label>
+              <Input
+                id="redhat-username"
+                placeholder="Red Hat username"
+                value={redhatCredentials?.username || ''}
+                onChange={(e) => onRedhatCredentialsChange?.({
+                  ...redhatCredentials,
+                  username: e.target.value,
+                  password: redhatCredentials?.password || ''
+                })}
+              />
+            </div>
+            <div>
+              <Label htmlFor="redhat-password">Password</Label>
+              <Input
+                id="redhat-password"
+                type="password"
+                placeholder="Red Hat password"
+                value={redhatCredentials?.password || ''}
+                onChange={(e) => onRedhatCredentialsChange?.({
+                  ...redhatCredentials,
+                  username: redhatCredentials?.username || '',
+                  password: e.target.value
+                })}
+              />
+            </div>
+            <p className="text-xs text-muted-foreground">
+              These credentials are required to pull subscription-based packages during the build process
+            </p>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Save Preset Section */}
       

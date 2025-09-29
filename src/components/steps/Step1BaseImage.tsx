@@ -138,50 +138,6 @@ export function Step1BaseImage({
                      <code className="text-sm font-mono bg-muted px-2 py-1 rounded text-muted-foreground">
                        {image.name}:{image.tag}
                      </code>
-                     
-                     {/* Red Hat Credentials Fields */}
-                     {image.id === "ee-minimal-rhel9" && 
-                      popularBaseImages.find(img => `${img.name}:${img.tag}` === selectedBaseImage)?.id === "ee-minimal-rhel9" && (
-                       <div className="space-y-3 mt-4 p-3 bg-muted/50 rounded-md border">
-                         <div className="text-sm font-medium text-foreground">
-                           Red Hat Customer Portal Credentials
-                         </div>
-                         <div className="grid grid-cols-1 gap-3">
-                           <div>
-                             <Label htmlFor="redhat-username" className="text-xs">Username</Label>
-                             <Input
-                               id="redhat-username"
-                               placeholder="Red Hat username"
-                               value={redhatCredentials?.username || ''}
-                               onChange={(e) => onRedhatCredentialsChange?.({
-                                 ...redhatCredentials,
-                                 username: e.target.value,
-                                 password: redhatCredentials?.password || ''
-                               })}
-                               className="text-sm"
-                             />
-                           </div>
-                           <div>
-                             <Label htmlFor="redhat-password" className="text-xs">Password</Label>
-                             <Input
-                               id="redhat-password"
-                               type="password"
-                               placeholder="Red Hat password"
-                               value={redhatCredentials?.password || ''}
-                               onChange={(e) => onRedhatCredentialsChange?.({
-                                 ...redhatCredentials,
-                                 username: redhatCredentials?.username || '',
-                                 password: e.target.value
-                               })}
-                               className="text-sm"
-                             />
-                           </div>
-                         </div>
-                         <p className="text-xs text-muted-foreground">
-                           Required to pull images from registry.redhat.io
-                         </p>
-                       </div>
-                     )}
                    </div>
                  </div>
                ))}

@@ -471,17 +471,6 @@ You can modify the build options by editing the variables at the top of the \`bu
     setShowSaveDialog(true);
   };
   return <div className="space-y-8">
-      {/* Red Hat Subscription Warning */}
-      {hasRedHatPackages && <Alert variant="destructive">
-          <AlertTriangle className="h-4 w-4" />
-          <AlertTitle>Red Hat Subscription Required</AlertTitle>
-          <AlertDescription>
-            The following packages require a Red Hat subscription: <strong>{redHatPackagesFound.join(', ')}</strong>
-            <br />
-            Make sure you are building the execution environment on Red Hat Enterprise Linux with a valid subscription.
-          </AlertDescription>
-        </Alert>}
-
       {/* Step 1: Set Build Information */}
       <Card className="bg-card border-border">
         <CardHeader>
@@ -575,15 +564,6 @@ You can modify the build options by editing the variables at the top of the \`bu
               </div>
             </div>
           </div>
-
-          {hasRedHatPackages && <Alert variant="destructive">
-              <AlertTriangle className="h-4 w-4" />
-              <AlertTitle>Red Hat Subscription Required</AlertTitle>
-              <AlertDescription>
-                Your EE includes packages ({redHatPackagesFound.join(', ')}) that require a Red Hat subscription. 
-                Make sure your build environment has the necessary entitlements configured.
-              </AlertDescription>
-            </Alert>}
         </CardContent>
       </Card>
 
