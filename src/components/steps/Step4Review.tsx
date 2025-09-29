@@ -114,6 +114,10 @@ export function Step4Review({
     if (selectedPackages.length > 0) {
       dependenciesLines.push('  system: bindep.txt');
     }
+    
+    // Check if Red Hat Ansible Minimal EE is selected
+    const isRedHatMinimalEE = selectedBaseImage.includes('registry.redhat.io/ansible-automation-platform-25/ee-minimal-rhel9');
+    
     let content = `---
 version: 3
 
@@ -124,15 +128,44 @@ images:
 dependencies:
 ${dependenciesLines.join('\n')}`;
 
-    // Add additional_build_steps if any are defined
+    // Prepare additional_build_steps
+    const buildStepsGroups: Record<string, string[]> = {};
+    
+    // Add existing additional_build_steps if any
     if (additionalBuildSteps.length > 0) {
-      const buildStepsGroups: Record<string, string[]> = {};
       additionalBuildSteps.forEach(step => {
         if (!buildStepsGroups[step.stepType]) {
           buildStepsGroups[step.stepType] = [];
         }
         buildStepsGroups[step.stepType].push(...step.commands);
       });
+    }
+    
+    // Add subscription manager setup for Red Hat Ansible Minimal EE with subscription packages
+    if (isRedHatMinimalEE && hasRedHatPackages && redhatCredentials) {
+      // Add subscription manager prepend
+      if (!buildStepsGroups.prepend_base) {
+        buildStepsGroups.prepend_base = [];
+      }
+      buildStepsGroups.prepend_base.unshift(
+        'RUN microdnf -y install subscription-manager',
+        `RUN subscription-manager register --username ${redhatCredentials.username} --password ${redhatCredentials.password}`
+      );
+      
+      // Add subscription manager cleanup append
+      if (!buildStepsGroups.append_final) {
+        buildStepsGroups.append_final = [];
+      }
+      buildStepsGroups.append_final.push(
+        'RUN subscription-manager unregister',
+        'RUN subscription-manager clean',
+        'RUN microdnf -y remove subscription-manager',
+        'RUN microdnf clean all'
+      );
+    }
+    
+    // Add additional_build_steps section if any steps exist
+    if (Object.keys(buildStepsGroups).length > 0) {
       content += '\n\nadditional_build_steps:';
       Object.entries(buildStepsGroups).forEach(([stepType, commands]) => {
         content += `\n  ${stepType}:`;
@@ -141,6 +174,12 @@ ${dependenciesLines.join('\n')}`;
         });
       });
     }
+    
+    // Add microdnf package manager option for Red Hat Ansible Minimal EE
+    if (isRedHatMinimalEE) {
+      content += '\n\noptions:\n  package_manager_path: /usr/bin/microdnf';
+    }
+    
     return content;
   };
   const generateRequirementsTxt = () => {
