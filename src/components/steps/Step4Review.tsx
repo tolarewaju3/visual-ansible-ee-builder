@@ -97,10 +97,11 @@ export function Step4Review({
   const isImageTagValid = selectedBuildMethod === 'cloud' ? isValidCloudImage(imageTag) : isValidContainerImage(imageTag);
 
   // Packages that require Red Hat subscription
-  const redHatSubscriptionPackages = ['telnet', 'tcpdump'];
+  const redHatSubscriptionPackages = ['telnet', 'tcpdump', 'openshift'];
 
-  // Check if any selected packages require Red Hat subscription
-  const hasRedHatPackages = selectedPackages.some(pkg => redHatSubscriptionPackages.includes(pkg.toLowerCase()));
+  // Check if any selected packages or requirements require Red Hat subscription
+  const hasRedHatPackages = selectedPackages.some(pkg => redHatSubscriptionPackages.includes(pkg.toLowerCase())) || 
+                           requirements.some(req => req.toLowerCase().includes('openshift'));
   const redHatPackagesFound = selectedPackages.filter(pkg => redHatSubscriptionPackages.includes(pkg.toLowerCase()));
   const generateExecutionEnvironment = () => {
     const collections = selectedCollections.map(c => c.version ? `${c.name}:${c.version}` : c.name);
@@ -151,6 +152,13 @@ ${dependenciesLines.join('\n')}`;
         'RUN microdnf -y install subscription-manager',
         `RUN subscription-manager register --username ${redhatCredentials.username} --password ${redhatCredentials.password}`
       );
+      
+      // Add repository enablement for openshift if present
+      if (requirements.some(req => req.toLowerCase().includes('openshift'))) {
+        buildStepsGroups.prepend_base.push(
+          'RUN subscription-manager repos --enable=rhocp-4.16-for-rhel-9-$(arch)-rpms'
+        );
+      }
       
       // Add subscription manager cleanup append
       if (!buildStepsGroups.append_final) {

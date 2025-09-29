@@ -116,6 +116,7 @@ export const PRESETS: Preset[] = [
       'jmespath>=1.0'
     ],
     packages: [
+      'python3-pip',
       'ca-certificates'
     ]
   }
