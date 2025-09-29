@@ -35,7 +35,7 @@ serve(async (req) => {
       throw new Error('Invalid or expired token');
     }
 
-    const { image, eeZipB64, registryUsername, registryPassword } = await req.json();
+    const { image, eeZipB64, registryUsername, registryPassword, redhat_username, redhat_password } = await req.json();
 
     if (!image || !eeZipB64 || !registryUsername || !registryPassword) {
       return new Response(
@@ -78,6 +78,10 @@ serve(async (req) => {
             ee_zip_b64: eeZipB64,
             registry_username: registryUsername,
             registry_password: registryPassword,
+            ...(redhat_username && redhat_password && {
+              redhat_username: redhat_username,
+              redhat_password: redhat_password,
+            }),
           },
         }),
       }

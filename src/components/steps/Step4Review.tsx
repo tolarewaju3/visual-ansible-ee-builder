@@ -374,7 +374,11 @@ You can modify the build options by editing the variables at the top of the \`bu
           image: imageTag,
           eeZipB64: zipBlob,
           registryUsername: registryUsername,
-          registryPassword: registryPassword
+          registryPassword: registryPassword,
+          ...(redhatCredentials && {
+            redhat_username: redhatCredentials.username,
+            redhat_password: redhatCredentials.password,
+          }),
         }
       });
       if (error) throw error;
