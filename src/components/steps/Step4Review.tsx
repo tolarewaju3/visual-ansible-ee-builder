@@ -503,22 +503,6 @@ You can modify the build options by editing the variables at the top of the \`bu
             </p>
           </div>
           
-          {/* Red Hat Credentials Display */}
-          {redhatCredentials && selectedBaseImage.includes('registry.redhat.io/ansible-automation-platform-25/ee-minimal-rhel9') && (
-            <div className="space-y-2">
-              <Label className="text-sm font-medium">Red Hat Customer Portal Credentials</Label>
-              <div className="bg-muted/50 rounded-md p-3 space-y-2">
-                <div className="text-xs">
-                  <span className="font-mono">Username: </span>
-                  <span className="text-muted-foreground">{redhatCredentials.username}</span>
-                </div>
-                <div className="text-xs">
-                  <span className="font-mono">Password: </span>
-                  <span className="text-muted-foreground">{'●'.repeat(8)}</span>
-                </div>
-              </div>
-            </div>
-          )}
           
         </CardContent>
       </Card>
