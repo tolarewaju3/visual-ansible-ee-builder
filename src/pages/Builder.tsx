@@ -12,7 +12,7 @@ import { Step3Customize } from "@/components/steps/Step3Customize";
 import { Step4Review } from "@/components/steps/Step4Review";
 import { SavePresetDialog } from "@/components/SavePresetDialog";
 import { useLocalStorage } from "@/hooks/useLocalStorage";
-import { Collection, AdditionalBuildStep, STORAGE_KEY, DEFAULT_STATE, clearStoredState } from "@/lib/storage";
+import { Collection, AdditionalBuildStep, RedHatCredentials, STORAGE_KEY, DEFAULT_STATE, clearStoredState } from "@/lib/storage";
 import { getPresetById } from "@/lib/presets";
 
 const steps = [
@@ -56,6 +56,7 @@ const Builder = () => {
   const [requirements, setRequirements] = useLocalStorage<string[]>(`${STORAGE_KEY}-requirements`, DEFAULT_STATE.requirements);
   const [selectedPackages, setSelectedPackages] = useLocalStorage<string[]>(`${STORAGE_KEY}-selectedPackages`, DEFAULT_STATE.selectedPackages);
   const [additionalBuildSteps, setAdditionalBuildSteps] = useLocalStorage<AdditionalBuildStep[]>(`${STORAGE_KEY}-additionalBuildSteps`, DEFAULT_STATE.additionalBuildSteps);
+  const [redhatCredentials, setRedhatCredentials] = useLocalStorage<RedHatCredentials | undefined>(`${STORAGE_KEY}-redhatCredentials`, DEFAULT_STATE.redhatCredentials);
 
   // Handle preset from Templates page
   useEffect(() => {
@@ -68,6 +69,7 @@ const Builder = () => {
       setRequirements(preset.requirements);
       setSelectedPackages(preset.packages);
       setAdditionalBuildSteps(preset.additionalBuildSteps || []);
+      setRedhatCredentials(undefined); // Clear credentials on preset change
       
       // Clear the state to prevent reapplying on refresh
       window.history.replaceState({}, document.title);
@@ -82,6 +84,7 @@ const Builder = () => {
       setRequirements(DEFAULT_STATE.requirements);
       setSelectedPackages(DEFAULT_STATE.selectedPackages);
       setAdditionalBuildSteps(DEFAULT_STATE.additionalBuildSteps);
+      setRedhatCredentials(DEFAULT_STATE.redhatCredentials);
     } else if (presetId.startsWith('user_')) {
       // Handle user preset - data should already be loaded from useEffect
       // No need to do anything here as the data is already set
@@ -94,6 +97,7 @@ const Builder = () => {
         setRequirements(preset.requirements);
         setSelectedPackages(preset.packages);
         setAdditionalBuildSteps(preset.additionalBuildSteps || []);
+        setRedhatCredentials(undefined); // Clear credentials on preset change
       }
     }
   };
@@ -109,8 +113,12 @@ const Builder = () => {
         // Can proceed if a preset is selected
         return selectedPreset.trim() !== "";
       case 1:
-        // Can proceed if base image is selected
-        return selectedBaseImage.trim() !== "";
+        // Can proceed if base image is selected and Red Hat credentials if needed
+        if (selectedBaseImage.trim() === "") return false;
+        if (selectedBaseImage.includes('registry.redhat.io/ansible-automation-platform-25/ee-minimal-rhel9')) {
+          return Boolean(redhatCredentials?.username && redhatCredentials?.password);
+        }
+        return true;
       case 2:
         // Can always proceed from step 2, even with empty selections
         return true;
@@ -166,6 +174,7 @@ const Builder = () => {
     setRequirements(DEFAULT_STATE.requirements);
     setSelectedPackages(DEFAULT_STATE.selectedPackages);
     setAdditionalBuildSteps(DEFAULT_STATE.additionalBuildSteps);
+    setRedhatCredentials(DEFAULT_STATE.redhatCredentials);
   };
 
   const renderStep = () => {
@@ -182,6 +191,8 @@ const Builder = () => {
           <Step1BaseImage
             selectedBaseImage={selectedBaseImage}
             onBaseImageChange={setSelectedBaseImage}
+            redhatCredentials={redhatCredentials}
+            onRedhatCredentialsChange={setRedhatCredentials}
           />
         );
       case 2:
@@ -211,6 +222,7 @@ const Builder = () => {
             requirements={requirements}
             selectedPackages={selectedPackages}
             additionalBuildSteps={additionalBuildSteps}
+            redhatCredentials={redhatCredentials}
           />
         );
       default:

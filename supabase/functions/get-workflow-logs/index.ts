@@ -310,7 +310,7 @@ serve(async (req) => {
         // Add a log entry about the error
         actualLogs.push({
           timestamp: new Date().toISOString(),
-          message: `Could not fetch logs for ${job.name}: ${logError.message}`,
+          message: `Could not fetch logs for ${job.name}: ${logError instanceof Error ? logError.message : 'Unknown error'}`,
           step: job.name,
           level: 'warning'
         });

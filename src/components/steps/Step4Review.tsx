@@ -18,7 +18,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useUsageLimit } from "@/hooks/useUsageLimit";
 import { useCloudBuilds } from "@/hooks/useCloudBuilds";
 import { useToast } from "@/hooks/use-toast";
-import { Collection, AdditionalBuildStep } from "@/lib/storage";
+import { Collection, AdditionalBuildStep, RedHatCredentials } from "@/lib/storage";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import JSZip from "jszip";
@@ -29,13 +29,15 @@ interface Step4ReviewProps {
   requirements: string[];
   selectedPackages: string[];
   additionalBuildSteps: AdditionalBuildStep[];
+  redhatCredentials?: RedHatCredentials;
 }
 export function Step4Review({
   selectedBaseImage,
   selectedCollections,
   requirements,
   selectedPackages,
-  additionalBuildSteps
+  additionalBuildSteps,
+  redhatCredentials
 }: Step4ReviewProps) {
   // Component cleaned of all Pro gates - everything is now free
   const {
@@ -461,10 +463,22 @@ You can modify the build options by editing the variables at the top of the \`bu
             </p>
           </div>
           
-          <div className="grid gap-4 md:grid-cols-2">
-            
-          </div>
-          
+          {/* Red Hat Credentials Display */}
+          {redhatCredentials && selectedBaseImage.includes('registry.redhat.io/ansible-automation-platform-25/ee-minimal-rhel9') && (
+            <div className="space-y-2">
+              <Label className="text-sm font-medium">Red Hat Customer Portal Credentials</Label>
+              <div className="bg-muted/50 rounded-md p-3 space-y-2">
+                <div className="text-xs">
+                  <span className="font-mono">Username: </span>
+                  <span className="text-muted-foreground">{redhatCredentials.username}</span>
+                </div>
+                <div className="text-xs">
+                  <span className="font-mono">Password: </span>
+                  <span className="text-muted-foreground">{'●'.repeat(8)}</span>
+                </div>
+              </div>
+            </div>
+          )}
           
         </CardContent>
       </Card>

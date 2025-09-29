@@ -1,11 +1,23 @@
 import { supabase } from '@/integrations/supabase/client';
 
-
 export interface DailyExport {
   id: string;
   user_id: string;
   export_date: string;
   export_count: number;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface UserSubscription {
+  id: string;
+  user_id: string;
+  stripe_subscription_id: string;
+  stripe_customer_id: string;
+  status: string;
+  plan_name: string;
+  current_period_start: string;
+  current_period_end: string;
   created_at: string;
   updated_at: string;
 }
@@ -39,6 +51,25 @@ export const subscriptionService = {
     return data;
   },
 
+  async getUserSubscription(): Promise<UserSubscription | null> {
+    const { data: session } = await supabase.auth.getSession();
+    if (!session?.session?.user) {
+      return null;
+    }
+
+    const { data, error } = await supabase
+      .from('user_subscriptions')
+      .select('*')
+      .eq('user_id', session.session.user.id)
+      .single();
+
+    if (error && error.code !== 'PGRST116') {
+      console.error('Error fetching user subscription:', error);
+      return null;
+    }
+
+    return data;
+  },
 
   async getTodayExportCount(): Promise<number> {
     const { data: session } = await supabase.auth.getSession();
@@ -92,15 +123,14 @@ export const subscriptionService = {
     return data;
   },
 
-
-
   async getCloudBuildUsage(): Promise<CloudBuildUsage> {
     const { data: session } = await supabase.auth.getSession();
     if (!session?.session?.user) {
       return { used: 0, remaining: 3, total: 3 };
     }
 
-    const { data, error } = await supabase
+    // Use any type to bypass TypeScript restrictions on the table name
+    const { data, error } = await (supabase as any)
       .from('user_cloud_builds')
       .select('builds_used, builds_purchased')
       .eq('user_id', session.session.user.id)
@@ -126,7 +156,7 @@ export const subscriptionService = {
       throw new Error('User not authenticated');
     }
 
-    const { data, error } = await supabase.rpc('increment_cloud_build_count', {
+    const { data, error } = await (supabase as any).rpc('increment_cloud_build_count', {
       user_uuid: session.session.user.id
     });
 
