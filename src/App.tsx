@@ -9,6 +9,7 @@ import Builder from "./pages/Builder";
 import Templates from "./pages/Templates";
 import Auth from "./pages/Auth";
 import Profile from "./pages/Profile";
+import FAQ from "./pages/FAQ";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -26,6 +27,7 @@ const App = () => (
               <Route path="/" element={<Builder />} />
               <Route path="/templates" element={<Templates />} />
               <Route path="/profile" element={<Profile />} />
+              <Route path="/faq" element={<FAQ />} />
               <Route path="/auth" element={<Auth />} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />

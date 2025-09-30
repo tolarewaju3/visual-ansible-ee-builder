@@ -4,7 +4,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
-import { User, LogOut, Settings, FileText, Bug } from 'lucide-react';
+import { User, LogOut, Settings, FileText, Bug, HelpCircle } from 'lucide-react';
 import { SubscriptionBadge } from '@/components/SubscriptionBadge';
 import { ReportProblemDialog } from '@/components/ReportProblemDialog';
 
@@ -32,30 +32,43 @@ export const Navigation = () => {
               Ansible EE Builder
             </Link>
             
-            {user && (
-              <div className="flex items-center gap-1">
-                <Link
-                  to="/"
-                  className={`px-3 py-2 text-sm font-medium rounded-md transition-colors ${
-                    location.pathname === '/' 
-                      ? 'bg-primary text-primary-foreground' 
-                      : 'text-muted-foreground hover:text-foreground hover:bg-accent'
-                  }`}
-                >
-                  Builder
-                </Link>
-                <Link
-                  to="/templates"
-                  className={`px-3 py-2 text-sm font-medium rounded-md transition-colors ${
-                    location.pathname === '/templates' 
-                      ? 'bg-primary text-primary-foreground' 
-                      : 'text-muted-foreground hover:text-foreground hover:bg-accent'
-                  }`}
-                >
-                  My Templates
-                </Link>
-              </div>
-            )}
+            <div className="flex items-center gap-1">
+              {user && (
+                <>
+                  <Link
+                    to="/"
+                    className={`px-3 py-2 text-sm font-medium rounded-md transition-colors ${
+                      location.pathname === '/' 
+                        ? 'bg-primary text-primary-foreground' 
+                        : 'text-muted-foreground hover:text-foreground hover:bg-accent'
+                    }`}
+                  >
+                    Builder
+                  </Link>
+                  <Link
+                    to="/templates"
+                    className={`px-3 py-2 text-sm font-medium rounded-md transition-colors ${
+                      location.pathname === '/templates' 
+                        ? 'bg-primary text-primary-foreground' 
+                        : 'text-muted-foreground hover:text-foreground hover:bg-accent'
+                    }`}
+                  >
+                    My Templates
+                  </Link>
+                </>
+              )}
+              <Link
+                to="/faq"
+                className={`px-3 py-2 text-sm font-medium rounded-md transition-colors flex items-center gap-1.5 ${
+                  location.pathname === '/faq' 
+                    ? 'bg-primary text-primary-foreground' 
+                    : 'text-muted-foreground hover:text-foreground hover:bg-accent'
+                }`}
+              >
+                <HelpCircle className="h-4 w-4" />
+                FAQ
+              </Link>
+            </div>
           </div>
 
           {/* User Menu */}
