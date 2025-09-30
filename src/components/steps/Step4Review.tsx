@@ -100,6 +100,21 @@ export function Step4Review({
     }
   }, [savedRegistryCredentials, registryCredentials, onRegistryCredentialsChange]);
 
+  // Update image tag when build method changes
+  useEffect(() => {
+    if (selectedBuildMethod === 'cloud') {
+      // Set a cloud-compatible default if current tag is local format
+      if (imageTag === 'my-ee:latest' || !imageTag.includes('/')) {
+        setImageTag('quay.io/myorg/ee:latest');
+      }
+    } else {
+      // Set a local-compatible default if current tag is cloud format
+      if (imageTag.includes('quay.io/') || imageTag.includes('registry.com/')) {
+        setImageTag('my-ee:latest');
+      }
+    }
+  }, [selectedBuildMethod]);
+
   // Container image validation function for local builds
   const isValidContainerImage = (image: string): boolean => {
     // Regex to validate container image format: [registry[:port]/]namespace/name[:tag]
@@ -575,7 +590,7 @@ You can modify the build options by editing the variables at the top of the \`bu
             >
               <div className="flex flex-col items-center text-center space-y-3">
                 <Cloud className="h-8 w-8 text-foreground" />
-                <h3 className="font-semibold text-foreground">Build in Cloud</h3>
+                <h3 className="font-semibold text-foreground">Cloud Build</h3>
                 <p className="text-sm text-muted-foreground">We'll build & push the image for you.</p>
               </div>
             </div>
@@ -804,7 +819,7 @@ chmod +x build.sh && \\
                     size="lg"
                   >
                     <Play className="h-4 w-4 mr-2" />
-                    {user ? (isExporting ? 'Starting Build...' : 'Build in Cloud') : 'Sign in to Build in Cloud'}
+                    {user ? (isExporting ? 'Starting Build...' : 'Cloud Build') : 'Sign in for Cloud Builds'}
                   </Button>
                   
                   <p className="text-xs text-muted-foreground/60 text-center mt-3">
