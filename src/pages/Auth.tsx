@@ -89,7 +89,7 @@ const Auth = () => {
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold">Ansible EE Builder</h1>
           <p className="text-muted-foreground mt-2">
-            Sign in to save presets and build in cloud
+            Sign in to save presets and use cloud builds
           </p>
         </div>
 

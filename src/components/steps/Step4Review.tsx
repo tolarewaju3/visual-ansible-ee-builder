@@ -539,47 +539,11 @@ You can modify the build options by editing the variables at the top of the \`bu
     setShowSaveDialog(true);
   };
   return <div className="space-y-8">
-      {/* Step 1: Set Build Information */}
+      {/* Step 1: Choose Build Method */}
       <Card className="bg-card border-border">
         <CardHeader>
           <CardTitle className="flex items-center space-x-2">
             <div className="flex items-center justify-center w-6 h-6 rounded-full bg-primary text-primary-foreground text-sm font-medium">1</div>
-            
-            <span>Set Build Information</span>
-          </CardTitle>
-          <CardDescription>
-            Configure the image tag and container runtime for building
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="image-tag">Image Tag</Label>
-            <Input id="image-tag" placeholder={selectedBuildMethod === 'cloud' ? 'registry.com/namespace/image:tag' : 'my-ee:latest'} value={imageTag} onChange={e => setImageTag(e.target.value)} className={`${imageTag.trim() && !isImageTagValid ? 'border-destructive' : ''}`} />
-            {imageTag.trim() && !isImageTagValid && (
-              <p className="text-xs text-destructive">
-                {selectedBuildMethod === 'cloud' 
-                  ? 'Cloud builds require: registry.com/namespace/image:tag (tag optional)'
-                  : 'Invalid format. Use: [registry[:port]/][namespace/]name[:tag]'
-                }
-              </p>
-            )}
-            <p className="text-xs text-muted-foreground">
-              {selectedBuildMethod === 'cloud' 
-                ? 'Examples: quay.io/myorg/ee:latest, registry.com/namespace/image'
-                : 'Examples: registry.com/namespace/image:tag, namespace/image:tag, image:tag'
-              }
-            </p>
-          </div>
-          
-          
-        </CardContent>
-      </Card>
-
-      {/* Step 2: Choose Build Method */}
-      <Card className="bg-card border-border">
-        <CardHeader>
-          <CardTitle className="flex items-center space-x-2">
-            <div className="flex items-center justify-center w-6 h-6 rounded-full bg-primary text-primary-foreground text-sm font-medium">2</div>
             
             <span>Choose Build Method</span>
           </CardTitle>
@@ -616,6 +580,42 @@ You can modify the build options by editing the variables at the top of the \`bu
               </div>
             </div>
           </div>
+        </CardContent>
+      </Card>
+
+      {/* Step 2: Set Build Information */}
+      <Card className="bg-card border-border">
+        <CardHeader>
+          <CardTitle className="flex items-center space-x-2">
+            <div className="flex items-center justify-center w-6 h-6 rounded-full bg-primary text-primary-foreground text-sm font-medium">2</div>
+            
+            <span>Set Build Information</span>
+          </CardTitle>
+          <CardDescription>
+            Configure the image tag and container runtime for building
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="space-y-2">
+            <Label htmlFor="image-tag">Image Tag</Label>
+            <Input id="image-tag" placeholder={selectedBuildMethod === 'cloud' ? 'registry.com/namespace/image:tag' : 'my-ee:latest'} value={imageTag} onChange={e => setImageTag(e.target.value)} className={`${imageTag.trim() && !isImageTagValid ? 'border-destructive' : ''}`} />
+            {imageTag.trim() && !isImageTagValid && (
+              <p className="text-xs text-destructive">
+                {selectedBuildMethod === 'cloud' 
+                  ? 'Cloud builds require: registry.com/namespace/image:tag (tag optional)'
+                  : 'Invalid format. Use: [registry[:port]/][namespace/]name[:tag]'
+                }
+              </p>
+            )}
+            <p className="text-xs text-muted-foreground">
+              {selectedBuildMethod === 'cloud' 
+                ? 'Examples: quay.io/myorg/ee:latest, registry.com/namespace/image'
+                : 'Examples: registry.com/namespace/image:tag, namespace/image:tag, image:tag'
+              }
+            </p>
+          </div>
+          
+          
         </CardContent>
       </Card>
 
