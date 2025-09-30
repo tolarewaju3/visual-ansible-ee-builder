@@ -21,7 +21,7 @@ export function ReportProblemDialog({ children, errorDetails }: ReportProblemDia
   const [isCopied, setIsCopied] = useState(false);
   const { toast } = useToast();
 
-  const adminEmail = 'tio.olarewaju@gmail.com';
+  const adminEmail = 'support@visualeebuilder.com';
 
   const generateEmailContent = () => {
     const timestamp = new Date().toISOString();
