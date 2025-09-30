@@ -8,13 +8,9 @@ Visual builder for Ansible Execution Environments. Create an EE freaky fast — 
 ## 🚀 What it does
 - Start from **EE presets** (Basic, Network, Cloud, Security) or from scratch.
 - Pick a **base image**, add **collections / Python packages / RPMs**.
-- Export a ready-to-build package.
+- **Build in the cloud** or export a ready-to-build package.
+- **Secure credential storage** for Red Hat and registry authentication.
 - Save and reuse your own presets.  
-
-## 🧯 What it *doesn’t* (yet)
-- Run `ansible-builder` for you.
-- Push images to registries.
-- Manage Red Hat entitlements or credentials.
 
 ## 🧩 Presets
 Presets give you a **known working** execution environment & dependencies. You can use them as-is or tweak them.
@@ -39,16 +35,21 @@ Presets give you a **known working** execution environment & dependencies. You c
 ## ⏱️ Quick Start
 1. Pick a base image (or preset).  
 2. Add collections / Python deps / RPMs.  
-3. Export the build package & create your EE:  
+3. **Choose your build method:**
+   - **Cloud Build**: We'll build and push for you (requires registry credentials)
+   - **Local Build**: Export the build package & create your EE locally
 
-```bash
-ansible-builder build -t quay.io/<org>/<name>:<tag> -f execution-environment.yml --container-runtime podman
 
-# optional
-podman push quay.io/<org>/<name>:<tag>
-```
+## ☁️ Cloud Builds
+Skip the local setup and let us build your EE for you:
 
-## 📦 Files you’ll get
+- **3 free builds** included with every account
+- **Additional builds** available for $5 (10 builds)
+- **Automatic registry push** to your specified registry
+- **Secure credential storage** for Red Hat and registry authentication
+- **Real-time build logs** and progress tracking
+
+## 📦 Files you'll get
 ```
 execution-environment.yml
 requirements.yml
@@ -57,23 +58,14 @@ bindep.txt    # only if you added RPMs
 build.sh      # build script to run
 ```
 
-## ✅ Guardrails
-- Empty lists are **OK** → files still valid.  
-- Image ref sanity check (format like `quay.io/org/name:tag`).
-- Clear warnings for subscription-only RPMs.
-- RPMs **off by default**; enabled only when you add them (and when base supports it).
-
 ## 🧪 Troubleshooting
 - **`registry.redhat.io` pull fails** → run `podman login registry.redhat.io`.  
 - **Missing Python at build** → use **UBI Python 3.11** base or install Python in your Containerfile.  
 - **`dnf` vs `microdnf`** → UBI minimal uses `microdnf`; standard UBI/AAP use `dnf`.  
 - **Custom base quirks** → non‑RHEL bases may not support RPM installs.
 
-## 🗺️ Roadmap (post‑MVP)
-- Optional backend to run `ansible-builder` + stream logs.  
-- Preflight checks (auth, base pullability, pkg‑mgr detection).  
-- Team templates, org RBAC, audit history.
-
 ## 🔐 Security & Privacy
-- No credential collection.  
-- Files are generated client‑side and downloaded to your machine.
+- **Credential storage**: Red Hat and registry credentials are encrypted and stored securely
+- **Client-side generation**: Files are generated client-side and downloaded to your machine
+- **No credential logging**: Your credentials are never logged or stored in plain text
+- **Secure cloud builds**: Cloud builds use encrypted credentials and are processed securely
