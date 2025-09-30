@@ -525,14 +525,6 @@ You can modify the build options by editing the variables at the top of the \`bu
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          {/* Security Warning */}
-          <Alert>
-            <AlertTriangle className="h-4 w-4" />
-            <AlertTitle>Credential Security</AlertTitle>
-            <AlertDescription className="text-sm">
-              Your credentials are encrypted and stored securely. For local builds, credentials will be included in downloaded files - ensure you handle them appropriately. For cloud builds, credentials are transmitted securely and never logged.
-            </AlertDescription>
-          </Alert>
           <div className="space-y-2">
             <Label htmlFor="image-tag">Image Tag</Label>
             <Input id="image-tag" placeholder={selectedBuildMethod === 'cloud' ? 'registry.com/namespace/image:tag' : 'my-ee:latest'} value={imageTag} onChange={e => setImageTag(e.target.value)} className={`${imageTag.trim() && !isImageTagValid ? 'border-destructive' : ''}`} />
