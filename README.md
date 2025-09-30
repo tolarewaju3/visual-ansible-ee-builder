@@ -67,5 +67,4 @@ build.sh      # build script to run
 ## 🔐 Security & Privacy
 - **Credential storage**: Red Hat and registry credentials are encrypted and stored securely
 - **Client-side generation**: Files are generated client-side and downloaded to your machine
-- **No credential logging**: Your credentials are never logged or stored in plain text
 - **Secure cloud builds**: Cloud builds use encrypted credentials and are processed securely
