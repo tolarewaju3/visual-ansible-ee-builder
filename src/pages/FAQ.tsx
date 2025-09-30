@@ -72,6 +72,27 @@ const FAQ = () => {
 
         <Card>
           <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <AlertCircle className="h-5 w-5 text-destructive" />
+              subscription-manager container mode error
+            </CardTitle>
+            <CardDescription>Build fails with "subscription-manager is operating in container mode"</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-2">
+              <p className="text-sm font-medium">Error message:</p>
+              <code className="block bg-muted px-3 py-2 rounded text-xs">
+                subscription-manager is operating in container mode. Use your host system to manage subscriptions.
+              </code>
+              <p className="text-sm mt-3">
+                <strong>Why this happens:</strong> When the host is RHEL and already subscribed, subscription-manager is blocked inside containers ("container mode"). You must use host entitlements during the build instead of registering from inside the container.
+              </p>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
             <CardTitle>Need more help?</CardTitle>
           </CardHeader>
           <CardContent>
