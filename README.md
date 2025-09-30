@@ -43,7 +43,7 @@ Presets give you a **known working** execution environment & dependencies. You c
 ## ☁️ Cloud Builds
 Skip the local setup and let us build your EE for you:
 
-- **3 free builds** included with every account
+- **Free builds** included with every account
 - **Additional builds** available for $5 (10 builds)
 - **Automatic registry push** to your specified registry
 - **Secure credential storage** for Red Hat and registry authentication
