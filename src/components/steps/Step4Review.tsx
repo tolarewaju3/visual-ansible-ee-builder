@@ -1,4 +1,4 @@
-import { FileText, Download, AlertTriangle, Save, Package, ChevronDown, Settings, Play, Archive, Monitor, Cloud, CreditCard, Bug } from "lucide-react";
+import { FileText, Download, AlertTriangle, Save, Package, ChevronDown, Settings, Play, Archive, Monitor, Cloud, CreditCard, Bug, CheckCircle, Lock } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -18,8 +18,9 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useUsageLimit } from "@/hooks/useUsageLimit";
 import { useCloudBuilds } from "@/hooks/useCloudBuilds";
 import { useToast } from "@/hooks/use-toast";
-import { Collection, AdditionalBuildStep, RedHatCredentials } from "@/lib/storage";
-import { useState } from "react";
+import { useCredentials } from "@/hooks/useCredentials";
+import { Collection, AdditionalBuildStep, RedHatCredentials, RegistryCredentials } from "@/lib/storage";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import JSZip from "jszip";
 import { supabase } from "@/integrations/supabase/client";
@@ -30,6 +31,8 @@ interface Step4ReviewProps {
   selectedPackages: string[];
   additionalBuildSteps: AdditionalBuildStep[];
   redhatCredentials?: RedHatCredentials;
+  registryCredentials?: RegistryCredentials;
+  onRegistryCredentialsChange?: (credentials: RegistryCredentials | undefined) => void;
 }
 export function Step4Review({
   selectedBaseImage,
@@ -37,7 +40,9 @@ export function Step4Review({
   requirements,
   selectedPackages,
   additionalBuildSteps,
-  redhatCredentials
+  redhatCredentials,
+  registryCredentials,
+  onRegistryCredentialsChange
 }: Step4ReviewProps) {
   // Component cleaned of all Pro gates - everything is now free
   const {
@@ -59,6 +64,13 @@ export function Step4Review({
     incrementCloudBuild,
     purchaseBuildPack 
   } = useCloudBuilds();
+  const {
+    redhatCredentials: savedRedhatCredentials,
+    registryCredentials: savedRegistryCredentials,
+    loading: credentialsLoading,
+    hasRedhatCredentials,
+    hasRegistryCredentials
+  } = useCredentials();
   const [showSaveDialog, setShowSaveDialog] = useState(false);
   const [isGeneratedFilesOpen, setIsGeneratedFilesOpen] = useState(false);
   const [isExporting, setIsExporting] = useState(false);
@@ -79,6 +91,15 @@ export function Step4Review({
   const [currentRunUrl, setCurrentRunUrl] = useState<string | undefined>(undefined);
   const [buildError, setBuildError] = useState<string | null>(null);
 
+  // Autofill credentials when they're loaded from the database
+  useEffect(() => {
+    if (savedRegistryCredentials && !registryCredentials) {
+      setRegistryUsername(savedRegistryCredentials.username);
+      setRegistryPassword(savedRegistryCredentials.password);
+      onRegistryCredentialsChange?.(savedRegistryCredentials);
+    }
+  }, [savedRegistryCredentials, registryCredentials, onRegistryCredentialsChange]);
+
   // Container image validation function for local builds
   const isValidContainerImage = (image: string): boolean => {
     // Regex to validate container image format: [registry[:port]/]namespace/name[:tag]
@@ -95,13 +116,15 @@ export function Step4Review({
 
   // Store credentials securely when they change
   const storeRegistryCredentials = async () => {
-    if (!user || !registryUsername || !registryPassword) return;
+    const currentUsername = registryCredentials?.username || registryUsername;
+    const currentPassword = registryCredentials?.password || registryPassword;
+    if (!user || !currentUsername || !currentPassword) return;
     
     try {
       const { storeCredentials } = await import('@/lib/credentialsService');
       await storeCredentials(user.id, 'registry', {
-        username: registryUsername,
-        password: registryPassword
+        username: currentUsername,
+        password: currentPassword
       });
     } catch (error) {
       console.error('Failed to store registry credentials:', error);
@@ -407,7 +430,9 @@ You can modify the build options by editing the variables at the top of the \`bu
       });
       return;
     }
-    if (!registryUsername || !registryPassword) {
+    const currentUsername = registryCredentials?.username || registryUsername;
+    const currentPassword = registryCredentials?.password || registryPassword;
+    if (!currentUsername || !currentPassword) {
       toast({
         title: "Registry credentials required",
         description: "Please enter your registry username and password.",
@@ -449,7 +474,9 @@ You can modify the build options by editing the variables at the top of the \`bu
       });
 
       // Store credentials securely before building
-      if (registryUsername && registryPassword) {
+      const currentUsername = registryCredentials?.username || registryUsername;
+      const currentPassword = registryCredentials?.password || registryPassword;
+      if (currentUsername && currentPassword) {
         await storeRegistryCredentials();
       }
       if (redhatCredentials?.username && redhatCredentials?.password) {
@@ -667,28 +694,54 @@ chmod +x build.sh && \\
           ) : (
             <div className="space-y-4">
               {/* Registry Credentials */}
-              <div className="grid gap-4 md:grid-cols-2">
-                <div className="space-y-2">
-                  <Label htmlFor="registry-username-cloud">Username</Label>
-                  <Input 
-                    id="registry-username-cloud" 
-                    type="text" 
-                    placeholder="Your username" 
-                    value={registryUsername} 
-                    onChange={e => setRegistryUsername(e.target.value)} 
-                    className="font-mono text-sm" 
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="registry-password-cloud">Password (Access Token Recommended)</Label>
-                  <Input 
-                    id="registry-password-cloud" 
-                    type="password" 
-                    placeholder="Your password/token" 
-                    value={registryPassword} 
-                    onChange={e => setRegistryPassword(e.target.value)} 
-                    className="font-mono text-sm" 
-                  />
+              <div className="space-y-4">
+                {hasRegistryCredentials && (
+                  <div className="flex items-center gap-2 text-sm text-green-600 bg-green-50 dark:bg-green-900/20 p-3 rounded-lg border border-green-200 dark:border-green-800">
+                    <CheckCircle className="h-4 w-4" />
+                    <span>Registry credentials loaded from your saved settings</span>
+                  </div>
+                )}
+                <div className="grid gap-4 md:grid-cols-2">
+                  <div className="space-y-2">
+                    <Label htmlFor="registry-username-cloud" className="flex items-center gap-2">
+                      Username
+                      {hasRegistryCredentials && <Lock className="h-3 w-3 text-green-600" />}
+                    </Label>
+                    <Input 
+                      id="registry-username-cloud" 
+                      type="text" 
+                      placeholder="Your username" 
+                      value={registryCredentials?.username || registryUsername} 
+                      onChange={e => {
+                        setRegistryUsername(e.target.value);
+                        onRegistryCredentialsChange?.({
+                          username: e.target.value,
+                          password: registryCredentials?.password || registryPassword
+                        });
+                      }} 
+                      className="font-mono text-sm" 
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="registry-password-cloud" className="flex items-center gap-2">
+                      Password (Access Token Recommended)
+                      {hasRegistryCredentials && <Lock className="h-3 w-3 text-green-600" />}
+                    </Label>
+                    <Input 
+                      id="registry-password-cloud" 
+                      type="password" 
+                      placeholder="Your password/token" 
+                      value={registryCredentials?.password || registryPassword} 
+                      onChange={e => {
+                        setRegistryPassword(e.target.value);
+                        onRegistryCredentialsChange?.({
+                          username: registryCredentials?.username || registryUsername,
+                          password: e.target.value
+                        });
+                      }} 
+                      className="font-mono text-sm" 
+                    />
+                  </div>
                 </div>
               </div>
 
@@ -746,7 +799,7 @@ chmod +x build.sh && \\
                 <div className="space-y-3">
                   <Button 
                     onClick={user ? handleCloudBuild : () => navigate('/auth')} 
-                    disabled={user && (isExporting || !isImageTagValid || !registryUsername || !registryPassword || !canCloudBuild)} 
+                    disabled={user && (isExporting || !isImageTagValid || !(registryCredentials?.username || registryUsername) || !(registryCredentials?.password || registryPassword) || !canCloudBuild)} 
                     className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700" 
                     size="lg"
                   >

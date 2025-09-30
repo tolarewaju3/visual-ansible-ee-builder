@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import React, { useState, useRef } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -8,12 +8,13 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
-import { Plus, X, Upload, Package, Layers, Search, FileText, Save, ChevronDown, Lock } from "lucide-react";
+import { Plus, X, Upload, Package, Layers, Search, FileText, Save, ChevronDown, Lock, CheckCircle } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import { SavePresetDialog } from "@/components/SavePresetDialog";
 import { useAuth } from "@/contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
+import { useCredentials } from "@/hooks/useCredentials";
 const systemPackages = [{
   name: "wget",
   description: "Download files from web",
@@ -106,6 +107,18 @@ export function Step2CollectionsRequirements({
   const [customRequirement, setCustomRequirement] = useState("");
   const [customPackage, setCustomPackage] = useState("");
   const [packageSearchQuery, setPackageSearchQuery] = useState("");
+  
+  const {
+    redhatCredentials: savedRedhatCredentials,
+    hasRedhatCredentials
+  } = useCredentials();
+
+  // Autofill Red Hat credentials when they're loaded from the database
+  React.useEffect(() => {
+    if (savedRedhatCredentials && !redhatCredentials) {
+      onRedhatCredentialsChange?.(savedRedhatCredentials);
+    }
+  }, [savedRedhatCredentials, redhatCredentials, onRedhatCredentialsChange]);
   const [customCollection, setCustomCollection] = useState("");
   const [customCollectionVersion, setCustomCollectionVersion] = useState("");
   const [showSaveDialog, setShowSaveDialog] = useState(false);
@@ -434,8 +447,17 @@ export function Step2CollectionsRequirements({
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
+            {hasRedhatCredentials && (
+              <div className="flex items-center gap-2 text-sm text-green-600 bg-green-50 dark:bg-green-900/20 p-3 rounded-lg border border-green-200 dark:border-green-800">
+                <CheckCircle className="h-4 w-4" />
+                <span>Red Hat credentials loaded from your saved settings</span>
+              </div>
+            )}
             <div>
-              <Label htmlFor="redhat-username">Username</Label>
+              <Label htmlFor="redhat-username" className="flex items-center gap-2">
+                Username
+                {hasRedhatCredentials && <Lock className="h-3 w-3 text-green-600" />}
+              </Label>
               <Input
                 id="redhat-username"
                 placeholder="Red Hat username"
@@ -448,7 +470,10 @@ export function Step2CollectionsRequirements({
               />
             </div>
             <div>
-              <Label htmlFor="redhat-password">Password</Label>
+              <Label htmlFor="redhat-password" className="flex items-center gap-2">
+                Password
+                {hasRedhatCredentials && <Lock className="h-3 w-3 text-green-600" />}
+              </Label>
               <Input
                 id="redhat-password"
                 type="password"

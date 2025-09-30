@@ -4,7 +4,8 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Container, Zap, Lock, CheckCircle } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useCredentials } from "@/hooks/useCredentials";
 
 interface BaseImage {
   id: string;
@@ -56,6 +57,18 @@ export function Step1BaseImage({
 }: Step1BaseImageProps) {
   const [customImage, setCustomImage] = useState("");
   const [isCustomSelected, setIsCustomSelected] = useState(false);
+  
+  const {
+    redhatCredentials: savedRedhatCredentials,
+    hasRedhatCredentials
+  } = useCredentials();
+
+  // Autofill Red Hat credentials when they're loaded from the database
+  useEffect(() => {
+    if (savedRedhatCredentials && !redhatCredentials) {
+      onRedhatCredentialsChange?.(savedRedhatCredentials);
+    }
+  }, [savedRedhatCredentials, redhatCredentials, onRedhatCredentialsChange]);
 
   // Check if current selection is a custom image (not in popular images list)
   const isCurrentCustom = !popularBaseImages.some(img => `${img.name}:${img.tag}` === selectedBaseImage);
@@ -143,6 +156,12 @@ export function Step1BaseImage({
                      {image.id === "ee-minimal-rhel9" && 
                       popularBaseImages.find(img => `${img.name}:${img.tag}` === selectedBaseImage)?.id === "ee-minimal-rhel9" && (
                        <div className="space-y-3 mt-4 p-3 bg-muted/50 rounded-md border">
+                         {hasRedhatCredentials && (
+                           <div className="flex items-center gap-2 text-sm text-green-600 bg-green-50 dark:bg-green-900/20 p-2 rounded border border-green-200 dark:border-green-800">
+                             <CheckCircle className="h-4 w-4" />
+                             <span>Red Hat credentials loaded from your saved settings</span>
+                           </div>
+                         )}
                          <div className="flex items-center justify-between">
                            <div className="text-sm font-medium text-foreground">
                              Red Hat Customer Portal Credentials
@@ -157,7 +176,10 @@ export function Step1BaseImage({
                          </p>
                          <div className="grid grid-cols-1 gap-3">
                            <div>
-                             <Label htmlFor="redhat-username" className="text-xs">Username</Label>
+                             <Label htmlFor="redhat-username" className="text-xs flex items-center gap-2">
+                               Username
+                               {hasRedhatCredentials && <Lock className="h-3 w-3 text-green-600" />}
+                             </Label>
                              <Input
                                id="redhat-username"
                                placeholder="Red Hat username"
@@ -171,7 +193,10 @@ export function Step1BaseImage({
                              />
                            </div>
                            <div>
-                             <Label htmlFor="redhat-password" className="text-xs">Password</Label>
+                             <Label htmlFor="redhat-password" className="text-xs flex items-center gap-2">
+                               Password
+                               {hasRedhatCredentials && <Lock className="h-3 w-3 text-green-600" />}
+                             </Label>
                              <Input
                                id="redhat-password"
                                type="password"

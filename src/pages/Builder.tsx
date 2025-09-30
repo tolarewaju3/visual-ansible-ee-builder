@@ -12,7 +12,7 @@ import { Step3Customize } from "@/components/steps/Step3Customize";
 import { Step4Review } from "@/components/steps/Step4Review";
 import { SavePresetDialog } from "@/components/SavePresetDialog";
 import { useLocalStorage } from "@/hooks/useLocalStorage";
-import { Collection, AdditionalBuildStep, RedHatCredentials, STORAGE_KEY, DEFAULT_STATE, clearStoredState } from "@/lib/storage";
+import { Collection, AdditionalBuildStep, RedHatCredentials, RegistryCredentials, STORAGE_KEY, DEFAULT_STATE, clearStoredState } from "@/lib/storage";
 import { getPresetById } from "@/lib/presets";
 
 const steps = [
@@ -57,6 +57,7 @@ const Builder = () => {
   const [selectedPackages, setSelectedPackages] = useLocalStorage<string[]>(`${STORAGE_KEY}-selectedPackages`, DEFAULT_STATE.selectedPackages);
   const [additionalBuildSteps, setAdditionalBuildSteps] = useLocalStorage<AdditionalBuildStep[]>(`${STORAGE_KEY}-additionalBuildSteps`, DEFAULT_STATE.additionalBuildSteps);
   const [redhatCredentials, setRedhatCredentials] = useLocalStorage<RedHatCredentials | undefined>(`${STORAGE_KEY}-redhatCredentials`, DEFAULT_STATE.redhatCredentials);
+  const [registryCredentials, setRegistryCredentials] = useLocalStorage<RegistryCredentials | undefined>(`${STORAGE_KEY}-registryCredentials`, DEFAULT_STATE.registryCredentials);
 
   // Handle preset from Templates page
   useEffect(() => {
@@ -70,6 +71,7 @@ const Builder = () => {
       setSelectedPackages(preset.packages);
       setAdditionalBuildSteps(preset.additionalBuildSteps || []);
       setRedhatCredentials(undefined); // Clear credentials on preset change
+      setRegistryCredentials(undefined); // Clear credentials on preset change
       
       // Clear the state to prevent reapplying on refresh
       window.history.replaceState({}, document.title);
@@ -85,6 +87,7 @@ const Builder = () => {
       setSelectedPackages(DEFAULT_STATE.selectedPackages);
       setAdditionalBuildSteps(DEFAULT_STATE.additionalBuildSteps);
       setRedhatCredentials(DEFAULT_STATE.redhatCredentials);
+      setRegistryCredentials(DEFAULT_STATE.registryCredentials);
     } else if (presetId.startsWith('user_')) {
       // Handle user preset - data should already be loaded from useEffect
       // No need to do anything here as the data is already set
@@ -98,6 +101,7 @@ const Builder = () => {
         setSelectedPackages(preset.packages);
         setAdditionalBuildSteps(preset.additionalBuildSteps || []);
         setRedhatCredentials(undefined); // Clear credentials on preset change
+        setRegistryCredentials(undefined); // Clear credentials on preset change
       }
     }
   };
@@ -183,6 +187,7 @@ const Builder = () => {
     setSelectedPackages(DEFAULT_STATE.selectedPackages);
     setAdditionalBuildSteps(DEFAULT_STATE.additionalBuildSteps);
     setRedhatCredentials(DEFAULT_STATE.redhatCredentials);
+    setRegistryCredentials(DEFAULT_STATE.registryCredentials);
   };
 
   const renderStep = () => {
@@ -233,6 +238,8 @@ const Builder = () => {
             selectedPackages={selectedPackages}
             additionalBuildSteps={additionalBuildSteps}
             redhatCredentials={redhatCredentials}
+            registryCredentials={registryCredentials}
+            onRegistryCredentialsChange={setRegistryCredentials}
           />
         );
       default:

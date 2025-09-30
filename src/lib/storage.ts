@@ -14,6 +14,11 @@ export interface RedHatCredentials {
   password: string;
 }
 
+export interface RegistryCredentials {
+  username: string;
+  password: string;
+}
+
 export interface BuilderState {
   currentStep: number;
   selectedPreset: string;
@@ -23,6 +28,7 @@ export interface BuilderState {
   selectedPackages: string[];
   additionalBuildSteps: AdditionalBuildStep[];
   redhatCredentials?: RedHatCredentials;
+  registryCredentials?: RegistryCredentials;
 }
 
 export const STORAGE_KEY = 'ansible-builder-state';
@@ -35,7 +41,8 @@ export const DEFAULT_STATE: BuilderState = {
   requirements: [],
   selectedPackages: [],
   additionalBuildSteps: [],
-  redhatCredentials: undefined
+  redhatCredentials: undefined,
+  registryCredentials: undefined
 };
 
 export const clearStoredState = () => {
