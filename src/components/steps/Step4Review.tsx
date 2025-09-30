@@ -819,7 +819,7 @@ chmod +x build.sh && \\
                     size="lg"
                   >
                     <Play className="h-4 w-4 mr-2" />
-                    {user ? (isExporting ? 'Starting Build...' : 'Cloud Build') : 'Sign in for Cloud Builds'}
+                    {user ? (isExporting ? 'Starting Build...' : 'Build in Cloud') : 'Sign in for Cloud Builds'}
                   </Button>
                   
                   <p className="text-xs text-muted-foreground/60 text-center mt-3">

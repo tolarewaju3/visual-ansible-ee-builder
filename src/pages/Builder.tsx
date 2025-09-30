@@ -12,6 +12,7 @@ import { Step3Customize } from "@/components/steps/Step3Customize";
 import { Step4Review } from "@/components/steps/Step4Review";
 import { SavePresetDialog } from "@/components/SavePresetDialog";
 import { useLocalStorage } from "@/hooks/useLocalStorage";
+import { useToast } from "@/hooks/use-toast";
 import { Collection, AdditionalBuildStep, RedHatCredentials, RegistryCredentials, STORAGE_KEY, DEFAULT_STATE, clearStoredState } from "@/lib/storage";
 import { getPresetById } from "@/lib/presets";
 
@@ -47,6 +48,7 @@ const Builder = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { user } = useAuth();
+  const { toast } = useToast();
   
   // Persistent state using localStorage
   const [currentStep, setCurrentStep] = useLocalStorage(`${STORAGE_KEY}-currentStep`, DEFAULT_STATE.currentStep);
@@ -77,6 +79,35 @@ const Builder = () => {
       window.history.replaceState({}, document.title);
     }
   }, [location.state]);
+
+  // Handle URL parameters for step and purchase success
+  useEffect(() => {
+    const urlParams = new URLSearchParams(location.search);
+    const stepParam = urlParams.get('step');
+    const purchaseSuccess = urlParams.get('purchase') === 'success';
+    
+    if (stepParam) {
+      const stepNumber = parseInt(stepParam, 10);
+      if (!isNaN(stepNumber) && stepNumber >= 0 && stepNumber <= 4) {
+        setCurrentStep(stepNumber);
+      }
+    }
+    
+    if (purchaseSuccess) {
+      toast({
+        title: "Purchase Successful!",
+        description: "10 cloud builds have been added to your account. You can now build your execution environment.",
+      });
+    }
+    
+    // Clear URL parameters after processing
+    if (stepParam || purchaseSuccess) {
+      const newUrl = new URL(window.location.href);
+      newUrl.searchParams.delete('step');
+      newUrl.searchParams.delete('purchase');
+      window.history.replaceState({}, document.title, newUrl.pathname);
+    }
+  }, [location.search, toast]);
 
   const applyPreset = (presetId: string) => {
     if (presetId === 'scratch') {

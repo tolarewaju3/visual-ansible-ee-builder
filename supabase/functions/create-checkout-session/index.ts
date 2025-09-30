@@ -76,8 +76,8 @@ serve(async (req) => {
 
     // Create checkout session for cloud build packs
     const checkoutData = new URLSearchParams({
-      'success_url': `${req.headers.get('origin')}/templates?session_id={CHECKOUT_SESSION_ID}`,
-      'cancel_url': `${req.headers.get('origin')}/templates`,
+      'success_url': `${req.headers.get('origin')}/`,
+      'cancel_url': `${req.headers.get('origin')}/`,
       'payment_method_types[0]': 'card',
       'mode': 'payment',
       'customer': customerId,
