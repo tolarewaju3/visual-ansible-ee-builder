@@ -119,6 +119,9 @@ export function Step4Review({
     // Check if Red Hat Ansible Minimal EE is selected
     const isRedHatMinimalEE = selectedBaseImage.includes('registry.redhat.io/ansible-automation-platform-25/ee-minimal-rhel9');
     
+    // Check if any Red Hat base image is selected (minimal or non-minimal)
+    const isRedHatBase = selectedBaseImage.includes('registry.redhat.io') || selectedBaseImage.includes('registry.access.redhat.com');
+    
     let content = `---
 version: 3
 
@@ -142,14 +145,17 @@ ${dependenciesLines.join('\n')}`;
       });
     }
     
-    // Add subscription manager setup for Red Hat Ansible Minimal EE with subscription packages
-    if (isRedHatMinimalEE && hasRedHatPackages && redhatCredentials) {
+    // Add subscription manager setup for Red Hat base images with subscription packages
+    if (isRedHatBase && hasRedHatPackages && redhatCredentials) {
+      // Determine package manager based on base image type
+      const packageManager = isRedHatMinimalEE ? 'microdnf' : 'dnf';
+      
       // Add subscription manager prepend
       if (!buildStepsGroups.prepend_base) {
         buildStepsGroups.prepend_base = [];
       }
       buildStepsGroups.prepend_base.unshift(
-        'RUN microdnf -y install subscription-manager',
+        `RUN ${packageManager} -y install subscription-manager`,
         `RUN subscription-manager register --username ${redhatCredentials.username} --password ${redhatCredentials.password}`
       );
       
@@ -167,8 +173,8 @@ ${dependenciesLines.join('\n')}`;
       buildStepsGroups.append_final.push(
         'RUN subscription-manager unregister',
         'RUN subscription-manager clean',
-        'RUN microdnf -y remove subscription-manager',
-        'RUN microdnf clean all'
+        `RUN ${packageManager} -y remove subscription-manager`,
+        `RUN ${packageManager} clean all`
       );
     }
     
@@ -183,9 +189,10 @@ ${dependenciesLines.join('\n')}`;
       });
     }
     
-    // Add microdnf package manager option for Red Hat Ansible Minimal EE
-    if (isRedHatMinimalEE) {
-      content += '\n\noptions:\n  package_manager_path: /usr/bin/microdnf';
+    // Add package manager path option for Red Hat base images
+    if (isRedHatBase) {
+      const packageManagerPath = isRedHatMinimalEE ? '/usr/bin/microdnf' : '/usr/bin/dnf';
+      content += '\n\noptions:\n  package_manager_path: ' + packageManagerPath;
     }
     
     return content;
