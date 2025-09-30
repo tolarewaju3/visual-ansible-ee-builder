@@ -13,7 +13,7 @@ Visual builder for Ansible Execution Environments. Create an EE freaky fast — 
 - Save and reuse your own presets.  
 
 ## 🧩 Presets
-Presets give you a **known working** execution environment & dependencies. You can use them as-is or tweak them.
+Presets give you a **known working** execution environment & dependencies. Use them as-is or tweak them.
 
 - **Basic Automation** → minimal setup for running playbooks (posix + requests + openssh-clients).  
 - **Network Automation** → SSH/NETCONF ready (ansible.netcommon, netmiko, paramiko, ncclient).  
