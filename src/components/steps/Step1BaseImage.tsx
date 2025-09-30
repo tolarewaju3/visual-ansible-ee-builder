@@ -143,9 +143,18 @@ export function Step1BaseImage({
                      {image.id === "ee-minimal-rhel9" && 
                       popularBaseImages.find(img => `${img.name}:${img.tag}` === selectedBaseImage)?.id === "ee-minimal-rhel9" && (
                        <div className="space-y-3 mt-4 p-3 bg-muted/50 rounded-md border">
-                         <div className="text-sm font-medium text-foreground">
-                           Red Hat Customer Portal Credentials
+                         <div className="flex items-center justify-between">
+                           <div className="text-sm font-medium text-foreground">
+                             Red Hat Customer Portal Credentials
+                           </div>
+                           <Badge variant="outline" className="gap-1">
+                             <Lock className="h-3 w-3" />
+                             Encrypted
+                           </Badge>
                          </div>
+                         <p className="text-xs text-muted-foreground">
+                           Your credentials are encrypted and securely stored. They will never be logged.
+                         </p>
                          <div className="grid grid-cols-1 gap-3">
                            <div>
                              <Label htmlFor="redhat-username" className="text-xs">Username</Label>

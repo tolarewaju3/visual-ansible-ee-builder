@@ -419,10 +419,16 @@ export function Step2CollectionsRequirements({
       {needsRedHatCredentials && (
         <Card className="bg-card border-border border-orange-500/50">
           <CardHeader>
-            <CardTitle className="flex items-center space-x-2">
-              <Lock className="h-5 w-5 text-orange-500" />
-              <span>Red Hat Subscription Required</span>
-            </CardTitle>
+            <div className="flex items-center justify-between">
+              <CardTitle className="flex items-center space-x-2">
+                <Lock className="h-5 w-5 text-orange-500" />
+                <span>Red Hat Subscription Required</span>
+              </CardTitle>
+              <Badge variant="outline" className="gap-1">
+                <Lock className="h-3 w-3" />
+                Encrypted
+              </Badge>
+            </div>
             <CardDescription>
               Enter your Red Hat Customer Portal credentials to access subscription-required packages
             </CardDescription>

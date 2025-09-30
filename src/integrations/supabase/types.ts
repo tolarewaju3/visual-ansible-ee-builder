@@ -74,6 +74,60 @@ export type Database = {
         }
         Relationships: []
       }
+      user_cloud_builds: {
+        Row: {
+          builds_purchased: number | null
+          builds_used: number | null
+          created_at: string | null
+          id: string
+          updated_at: string | null
+          user_id: string | null
+        }
+        Insert: {
+          builds_purchased?: number | null
+          builds_used?: number | null
+          created_at?: string | null
+          id?: string
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          builds_purchased?: number | null
+          builds_used?: number | null
+          created_at?: string | null
+          id?: string
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      user_credentials: {
+        Row: {
+          created_at: string
+          credential_type: string
+          encrypted_data: string
+          id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          credential_type: string
+          encrypted_data: string
+          id?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          credential_type?: string
+          encrypted_data?: string
+          id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_presets: {
         Row: {
           base_image: string
@@ -160,6 +214,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      add_purchased_builds: {
+        Args: { builds_to_add: number; user_uuid: string }
+        Returns: number
+      }
       can_user_export: {
         Args: { user_uuid: string }
         Returns: boolean
@@ -174,6 +232,10 @@ export type Database = {
           updated_at: string
           user_id: string
         }
+      }
+      increment_cloud_build_count: {
+        Args: { user_uuid: string }
+        Returns: number
       }
       increment_export_count: {
         Args: { user_uuid: string }

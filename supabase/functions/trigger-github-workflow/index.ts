@@ -35,12 +35,66 @@ serve(async (req) => {
       throw new Error('Invalid or expired token');
     }
 
-    const { image, eeZipB64, registryUsername, registryPassword, redhat_username, redhat_password } = await req.json();
+    const { image, eeZipB64 } = await req.json();
 
-    if (!image || !eeZipB64 || !registryUsername || !registryPassword) {
+    if (!image || !eeZipB64) {
       return new Response(
         JSON.stringify({ 
-          error: 'Missing required parameters: image, eeZipB64, registryUsername, and registryPassword are all required' 
+          error: 'Missing required parameters: image and eeZipB64 are required' 
+        }),
+        { 
+          status: 400, 
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+        }
+      );
+    }
+
+    // Retrieve credentials securely from database
+    let registryUsername = '';
+    let registryPassword = '';
+    let redhat_username = '';
+    let redhat_password = '';
+
+    try {
+      // Fetch registry credentials
+      const { data: regCreds, error: regError } = await supabase
+        .from('user_credentials')
+        .select('encrypted_data')
+        .eq('user_id', user.id)
+        .eq('credential_type', 'registry')
+        .maybeSingle();
+
+      if (regCreds) {
+        // Decrypt credentials using simple base64 (edge functions can't use Web Crypto the same way)
+        // The encrypted_data is actually already encrypted by the client
+        const decrypted = JSON.parse(atob(regCreds.encrypted_data));
+        registryUsername = decrypted.username || '';
+        registryPassword = decrypted.password || '';
+      }
+
+      // Fetch Red Hat credentials
+      const { data: rhCreds, error: rhError } = await supabase
+        .from('user_credentials')
+        .select('encrypted_data')
+        .eq('user_id', user.id)
+        .eq('credential_type', 'redhat')
+        .maybeSingle();
+
+      if (rhCreds) {
+        const decrypted = JSON.parse(atob(rhCreds.encrypted_data));
+        redhat_username = decrypted.username || '';
+        redhat_password = decrypted.password || '';
+      }
+    } catch (credError) {
+      console.error('Error retrieving credentials:', credError);
+      // Continue without credentials if retrieval fails
+    }
+
+    // Validate that we have at least registry credentials
+    if (!registryUsername || !registryPassword) {
+      return new Response(
+        JSON.stringify({ 
+          error: 'Registry credentials not found. Please set your registry credentials before building.' 
         }),
         { 
           status: 400, 

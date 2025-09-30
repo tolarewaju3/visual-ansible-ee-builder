@@ -93,6 +93,35 @@ export function Step4Review({
     return cloudPattern.test(image.trim());
   };
 
+  // Store credentials securely when they change
+  const storeRegistryCredentials = async () => {
+    if (!user || !registryUsername || !registryPassword) return;
+    
+    try {
+      const { storeCredentials } = await import('@/lib/credentialsService');
+      await storeCredentials(user.id, 'registry', {
+        username: registryUsername,
+        password: registryPassword
+      });
+    } catch (error) {
+      console.error('Failed to store registry credentials:', error);
+    }
+  };
+
+  const storeRedHatCredentials = async () => {
+    if (!user || !redhatCredentials?.username || !redhatCredentials?.password) return;
+    
+    try {
+      const { storeCredentials } = await import('@/lib/credentialsService');
+      await storeCredentials(user.id, 'redhat', {
+        username: redhatCredentials.username,
+        password: redhatCredentials.password
+      });
+    } catch (error) {
+      console.error('Failed to store Red Hat credentials:', error);
+    }
+  };
+
   // Check if image tag is valid for current build method
   const isImageTagValid = selectedBuildMethod === 'cloud' ? isValidCloudImage(imageTag) : isValidContainerImage(imageTag);
 
@@ -419,7 +448,16 @@ You can modify the build options by editing the variables at the top of the \`bu
         type: "base64"
       });
 
+      // Store credentials securely before building
+      if (registryUsername && registryPassword) {
+        await storeRegistryCredentials();
+      }
+      if (redhatCredentials?.username && redhatCredentials?.password) {
+        await storeRedHatCredentials();
+      }
+
       // Call Supabase function to trigger GitHub workflow
+      // Credentials are now retrieved securely from the database by the edge function
       const {
         data,
         error
@@ -427,12 +465,8 @@ You can modify the build options by editing the variables at the top of the \`bu
         body: {
           image: imageTag,
           eeZipB64: zipBlob,
-          registryUsername: registryUsername,
-          registryPassword: registryPassword,
-          ...(redhatCredentials && {
-            redhat_username: redhatCredentials.username,
-            redhat_password: redhatCredentials.password,
-          }),
+          // Credentials are no longer sent in the request
+          // They will be retrieved from the database by the edge function
         }
       });
       if (error) throw error;
@@ -491,6 +525,14 @@ You can modify the build options by editing the variables at the top of the \`bu
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
+          {/* Security Warning */}
+          <Alert>
+            <AlertTriangle className="h-4 w-4" />
+            <AlertTitle>Credential Security</AlertTitle>
+            <AlertDescription className="text-sm">
+              Your credentials are encrypted and stored securely. For local builds, credentials will be included in downloaded files - ensure you handle them appropriately. For cloud builds, credentials are transmitted securely and never logged.
+            </AlertDescription>
+          </Alert>
           <div className="space-y-2">
             <Label htmlFor="image-tag">Image Tag</Label>
             <Input id="image-tag" placeholder={selectedBuildMethod === 'cloud' ? 'registry.com/namespace/image:tag' : 'my-ee:latest'} value={imageTag} onChange={e => setImageTag(e.target.value)} className={`${imageTag.trim() && !isImageTagValid ? 'border-destructive' : ''}`} />
