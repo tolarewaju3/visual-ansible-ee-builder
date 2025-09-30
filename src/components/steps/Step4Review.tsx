@@ -763,7 +763,19 @@ chmod +x build.sh && \\
                   </Button>
                   
                   <p className="text-xs text-muted-foreground/60 text-center mt-3">
-                    {user ? "Your registry credentials are never stored. They're deleted after each build." : "Sign in to access cloud builds"}
+                    {user ? (
+                      <>
+                        Credentials stay encrypted and secure. Delete them anytime{' '}
+                        <button 
+                          onClick={() => navigate('/profile')} 
+                          className="underline hover:text-primary cursor-pointer"
+                        >
+                          here
+                        </button>.
+                      </>
+                    ) : (
+                      "Sign in to access cloud builds"
+                    )}
                   </p>
                   
                   {/* Report Problem Button - Show when build fails */}
