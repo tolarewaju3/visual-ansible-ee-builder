@@ -415,8 +415,8 @@ export function Step2CollectionsRequirements({
         </Card>
       </Collapsible>
 
-      {/* Red Hat Credentials - shown when needed and not already provided */}
-      {needsRedHatCredentials && (!redhatCredentials?.username || !redhatCredentials?.password) && (
+      {/* Red Hat Credentials - shown when subscription-required packages are selected */}
+      {needsRedHatCredentials && (
         <Card className="bg-card border-border border-orange-500/50">
           <CardHeader>
             <CardTitle className="flex items-center space-x-2">
