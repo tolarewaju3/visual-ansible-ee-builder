@@ -8,7 +8,7 @@ Visual builder for Ansible Execution Environments. Create an EE freaky fast — 
 ## 🚀 What it does
 - Start from **EE presets** (Basic, Network, Cloud, Security) or from scratch.
 - Pick a **base image**, add **collections / Python packages / RPMs**.
-- **Build in the cloud** or export a ready-to-build package.
+- [**Build in the cloud** ](https://www.visualeebuilder.com) or export a ready-to-build package.
 - **Secure credential storage** for Red Hat and registry authentication.
 - Save and reuse your own presets.  
 
