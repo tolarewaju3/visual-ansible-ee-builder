@@ -44,7 +44,7 @@ Presets give you a **known working** execution environment & dependencies. Use t
 Skip the local setup and let us build your EE for you:
 
 - **Free builds** included with every account
-- **Additional builds** available for $5 (10 builds)
+- **Additional builds** available for $3 (10 builds)
 - **Automatic registry push** to your specified registry
 - **Secure credential storage** for Red Hat and registry authentication
 - **Real-time build logs** and progress tracking

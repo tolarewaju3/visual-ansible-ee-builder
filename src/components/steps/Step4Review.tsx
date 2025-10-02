@@ -790,10 +790,10 @@ chmod +x build.sh && \\
                     size="lg"
                   >
                     <CreditCard className="h-4 w-4 mr-2" />
-                    Buy 10 More Builds - $5
+                    Buy 10 More Builds - $3
                   </Button>
                   <p className="text-xs text-muted-foreground/60 text-center">
-                    Get 10 additional cloud builds for just $5
+                    Get 10 additional cloud builds for just $3
                   </p>
                 </div>
               ) : currentRunId && buildStatus !== 'idle' ? (

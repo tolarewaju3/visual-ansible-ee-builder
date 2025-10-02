@@ -81,7 +81,7 @@ serve(async (req) => {
       'payment_method_types[0]': 'card',
       'mode': 'payment',
       'customer': customerId,
-      'line_items[0][price]': 'price_1SBLH17mbN0biK7otdMonZrj', // Cloud builds: $5 for 10 builds
+      'line_items[0][price]': 'price_1SDo757mbN0biK7o0ayj4Qh7', // Cloud builds: $3 for 10 builds
       'line_items[0][quantity]': '1',
       'metadata[user_id]': user.id,
       'metadata[plan_type]': 'cloud-builds',
