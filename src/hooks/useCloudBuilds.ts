@@ -5,16 +5,16 @@ import { subscriptionService } from '@/lib/subscriptionService';
 export const useCloudBuilds = () => {
   const { user } = useAuth();
   const [cloudBuildsUsed, setCloudBuildsUsed] = useState(0);
-  const [cloudBuildsRemaining, setCloudBuildsRemaining] = useState(3);
-  const [cloudBuildsTotal, setCloudBuildsTotal] = useState(3);
+  const [cloudBuildsRemaining, setCloudBuildsRemaining] = useState(5);
+  const [cloudBuildsTotal, setCloudBuildsTotal] = useState(5);
   const [canBuild, setCanBuild] = useState(true);
   const [loading, setLoading] = useState(true);
 
   const loadCloudBuildData = async () => {
     if (!user) {
       setCloudBuildsUsed(0);
-      setCloudBuildsRemaining(3);
-      setCloudBuildsTotal(3);
+      setCloudBuildsRemaining(5);
+      setCloudBuildsTotal(5);
       setCanBuild(false);
       setLoading(false);
       return;

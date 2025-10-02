@@ -52,7 +52,7 @@ END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 
 -- Add comment about free builds
-COMMENT ON TABLE user_cloud_builds IS 'Tracks cloud build usage. Users get 3 free builds + purchased packs (10 each)';
+COMMENT ON TABLE user_cloud_builds IS 'Tracks cloud build usage. Users get 5 free builds + purchased packs (10 each)';
 
 -- Enable RLS
 ALTER TABLE user_cloud_builds ENABLE ROW LEVEL SECURITY;

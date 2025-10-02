@@ -126,7 +126,7 @@ export const subscriptionService = {
   async getCloudBuildUsage(): Promise<CloudBuildUsage> {
     const { data: session } = await supabase.auth.getSession();
     if (!session?.session?.user) {
-      return { used: 0, remaining: 3, total: 3 };
+      return { used: 0, remaining: 5, total: 5 };
     }
 
     // Use any type to bypass TypeScript restrictions on the table name
@@ -138,13 +138,13 @@ export const subscriptionService = {
 
     if (error && error.code !== 'PGRST116') {
       console.error('Error fetching cloud build usage:', error);
-      // New user - return default 3 free builds
-      return { used: 0, remaining: 3, total: 3 };
+      // New user - return default 5 free builds
+      return { used: 0, remaining: 5, total: 5 };
     }
 
     const used = data?.builds_used || 0;
     const purchased = data?.builds_purchased || 0;
-    const total = 3 + purchased; // 3 free + purchased packs (10 each)
+    const total = 5 + purchased; // 5 free + purchased packs (10 each)
     const remaining = Math.max(0, total - used);
 
     return { used, remaining, total };
