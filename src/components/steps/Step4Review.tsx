@@ -172,7 +172,7 @@ export function Step4Review({
   const redHatPackagesFound = selectedPackages.filter(pkg => redHatSubscriptionPackages.includes(pkg.toLowerCase()));
   const generateExecutionEnvironment = () => {
     const collections = selectedCollections.map(c => c.version ? `${c.name}:${c.version}` : c.name);
-    const dependenciesLines = ['  ansible_core:', '    package_pip: ansible-core==2.14.4', '  ansible_runner:', '    package_pip: ansible-runner'];
+    const dependenciesLines = ['  ansible_core:', '    package_pip: ansible-core==2.16.14', '  ansible_runner:', '    package_pip: ansible-runner'];
     if (selectedCollections.length > 0) {
       dependenciesLines.push('  galaxy: requirements.yml');
     }
