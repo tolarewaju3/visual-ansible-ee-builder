@@ -130,6 +130,7 @@ export type Database = {
       }
       user_presets: {
         Row: {
+          additional_build_steps: Json
           base_image: string
           collections: Json
           created_at: string
@@ -143,6 +144,7 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          additional_build_steps?: Json
           base_image: string
           collections?: Json
           created_at?: string
@@ -156,6 +158,7 @@ export type Database = {
           user_id: string
         }
         Update: {
+          additional_build_steps?: Json
           base_image?: string
           collections?: Json
           created_at?: string
