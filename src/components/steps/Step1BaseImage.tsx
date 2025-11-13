@@ -4,8 +4,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Container, Zap, Lock, CheckCircle } from "lucide-react";
-import { useState, useEffect } from "react";
-import { useCredentials } from "@/hooks/useCredentials";
+import { useState } from "react";
 
 interface BaseImage {
   id: string;
@@ -57,18 +56,6 @@ export function Step1BaseImage({
 }: Step1BaseImageProps) {
   const [customImage, setCustomImage] = useState("");
   const [isCustomSelected, setIsCustomSelected] = useState(false);
-  
-  const {
-    redhatCredentials: savedRedhatCredentials,
-    hasRedhatCredentials
-  } = useCredentials();
-
-  // Autofill Red Hat credentials when they're loaded from the database
-  useEffect(() => {
-    if (savedRedhatCredentials && !redhatCredentials) {
-      onRedhatCredentialsChange?.(savedRedhatCredentials);
-    }
-  }, [savedRedhatCredentials, redhatCredentials, onRedhatCredentialsChange]);
 
   // Check if current selection is a custom image (not in popular images list)
   const isCurrentCustom = !popularBaseImages.some(img => `${img.name}:${img.tag}` === selectedBaseImage);

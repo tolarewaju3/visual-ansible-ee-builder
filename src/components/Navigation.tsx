@@ -1,19 +1,12 @@
 import React from 'react';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { useAuth } from '@/contexts/AuthContext';
+import { Link, useLocation } from 'react-router-dom';
 import { useTheme } from 'next-themes';
 import { Button } from '@/components/ui/button';
-import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
-import { User, LogOut, Settings, FileText, Bug, HelpCircle, Moon, Sun } from 'lucide-react';
-import { SubscriptionBadge } from '@/components/SubscriptionBadge';
-import { ReportProblemDialog } from '@/components/ReportProblemDialog';
+import { HelpCircle, Moon, Sun } from 'lucide-react';
 
 export const Navigation = () => {
-  const { user, signOut } = useAuth();
   const { theme, setTheme } = useTheme();
   const location = useLocation();
-  const navigate = useNavigate();
 
   const handleSignOut = async () => {
     await signOut();
