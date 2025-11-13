@@ -1,8 +1,7 @@
 // Ansible Execution Environment Builder
 import { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { useAuth } from "@/contexts/AuthContext";
-import { Container, Layers, Package, Play, ChevronLeft, ChevronRight, RotateCcw, Sparkles, Save, Settings } from "lucide-react";
+import { Container, Layers, Package, Play, ChevronLeft, ChevronRight, RotateCcw, Sparkles, Settings } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { StepNavigation } from "@/components/StepNavigation";
 import { Step0Presets } from "@/components/steps/Step0Presets";
@@ -47,7 +46,6 @@ const steps = [
 const Builder = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const { user } = useAuth();
   const { toast } = useToast();
   
   // Persistent state using localStorage

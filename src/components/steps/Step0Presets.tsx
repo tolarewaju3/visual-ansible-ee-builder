@@ -1,13 +1,7 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { PRESETS, Preset } from "@/lib/presets";
-import { UserPreset, userPresetsService } from "@/lib/userPresets";
-import { useAuth } from "@/contexts/AuthContext";
-import { Wrench, Trash2, User } from "lucide-react";
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
-import { toast } from "@/hooks/use-toast";
+import { PRESETS } from "@/lib/presets";
 
 interface Step0PresetsProps {
   selectedPreset: string;
@@ -15,47 +9,6 @@ interface Step0PresetsProps {
 }
 
 export function Step0Presets({ selectedPreset, onPresetChange }: Step0PresetsProps) {
-  const { user } = useAuth();
-  const [userPresets, setUserPresets] = useState<UserPreset[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [deleteId, setDeleteId] = useState<string | null>(null);
-
-  useEffect(() => {
-    if (user) {
-      loadUserPresets();
-    }
-  }, [user]);
-
-  const loadUserPresets = async () => {
-    try {
-      setLoading(true);
-      const presets = await userPresetsService.getUserPresets();
-      setUserPresets(presets);
-    } catch (error) {
-      console.error('Error loading user presets:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleDeletePreset = async (id: string) => {
-    try {
-      await userPresetsService.deleteUserPreset(id);
-      setUserPresets(userPresets.filter(p => p.id !== id));
-      toast({
-        title: 'Preset deleted',
-        description: 'The preset has been removed from your templates.',
-      });
-    } catch (error) {
-      console.error('Error deleting preset:', error);
-      toast({
-        title: 'Failed to delete preset',
-        description: 'There was an error deleting the preset.',
-        variant: 'destructive',
-      });
-    }
-    setDeleteId(null);
-  };
   return (
     <div className="space-y-6">
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
