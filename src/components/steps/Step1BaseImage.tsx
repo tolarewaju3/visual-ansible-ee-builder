@@ -143,29 +143,22 @@ export function Step1BaseImage({
                      {image.id === "ee-minimal-rhel9" && 
                       popularBaseImages.find(img => `${img.name}:${img.tag}` === selectedBaseImage)?.id === "ee-minimal-rhel9" && (
                        <div className="space-y-3 mt-4 p-3 bg-muted/50 rounded-md border">
-                         {hasRedhatCredentials && (
-                           <div className="flex items-center gap-2 text-sm text-green-600 bg-green-50 dark:bg-green-900/20 p-2 rounded border border-green-200 dark:border-green-800">
-                             <CheckCircle className="h-4 w-4" />
-                             <span>Red Hat credentials loaded from your saved settings</span>
-                           </div>
-                         )}
                          <div className="flex items-center justify-between">
                            <div className="text-sm font-medium text-foreground">
                              Red Hat Customer Portal Credentials
                            </div>
                            <Badge variant="outline" className="gap-1">
                              <Lock className="h-3 w-3" />
-                             Encrypted
+                             Required
                            </Badge>
                          </div>
                          <p className="text-xs text-muted-foreground">
-                           Your credentials are encrypted and securely stored. They will never be logged.
+                           Enter your Red Hat credentials to pull this base image.
                          </p>
                          <div className="grid grid-cols-1 gap-3">
                            <div>
-                             <Label htmlFor="redhat-username" className="text-xs flex items-center gap-2">
+                             <Label htmlFor="redhat-username" className="text-xs">
                                Username
-                               {hasRedhatCredentials && <Lock className="h-3 w-3 text-green-600" />}
                              </Label>
                              <Input
                                id="redhat-username"
@@ -180,9 +173,8 @@ export function Step1BaseImage({
                              />
                            </div>
                            <div>
-                             <Label htmlFor="redhat-password" className="text-xs flex items-center gap-2">
+                             <Label htmlFor="redhat-password" className="text-xs">
                                Password
-                               {hasRedhatCredentials && <Lock className="h-3 w-3 text-green-600" />}
                              </Label>
                              <Input
                                id="redhat-password"
